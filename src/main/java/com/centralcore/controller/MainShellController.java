@@ -48,7 +48,7 @@ public class MainShellController implements Initializable {
         setActiveNav(btnModules);
     }
 
-    // --- sidebar navigation handlers / manejadores de navegacion del sidebar ---
+    //sidebar navigation handlers / manejadores de navegacion del sidebar
 
     @FXML
     private void onModulesClicked() {
@@ -76,13 +76,13 @@ public class MainShellController implements Initializable {
 
     @FXML
     private void onLogoutClicked() {
-        // clear session and return to welcome screen
-        // limpiar sesion y volver a la pantalla de bienvenida
+        //clear session and return to welcome screen
+        //limpiar sesion y volver a la pantalla de bienvenida
         SessionManager.clearSession();
         SceneManager.showWelcome();
     }
 
-    // --- private helpers / ayudantes privados ---
+    //private helpers / ayudantes privados
 
     /**
      * loads an fxml view into the content pane, replacing whatever was there
@@ -123,8 +123,8 @@ public class MainShellController implements Initializable {
         btnLicences.getStyleClass().remove("nav-item-active");
         btnSettings.getStyleClass().remove("nav-item-active");
 
-        // add active class to the selected button
-        // agregar clase activa al boton seleccionado
+        //add active class to the selected button
+        //agregar clase activa al boton seleccionado
         if (!active.getStyleClass().contains("nav-item-active")) {
             active.getStyleClass().add("nav-item-active");
         }

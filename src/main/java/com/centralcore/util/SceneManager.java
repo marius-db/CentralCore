@@ -3,6 +3,7 @@ package com.centralcore.util;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -20,20 +21,20 @@ import java.net.URL;
  */
 public class SceneManager {
 
-    // the primary stage set during app startup
-    // el stage principal definido durante el inicio de la app
+    //the primary stage set during app startup
+    //el stage principal definido durante el inicio de la app
     private static Stage stage;
 
-    // path prefix for all fxml files
-    // prefijo de ruta para todos los archivos fxml
+    //path prefix for all fxml files
+    //prefijo de ruta para todos los archivos fxml
     private static final String FXML_PATH = "/com/centralcore/fxml/";
 
-    // path prefix for all css files
-    // prefijo de ruta para todos los archivos css
+    //path prefix for all css files
+    //prefijo de ruta para todos los archivos css
     private static final String CSS_PATH = "/com/centralcore/css/";
 
-    // private constructor - utility class, no instantiation
-    // constructor privado - clase utilitaria, sin instanciacion
+    //private constructor - utility class, no instantiation
+    //constructor privado - clase utilitaria, sin instanciacion
     private SceneManager() {}
 
     /**
@@ -44,7 +45,7 @@ public class SceneManager {
         stage = primaryStage;
     }
 
-    // --- navigation methods / metodos de navegacion ---
+    //navigation methods / metodos de navegacion
 
     /** shows the welcome/splash screen / muestra la pantalla de bienvenida */
     public static void showWelcome() {
@@ -61,7 +62,7 @@ public class SceneManager {
         loadScene("MainShell.fxml", "main");
     }
 
-    // --- private helpers / ayudantes privados ---
+    //private helpers / ayudantes privados
 
     /**
      * loads an fxml file and applies its matching css file if it exists

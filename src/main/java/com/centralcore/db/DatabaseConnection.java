@@ -16,14 +16,14 @@ import java.sql.SQLException;
  */
 public class DatabaseConnection {
 
-    // --- database config / configuracion de la base de datos ---
+    //database config / configuracion de la base de datos
     private static final String HOST     = "localhost";
     private static final String PORT     = "3306";
     private static final String DATABASE = "centralcore";
     private static final String USER     = "root";       // change to your mysql user / cambia a tu usuario mysql
     private static final String PASSWORD = "root";       // change to your mysql password / cambia a tu contraseña mysql
 
-    // full jdbc connection url / url de conexion jdbc completa
+    //full jdbc connection url / url de conexion jdbc completa
     private static final String URL =
         "jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE
         + "?useSSL=false"
@@ -31,11 +31,11 @@ public class DatabaseConnection {
         + "&allowPublicKeyRetrieval=true"
         + "&characterEncoding=UTF-8";
 
-    // single shared connection instance / instancia de conexion compartida
+    //single shared connection instance / instancia de conexion compartida
     private static Connection connection = null;
 
-    // private constructor - no instantiation allowed
-    // constructor privado - no se permite instanciacion
+    //private constructor - no instantiation allowed
+    //constructor privado - no se permite instanciacion
     private DatabaseConnection() {}
 
     /**

@@ -19,8 +19,8 @@ public class SettingsController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // show the current db connection string (without password)
-        // mostrar la cadena de conexion actual (sin contraseña)
+        //show the current db connection string (without password)
+        //mostrar la cadena de conexion actual (sin contraseña)
         txtDbPath.setText("localhost:3306/centralcore");
     }
 
