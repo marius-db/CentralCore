@@ -1,0 +1,140 @@
+/* global.css - applied to every scene in the app / aplicado a cada escena de la app */
+
+/* ─── color palette / paleta de colores ─────────────────────────────────────── */
+/* based on centralcore brand: white, blue, black / basado en la marca centralcore: blanco, azul, negro */
+
+.root {
+    /* background colors / colores de fondo */
+    -cc-bg-dark:       #0d0f14;
+    -cc-bg-mid:        #151820;
+    -cc-bg-card:       #1c1f2b;
+    -cc-bg-hover:      #232737;
+
+    /* brand blue / azul de marca */
+    -cc-blue:          #2b7fff;
+    -cc-blue-dark:     #1a5fcc;
+    -cc-blue-light:    #5a9fff;
+
+    /* text colors / colores de texto */
+    -cc-text-primary:  #f0f2f8;
+    -cc-text-secondary:#8b92a8;
+    -cc-text-muted:    #555d75;
+
+    /* border and divider / borde y divisor */
+    -cc-border:        #252a3a;
+
+    /* status colors / colores de estado */
+    -cc-success:       #22c55e;
+    -cc-warning:       #f59e0b;
+    -cc-error:         #ef4444;
+
+    /* font - orbitron for brand, system font for body */
+    /* fuente - orbitron para marca, fuente del sistema para cuerpo */
+    -fx-font-family: "System";
+    -fx-font-size: 13px;
+    -fx-background-color: -cc-bg-dark;
+}
+
+/* ─── logo / logotipo ────────────────────────────────────────────────────────── */
+
+.logo-central {
+    -fx-text-fill: -cc-text-primary;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 4px;
+}
+
+.logo-core {
+    -fx-text-fill: -cc-blue;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 4px;
+    -fx-padding: -10 0 0 0;
+}
+
+.logo-central-small {
+    -fx-text-fill: -cc-text-primary;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 3px;
+}
+
+.logo-core-small {
+    -fx-text-fill: -cc-blue;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 3px;
+    -fx-padding: -4 0 0 0;
+}
+
+/* ─── buttons / botones ──────────────────────────────────────────────────────── */
+
+.btn-primary {
+    -fx-background-color: -cc-blue;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 24 10 24;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+    -fx-border-width: 0;
+}
+
+.btn-primary:hover {
+    -fx-background-color: -cc-blue-dark;
+}
+
+.btn-primary:pressed {
+    -fx-background-color: derive(-cc-blue-dark, -10%);
+}
+
+.btn-ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: -cc-text-secondary;
+    -fx-font-size: 12px;
+    -fx-padding: 6 12 6 12;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+    -fx-border-width: 0;
+}
+
+.btn-ghost:hover {
+    -fx-background-color: -cc-bg-hover;
+    -fx-text-fill: -cc-text-primary;
+}
+
+/* ─── form fields / campos de formulario ─────────────────────────────────────── */
+
+.field-label {
+    -fx-text-fill: -cc-text-secondary;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 3 0;
+}
+
+.field-input {
+    -fx-background-color: -cc-bg-mid;
+    -fx-text-fill: -cc-text-primary;
+    -fx-prompt-text-fill: -cc-text-muted;
+    -fx-font-size: 13px;
+    -fx-padding: 9 12 9 12;
+    -fx-background-radius: 6px;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+}
+
+.field-input:focused {
+    -fx-border-color: -cc-blue;
+    -fx-background-color: -cc-bg-card;
+}
+
+/* ─── error label / etiqueta de error ────────────────────────────────────────── */
+
+.login-error {
+    -fx-text-fill: -cc-error;
+    -fx-font-size: 12px;
+    -fx-padding: 6 10 6 10;
+    -fx-background-color: derive(-cc-error, 80%);
+    -fx-background-radius: 4px;
+}

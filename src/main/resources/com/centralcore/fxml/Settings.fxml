@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<!--
+    settings view - app appearance and profile settings
+    vista de configuracion - ajustes de apariencia y perfil de la app
+-->
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.centralcore.controller.SettingsController"
+      styleClass="view-root">
+
+    <!-- page header / cabecera de la pagina -->
+    <HBox styleClass="view-header">
+        <Label text="Settings" styleClass="view-title"/>
+    </HBox>
+
+    <ScrollPane VBox.vgrow="ALWAYS" styleClass="settings-scroll" fitToWidth="true">
+        <VBox styleClass="settings-content">
+
+            <!-- appearance section / seccion de apariencia -->
+            <Label text="Appearance" styleClass="settings-section-title"/>
+
+            <HBox styleClass="settings-row">
+                <Label text="Theme" styleClass="settings-label" HBox.hgrow="ALWAYS"/>
+                <ToggleButton fx:id="toggleTheme" text="Dark" styleClass="toggle-btn"/>
+            </HBox>
+
+            <!-- database section / seccion de base de datos -->
+            <Label text="Database" styleClass="settings-section-title"/>
+
+            <HBox styleClass="settings-row">
+                <VBox HBox.hgrow="ALWAYS">
+                    <Label text="Connection String" styleClass="settings-label"/>
+                    <TextField fx:id="txtDbPath" styleClass="field-input" editable="false"/>
+                </VBox>
+                <Button text="Change" styleClass="btn-ghost" onAction="#onChangeDbClicked"/>
+            </HBox>
+
+            <HBox styleClass="settings-row">
+                <Label text="Test Connection" styleClass="settings-label" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnTestConn" text="Test" styleClass="btn-ghost" onAction="#onTestConnectionClicked"/>
+            </HBox>
+
+            <!-- status label for connection test / etiqueta de estado para prueba de conexion -->
+            <Label fx:id="lblConnStatus" text="" styleClass="settings-status"/>
+
+        </VBox>
+    </ScrollPane>
+
+</VBox>

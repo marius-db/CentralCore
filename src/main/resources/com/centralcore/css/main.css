@@ -1,0 +1,114 @@
+/* main.css - styles for the main app shell / estilos para el shell principal de la app */
+
+.shell-root {
+    -fx-background-color: -cc-bg-dark;
+}
+
+/* ─── sidebar / barra lateral ────────────────────────────────────────────────── */
+
+.sidebar {
+    -fx-pref-width: 200px;
+    -fx-min-width: 180px;
+    -fx-background-color: -cc-bg-mid;
+    -fx-border-color: -cc-border;
+    -fx-border-width: 0 1 0 0;
+    -fx-padding: 0;
+}
+
+/* brand logo at the top of the sidebar / logo de marca en la parte superior del sidebar */
+.sidebar-brand {
+    -fx-padding: 24 20 20 20;
+    -fx-spacing: 0;
+    -fx-border-color: -cc-border;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* nav items container / contenedor de items de navegacion */
+.sidebar-nav {
+    -fx-padding: 12 0 0 0;
+    -fx-spacing: 2px;
+}
+
+/* individual nav button / boton de navegacion individual */
+.nav-item {
+    -fx-background-color: transparent;
+    -fx-text-fill: -cc-text-secondary;
+    -fx-font-size: 13px;
+    -fx-padding: 10 20 10 20;
+    -fx-alignment: center-left;
+    -fx-pref-width: infinity;
+    -fx-max-width: infinity;
+    -fx-background-radius: 0;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+}
+
+.nav-item:hover {
+    -fx-background-color: -cc-bg-hover;
+    -fx-text-fill: -cc-text-primary;
+}
+
+/* active nav item highlight / resaltado del item de navegacion activo */
+.nav-item-active {
+    -fx-background-color: derive(-cc-blue, -60%);
+    -fx-text-fill: -cc-blue-light;
+    -fx-font-weight: bold;
+    -fx-border-color: -cc-blue;
+    -fx-border-width: 0 0 0 3;
+}
+
+.nav-item-active:hover {
+    -fx-background-color: derive(-cc-blue, -55%);
+}
+
+/* bottom section of sidebar / seccion inferior del sidebar */
+.sidebar-bottom {
+    -fx-padding: 0 0 0 0;
+    -fx-spacing: 0;
+    -fx-border-color: -cc-border;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* user info block at the bottom / bloque de informacion del usuario en la parte inferior */
+.sidebar-user {
+    -fx-padding: 14 16 16 16;
+    -fx-spacing: 6px;
+}
+
+.sidebar-username {
+    -fx-text-fill: -cc-text-secondary;
+    -fx-font-size: 11px;
+}
+
+.btn-logout {
+    -fx-background-color: transparent;
+    -fx-text-fill: -cc-text-muted;
+    -fx-font-size: 11px;
+    -fx-padding: 4 0 4 0;
+    -fx-alignment: center-left;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+}
+
+.btn-logout:hover {
+    -fx-text-fill: -cc-error;
+    -fx-background-color: transparent;
+}
+
+/* ─── content pane / panel de contenido ──────────────────────────────────────── */
+
+.content-pane {
+    -fx-background-color: -cc-bg-dark;
+    -fx-padding: 0;
+}
+
+/* default placeholder shown before any module is selected */
+/* placeholder por defecto antes de seleccionar un modulo */
+.content-placeholder {
+    -fx-alignment: center;
+}
+
+.placeholder-text {
+    -fx-text-fill: -cc-text-muted;
+    -fx-font-size: 14px;
+}

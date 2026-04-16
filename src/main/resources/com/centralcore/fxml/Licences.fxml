@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<!--
+    licences view - manage and activate module licences
+    vista de licencias - gestionar y activar licencias de modulos
+-->
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.centralcore.controller.LicencesController"
+      styleClass="view-root">
+
+    <!-- page header / cabecera de la pagina -->
+    <HBox styleClass="view-header">
+        <Label text="Licences" styleClass="view-title"/>
+        <HBox HBox.hgrow="ALWAYS"/>
+        <Button text="+ Add Licence" styleClass="btn-primary" onAction="#onAddLicenceClicked"/>
+    </HBox>
+
+    <!-- licences table / tabla de licencias -->
+    <TableView fx:id="tableLicences" VBox.vgrow="ALWAYS" styleClass="data-table">
+        <columns>
+            <TableColumn fx:id="colModule"  text="Module"     prefWidth="200"/>
+            <TableColumn fx:id="colKey"     text="Key"        prefWidth="200"/>
+            <TableColumn fx:id="colExpiry"  text="Expires"    prefWidth="130"/>
+            <TableColumn fx:id="colActive"  text="Active"     prefWidth="80"/>
+        </columns>
+    </TableView>
+
+</VBox>

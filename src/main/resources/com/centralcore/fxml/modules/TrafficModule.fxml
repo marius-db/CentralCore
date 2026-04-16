@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<!--
+    traffic control module view
+    vista del modulo de control de trafico
+
+    full implementation: incident list + vehicle lookup + real-time incident management
+    implementacion completa: lista de incidentes + busqueda de vehiculos + gestion de incidentes en tiempo real
+-->
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.centralcore.controller.modules.TrafficModuleController"
+      styleClass="view-root">
+
+    <!-- module header / cabecera del modulo -->
+    <HBox styleClass="view-header">
+        <Button text="← Modules" styleClass="btn-ghost" onAction="#onBackClicked"/>
+        <Label text="Traffic Control" styleClass="view-title"/>
+        <HBox HBox.hgrow="ALWAYS"/>
+        <Button text="+ Report Incident" styleClass="btn-primary" onAction="#onReportClicked"/>
+    </HBox>
+
+    <!-- tab pane: incidents + vehicles / panel de pestañas: incidentes + vehiculos -->
+    <TabPane VBox.vgrow="ALWAYS" styleClass="module-tabs">
+
+        <!-- incidents tab / pestana de incidentes -->
+        <Tab text="Incidents" closable="false">
+            <VBox>
+                <HBox styleClass="module-toolbar">
+                    <TextField fx:id="txtSearchIncident"
+                               promptText="Search incidents..."
+                               styleClass="field-input"
+                               HBox.hgrow="ALWAYS"/>
+                    <ComboBox fx:id="cmbStatus" promptText="Status" styleClass="field-input"/>
+                    <ComboBox fx:id="cmbGravedad" promptText="Severity" styleClass="field-input"/>
+                </HBox>
+
+                <TableView fx:id="tableIncidents" VBox.vgrow="ALWAYS" styleClass="data-table">
+                    <columns>
+                        <TableColumn fx:id="colTipo"       text="Type"       prefWidth="120"/>
+                        <TableColumn fx:id="colUbicacion"  text="Location"   prefWidth="200"/>
+                        <TableColumn fx:id="colGravedad"   text="Severity"   prefWidth="90"/>
+                        <TableColumn fx:id="colEstado"     text="Status"     prefWidth="100"/>
+                        <TableColumn fx:id="colFechaHora"  text="Date/Time"  prefWidth="140"/>
+                        <TableColumn fx:id="colActions"    text=""           prefWidth="100"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <!-- vehicles tab / pestana de vehiculos -->
+        <Tab text="Vehicles" closable="false">
+            <VBox>
+                <HBox styleClass="module-toolbar">
+                    <TextField fx:id="txtSearchVehicle"
+                               promptText="Search by plate, brand or model..."
+                               styleClass="field-input"
+                               HBox.hgrow="ALWAYS"/>
+                </HBox>
+
+                <TableView fx:id="tableVehicles" VBox.vgrow="ALWAYS" styleClass="data-table">
+                    <columns>
+                        <TableColumn fx:id="colMatricula" text="Plate"  prefWidth="110"/>
+                        <TableColumn fx:id="colMarca"     text="Brand"  prefWidth="120"/>
+                        <TableColumn fx:id="colModelo"    text="Model"  prefWidth="120"/>
+                        <TableColumn fx:id="colColor"     text="Color"  prefWidth="90"/>
+                        <TableColumn fx:id="colTipo2"     text="Type"   prefWidth="100"/>
+                        <TableColumn fx:id="colOwner"     text="Owner"  prefWidth="160"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+
+    </TabPane>
+
+</VBox>

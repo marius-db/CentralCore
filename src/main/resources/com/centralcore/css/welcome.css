@@ -1,0 +1,46 @@
+/* welcome.css - styles for the welcome/splash screen / estilos para la pantalla de bienvenida */
+
+.welcome-root {
+    -fx-background-color: -cc-bg-dark;
+}
+
+/* left panel / panel izquierdo */
+.welcome-left {
+    -fx-pref-width: 440px;
+    -fx-min-width: 380px;
+    -fx-padding: 60 50 60 60;
+    -fx-spacing: 32px;
+    -fx-background-color: -cc-bg-dark;
+    -fx-alignment: center-left;
+}
+
+.welcome-brand {
+    -fx-spacing: 0px;
+}
+
+.welcome-tagline {
+    -fx-spacing: 12px;
+}
+
+.tagline-title {
+    -fx-text-fill: -cc-text-primary;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.tagline-subtitle {
+    -fx-text-fill: -cc-text-secondary;
+    -fx-font-size: 14px;
+    -fx-line-spacing: 4px;
+}
+
+/* right panel - sci-fi image area / panel derecho - area de imagen sci-fi */
+.welcome-right {
+    -fx-background-color: -cc-bg-mid;
+    -fx-background-radius: 0;
+}
+
+.image-placeholder {
+    -fx-text-fill: -cc-text-muted;
+    -fx-font-size: 14px;
+}
