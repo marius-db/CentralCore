@@ -14,11 +14,11 @@ import com.centralcore.model.User;
  */
 public class SessionManager {
 
-    // the currently logged in user / el usuario actualmente conectado
+    //the currently logged in user / el usuario actualmente conectado
     private static User currentUser = null;
 
-    // private constructor - no instantiation
-    // constructor privado - sin instanciacion
+    //private constructor - no instantiation
+    //constructor privado - sin instanciacion
     private SessionManager() {}
 
     /**

@@ -15,7 +15,7 @@
 }
 
 .welcome-brand {
-    -fx-spacing: 0px;
+    -fx-font-family: "Orbitron";
 }
 
 .welcome-tagline {

@@ -1,6 +1,7 @@
 package com.centralcore;
 
 import javafx.application.Application;
+import javafx.scene.text.Font;
 
 /**
  * main entry point for centralcore
@@ -12,8 +13,8 @@ import javafx.application.Application;
  */
 public class Main {
     public static void main(String[] args) {
-        // delegate launch to the actual javafx app class
-        // delegar el lanzamiento a la clase de la aplicacion javafx
+        //delegate launch to the actual javafx app class
+        //delegar el lanzamiento a la clase de la aplicacion javafx
         Application.launch(App.class, args);
     }
 }

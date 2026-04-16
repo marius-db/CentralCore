@@ -63,16 +63,20 @@ public class LoginController {
         SceneManager.showWelcome();
     }
 
-    // --- private helpers / ayudantes privados ---
+    //private helpers / ayudantes privados
 
-    /** shows an error message under the form / muestra un mensaje de error bajo el formulario */
+    /**
+     * shows an error message under the form / muestra un mensaje de error bajo el formulario
+     */
     private void showError(String message) {
         lblError.setText(message);
         lblError.setVisible(true);
         lblError.setManaged(true);
     }
 
-    /** hides the error message / oculta el mensaje de error */
+    /**
+     * hides the error message / oculta el mensaje de error
+     */
     private void hideError() {
         lblError.setVisible(false);
         lblError.setManaged(false);

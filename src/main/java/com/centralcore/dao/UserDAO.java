@@ -29,7 +29,7 @@ public class UserDAO {
      * @param password the plain text password to check / la contraseña en texto plano a verificar
      */
     public User authenticate(String email, String password) {
-        // query to find user by email / consulta para encontrar usuario por email
+        //query to find user by email / consulta para encontrar usuario por email
         String sql = "SELECT id, username, email, password_hash, role, active FROM users WHERE email = ? AND active = 1";
 
         Connection conn = DatabaseConnection.getConnection();
@@ -65,7 +65,7 @@ public class UserDAO {
             System.err.println("authentication query failed / fallo la consulta de autenticacion: " + e.getMessage());
         }
 
-        // wrong email or password / email o contraseña incorrectos
+        //wrong email or password / email o contraseña incorrectos
         return null;
     }
 

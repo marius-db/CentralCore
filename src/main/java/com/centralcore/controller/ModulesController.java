@@ -27,12 +27,13 @@ public class ModulesController implements Initializable {
 
     @FXML private FlowPane modulesGrid;
 
-    // path for module fxml files / ruta para archivos fxml de modulos
+    //path for module fxml files / ruta para archivos fxml de modulos
     private static final String FXML_PATH = "/com/centralcore/fxml/";
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // build the module cards / construir las tarjetas de modulos
+        //build the module cards / construir las tarjetas de modulos
+        //this needs to be replaced with java reflect later
         addModuleCard(
             "Citizen Database",
             "Manage all city residents, personal data and records.",
@@ -66,8 +67,8 @@ public class ModulesController implements Initializable {
 
         card.getChildren().addAll(lblTitle, lblDesc);
 
-        // on click, load the module view into a new scene or the content pane
-        // al hacer clic, cargar la vista del modulo en una nueva escena o el panel de contenido
+        //on click, load the module view into a new scene or the content pane
+        //al hacer clic, cargar la vista del modulo en una nueva escena o el panel de contenido
         card.setOnMouseClicked(e -> loadModule(fxmlPath));
 
         modulesGrid.getChildren().add(card);
@@ -91,8 +92,8 @@ public class ModulesController implements Initializable {
 
             Node moduleView = FXMLLoader.load(fxmlUrl);
 
-            // get the parent StackPane (contentPane in MainShell)
-            // obtener el StackPane padre (contentPane en MainShell)
+            //get the parent StackPane (contentPane in MainShell)
+            //obtener el StackPane padre (contentPane en MainShell)
             StackPane contentPane = (StackPane) modulesGrid.getScene()
                 .lookup("#contentPane");
 

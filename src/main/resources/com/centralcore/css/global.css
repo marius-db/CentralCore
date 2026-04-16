@@ -39,14 +39,14 @@
 
 .logo-central {
     -fx-text-fill: -cc-text-primary;
-    -fx-font-size: 28px;
+    -fx-font-size: 40px;
     -fx-font-weight: bold;
     -fx-letter-spacing: 4px;
 }
 
 .logo-core {
     -fx-text-fill: -cc-blue;
-    -fx-font-size: 28px;
+    -fx-font-size: 40px;
     -fx-font-weight: bold;
     -fx-letter-spacing: 4px;
     -fx-padding: -10 0 0 0;
