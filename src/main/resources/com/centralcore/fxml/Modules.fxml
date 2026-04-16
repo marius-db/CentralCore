@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<!--
+    modules view - loaded inside the main shell content pane
+    vista de modulos - cargada dentro del panel de contenido del shell principal
+
+    shows all available/licensed modules as clickable cards
+    muestra todos los modulos disponibles/licenciados como tarjetas clicables
+-->
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.centralcore.controller.ModulesController"
+      styleClass="view-root">
+
+    <!-- page header / cabecera de la pagina -->
+    <HBox styleClass="view-header">
+        <Label text="Modules" styleClass="view-title"/>
+    </HBox>
+
+    <!-- module cards grid / cuadricula de tarjetas de modulos -->
+    <!-- populated programmatically from ModulesController -->
+    <!-- poblada programaticamente desde ModulesController -->
+    <FlowPane fx:id="modulesGrid"
+              styleClass="modules-grid"
+              VBox.vgrow="ALWAYS"/>
+
+</VBox>

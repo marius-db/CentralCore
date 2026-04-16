@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<!--
+    installs view - shows available module versions and install options
+    vista de instalaciones - muestra versiones de modulos disponibles y opciones de instalacion
+-->
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.centralcore.controller.InstallsController"
+      styleClass="view-root">
+
+    <!-- page header / cabecera de la pagina -->
+    <HBox styleClass="view-header">
+        <Label text="Installs" styleClass="view-title"/>
+        <HBox HBox.hgrow="ALWAYS"/>
+        <Button text="+ Module" styleClass="btn-primary" onAction="#onAddModuleClicked"/>
+    </HBox>
+
+    <!-- installs table / tabla de instalaciones -->
+    <TableView fx:id="tableInstalls" VBox.vgrow="ALWAYS" styleClass="data-table">
+        <columns>
+            <TableColumn fx:id="colName"    text="Name"    prefWidth="200"/>
+            <TableColumn fx:id="colVersion" text="Version" prefWidth="120"/>
+            <TableColumn fx:id="colStatus"  text="Status"  prefWidth="120"/>
+            <TableColumn fx:id="colActions" text=""        prefWidth="100"/>
+        </columns>
+    </TableView>
+
+</VBox>

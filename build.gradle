@@ -1,0 +1,57 @@
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+group = 'com.centralcore'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+repositories {
+    mavenCentral()
+}
+
+javafx {
+    version = '21'
+    // modules needed for the app: controls, fxml, graphics
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics']
+}
+
+dependencies {
+    // mysql connector for database connection / conector mysql para la base de datos
+    implementation 'com.mysql:mysql-connector-j:9.6.0'
+
+    // bcrypt for password hashing / bcrypt para el hash de contraseñas
+    implementation 'org.mindrot:jbcrypt:0.4'
+
+    // json parsing for module data exchange / json para intercambio de datos entre modulos
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    // junit for unit tests / junit para pruebas unitarias
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+application {
+    // entry point of the app / punto de entrada de la aplicacion
+    mainClass = 'com.centralcore.Main'
+    // required jvm args for javafx on java 21
+    applicationDefaultJvmArgs = [
+        '--add-opens', 'javafx.graphics/com.sun.javafx.application=ALL-UNNAMED'
+    ]
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// task to run the app cleanly / tarea para ejecutar la app de forma limpia
+run {
+    jvmArgs = [
+        '--add-opens', 'javafx.graphics/com.sun.javafx.application=ALL-UNNAMED'
+    ]
+}

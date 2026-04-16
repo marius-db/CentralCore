@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<!--
+    login screen / pantalla de inicio de sesion
+    centered card with email + password + login button
+    tarjeta centrada con email + contraseña + boton de inicio de sesion
+-->
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.centralcore.controller.LoginController"
+           styleClass="login-root">
+
+    <VBox styleClass="login-card">
+
+        <!-- logo / logo -->
+        <VBox styleClass="login-brand">
+            <Label text="CENTRAL" styleClass="logo-central"/>
+            <Label text="CORE"    styleClass="logo-core"/>
+        </VBox>
+
+        <!-- error message - hidden by default / mensaje de error - oculto por defecto -->
+        <Label fx:id="lblError"
+               styleClass="login-error"
+               text=""
+               wrapText="true"
+               visible="false"
+               managed="false"/>
+
+        <!-- email field / campo de email -->
+        <Label text="Email" styleClass="field-label"/>
+        <TextField fx:id="txtEmail"
+                   promptText="admin@city.gov"
+                   styleClass="field-input"/>
+
+        <!-- password field / campo de contraseña -->
+        <Label text="Password" styleClass="field-label"/>
+        <PasswordField fx:id="txtPassword"
+                       promptText="••••••••"
+                       styleClass="field-input"/>
+
+        <!-- login button / boton de inicio de sesion -->
+        <Button fx:id="btnLogin"
+                text="Log In"
+                styleClass="btn-primary"
+                onAction="#onLoginClicked"
+                defaultButton="true"/>
+
+        <!-- back to welcome / volver a bienvenida -->
+        <Button fx:id="btnBack"
+                text="← Back"
+                styleClass="btn-ghost"
+                onAction="#onBackClicked"/>
+
+    </VBox>
+
+</StackPane>
