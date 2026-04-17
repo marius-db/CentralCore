@@ -1,0 +1,9 @@
+{
+  "id": "citizen_module",
+  "name": "Citizen Database",
+  "version": "1.0.0",
+  "description": "Manage city citizen records and profiles",
+  "logoPath": "images/logo.png",
+  "mainClass": "citizenmodule.CitizenModule",
+  "author": "CentralCore Team"
+}

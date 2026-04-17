@@ -1,6 +1,7 @@
 package com.centralcore;
 
 import com.centralcore.util.SceneManager;
+
 import javafx.application.Application;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -24,6 +25,10 @@ public class App extends Application {
         Font.loadFont(getClass().getResourceAsStream("/com/centralcore/fonts/Orbitron-VariableFont_wght.ttf"), 14);
         primaryStage = stage;
 
+        //remove default window decoration to use custom title bar
+        //elimina la decoracion de ventana por defecto para usar la barra de titulo personalizada
+        stage.initStyle(StageStyle.UNDECORATED);
+
         //configure the main window
         //configurar la ventana principal
         stage.setTitle("CentralCore");
@@ -31,10 +36,6 @@ public class App extends Application {
         stage.setMinHeight(680);
         stage.setWidth(1280);
         stage.setHeight(720);
-
-        //remove default window decoration if you want custom title bar later
-        //eliminar decoracion por defecto si se quiere barra de titulo personalizada despues
-        //stage.initStyle(StageStyle.UNDECORATED); // uncomment when ready
 
         //initialize the scene manager with our stage
         //inicializar el gestor de escenas con nuestro stage
