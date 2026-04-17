@@ -22,8 +22,8 @@ javafx {
 }
 
 dependencies {
-    // mysql connector for database connection / conector mysql para la base de datos
-    implementation 'com.mysql:mysql-connector-j:9.6.0'
+    // H2 connector for database connection / conector mysql para la base de datos
+    implementation 'com.h2database:h2:2.4.240'
 
     // bcrypt for password hashing / bcrypt para el hash de contraseñas
     implementation 'org.mindrot:jbcrypt:0.4'

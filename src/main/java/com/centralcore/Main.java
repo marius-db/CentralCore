@@ -1,7 +1,6 @@
 package com.centralcore;
 
 import javafx.application.Application;
-import javafx.scene.text.Font;
 
 /**
  * main entry point for centralcore

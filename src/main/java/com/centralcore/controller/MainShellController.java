@@ -1,7 +1,14 @@
 package com.centralcore.controller;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+
+import com.centralcore.modules.ModuleManager;
 import com.centralcore.util.SceneManager;
 import com.centralcore.util.SessionManager;
+import com.centralcore.util.TranslationManager;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -11,31 +18,44 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
-
 /**
  * controller for the main application shell
  * controlador para el shell principal de la aplicacion
  *
  * manages sidebar navigation and dynamically loads module views into the content pane
+ * also listens for language changes and updates ui automatically
  * gestiona la navegacion del sidebar y carga dinamicamente las vistas de modulos en el panel de contenido
+ * tambien escucha cambios de idioma y actualiza la ui automaticamente
  */
-public class MainShellController implements Initializable {
+public class MainShellController implements Initializable, TranslationManager.LanguageChangeListener {
 
+    @FXML private VBox      sidebar;
     @FXML private StackPane contentPane;
     @FXML private Label     lblUsername;
     @FXML private Button    btnModules;
     @FXML private Button    btnInstalls;
     @FXML private Button    btnLicences;
     @FXML private Button    btnSettings;
+    @FXML private Button    btnLogout;
 
     // path prefix for module fxml files / prefijo de ruta para archivos fxml de modulos
     private static final String FXML_PATH = "/com/centralcore/fxml/";
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        //register language change listener / registra escuchador de cambio de idioma
+        TranslationManager.addLanguageChangeListener(this);
+
+        //register content pane and sidebar with scene manager for module loading
+        //registra el panel de contenido y sidebar con el gestor de escenas para carga de modulos
+        SceneManager.setMainShellContentPane(contentPane);
+        SceneManager.setSidebar(sidebar);
+
+        //initialize the module manager and load all available modules
+        //inicializa el gestor de modulos y carga todos los modulos disponibles
+        ModuleManager moduleManager = ModuleManager.getInstance();
+        moduleManager.loadAndInitializeModules();
+
         // show the logged in username in the sidebar
         // mostrar el nombre del usuario conectado en el sidebar
         if (SessionManager.getCurrentUser() != null) {
@@ -44,15 +64,18 @@ public class MainShellController implements Initializable {
 
         // load modules view by default on startup
         // cargar vista de modulos por defecto al iniciar
-        loadView("Modules.fxml");
+        loadView("ModulesView.fxml");
         setActiveNav(btnModules);
+        
+        //update button labels with current language / actualiza etiquetas de botones con idioma actual
+        updateLabels();
     }
 
     //sidebar navigation handlers / manejadores de navegacion del sidebar
 
     @FXML
     private void onModulesClicked() {
-        loadView("Modules.fxml");
+        loadView("ModulesView.fxml");
         setActiveNav(btnModules);
     }
 
@@ -128,5 +151,26 @@ public class MainShellController implements Initializable {
         if (!active.getStyleClass().contains("nav-item-active")) {
             active.getStyleClass().add("nav-item-active");
         }
+    }
+
+    /**
+     * updates all ui labels with translated text from translation manager
+     * actualiza todas las etiquetas ui con texto traducido del gestor de traducciones
+     */
+    private void updateLabels() {
+        btnModules.setText(TranslationManager.get("nav.modules"));
+        btnInstalls.setText(TranslationManager.get("nav.installs"));
+        btnLicences.setText(TranslationManager.get("nav.licences"));
+        btnSettings.setText(TranslationManager.get("nav.settings"));
+        btnLogout.setText(TranslationManager.get("btn.logout"));
+    }
+
+    /**
+     * observer callback for language changes from any source
+     * devolucuon de observador para cambios de idioma de cualquier fuente
+     */
+    @Override
+    public void onLanguageChanged(String newLanguageCode) {
+        updateLabels();
     }
 }

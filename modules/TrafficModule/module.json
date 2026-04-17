@@ -1,0 +1,9 @@
+{
+  "id": "traffic_module",
+  "name": "Traffic Management",
+  "version": "1.0.0",
+  "description": "Track vehicles and traffic incidents in the city",
+  "logoPath": "images/logo.png",
+  "mainClass": "trafficmodule.TrafficModule",
+  "author": "CentralCore Team"
+}

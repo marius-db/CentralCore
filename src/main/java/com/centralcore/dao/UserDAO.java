@@ -1,13 +1,14 @@
 package com.centralcore.dao;
 
-import com.centralcore.db.DatabaseConnection;
-import com.centralcore.model.User;
-import org.mindrot.jbcrypt.BCrypt;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import org.mindrot.jbcrypt.BCrypt;
+
+import com.centralcore.db.DatabaseConnection;
+import com.centralcore.model.User;
 
 /**
  * data access object for user-related database operations
@@ -30,7 +31,7 @@ public class UserDAO {
      */
     public User authenticate(String email, String password) {
         //query to find user by email / consulta para encontrar usuario por email
-        String sql = "SELECT id, username, email, password_hash, role, active FROM users WHERE email = ? AND active = 1";
+        String sql = "SELECT id, username, email, password_hash, role, active FROM users WHERE email = ? AND active = true";
 
         Connection conn = DatabaseConnection.getConnection();
         if (conn == null) {
