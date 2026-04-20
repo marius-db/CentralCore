@@ -20,12 +20,12 @@
     <ScrollPane VBox.vgrow="ALWAYS" style="-fx-background-color: #2c3e50; -fx-border-color: #34495e; -fx-padding: 0;" fitToWidth="true">
         <VBox style="-fx-padding: 25; -fx-spacing: 25; -fx-background-color: #2c3e50;">
 
-            <!-- appearance section / seccion de apariencia -->
+            <!--seccion de apariencia-->
             <VBox style="-fx-spacing: 12;">
                 <Label fx:id="lblAppearance" text="Appearance" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
                 <Separator style="-fx-border-color: #34495e; -fx-padding: 0;"/>
 
-                <!-- dark mode toggle / toggle de modo oscuro -->
+                <!--toggle de modo oscuro-->
                 <HBox style="-fx-padding: 12; -fx-background-color: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-border-radius: 3; -fx-spacing: 10; -fx-alignment: center-left;">
                     <VBox HBox.hgrow="ALWAYS" style="-fx-spacing: 4;">
                         <Label fx:id="lblDarkMode" text="Dark Mode" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
@@ -35,12 +35,12 @@
                 </HBox>
             </VBox>
 
-            <!-- language section / seccion de idioma -->
+            <!--seccion de idioma-->
             <VBox style="-fx-spacing: 12;">
                 <Label fx:id="lblLanguageSection" text="Language" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
                 <Separator style="-fx-border-color: #34495e; -fx-padding: 0;"/>
 
-                <!-- language selector / selector de idioma -->
+                <!--selector de idioma-->
                 <HBox style="-fx-padding: 12; -fx-background-color: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-border-radius: 3; -fx-spacing: 10; -fx-alignment: center-left;">
                     <VBox HBox.hgrow="ALWAYS" style="-fx-spacing: 4;">
                         <Label fx:id="lblInterfaceLanguage" text="Interface Language" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
@@ -50,12 +50,12 @@
                 </HBox>
             </VBox>
 
-            <!-- notifications section / seccion de notificaciones -->
+            <!--seccion de notificaciones -->
             <VBox style="-fx-spacing: 12;">
                 <Label fx:id="lblNotifications" text="Notifications" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
                 <Separator style="-fx-border-color: #34495e; -fx-padding: 0;"/>
 
-                <!-- module updates / actualizaciones de modulos -->
+                <!--actualizaciones de modulos-->
                 <HBox style="-fx-padding: 12; -fx-background-color: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-border-radius: 3; -fx-spacing: 10; -fx-alignment: center-left;">
                     <VBox HBox.hgrow="ALWAYS" style="-fx-spacing: 4;">
                         <Label fx:id="lblModuleUpdates" text="Module Updates" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
@@ -64,7 +64,7 @@
                     <CheckBox fx:id="chkModuleUpdates" selected="true" style="-fx-padding: 5;"/>
                 </HBox>
 
-                <!-- system notifications / notificaciones del sistema -->
+                <!--notificaciones del sistema-->
                 <HBox style="-fx-padding: 12; -fx-background-color: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-border-radius: 3; -fx-spacing: 10; -fx-alignment: center-left;">
                     <VBox HBox.hgrow="ALWAYS" style="-fx-spacing: 4;">
                         <Label fx:id="lblSystemAlerts" text="System Alerts" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
@@ -74,12 +74,12 @@
                 </HBox>
             </VBox>
 
-            <!-- database section / seccion de base de datos -->
+            <!--seccion de base de datos-->
             <VBox style="-fx-spacing: 12;">
                 <Label fx:id="lblDatabase" text="Database" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
                 <Separator style="-fx-border-color: #34495e; -fx-padding: 0;"/>
 
-                <!-- connection test / prueba de conexion -->
+                <!--prueba de conexion-->
                 <HBox style="-fx-padding: 12; -fx-background-color: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-border-radius: 3; -fx-spacing: 10; -fx-alignment: center-left;">
                     <VBox HBox.hgrow="ALWAYS" style="-fx-spacing: 4;">
                         <Label fx:id="lblConnectionStatus" text="Connection Status" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
@@ -90,7 +90,7 @@
                 </HBox>
             </VBox>
 
-            <!-- about section / seccion de acerca de -->
+            <!--seccion de acerca de-->
             <VBox style="-fx-spacing: 12;">
                 <Label fx:id="lblAbout" text="About" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
                 <Separator style="-fx-border-color: #34495e; -fx-padding: 0;"/>

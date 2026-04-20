@@ -1,10 +1,10 @@
-/* welcome.css - styles for the welcome/splash screen / estilos para la pantalla de bienvenida */
+/*estilos para la pantalla de bienvenida*/
 
 .welcome-root {
     -fx-background-color: -cc-bg-dark;
 }
 
-/* left panel / panel izquierdo */
+/*panel izquierdo*/
 .welcome-left {
     -fx-pref-width: 440px;
     -fx-min-width: 380px;
@@ -34,7 +34,7 @@
     -fx-line-spacing: 4px;
 }
 
-/* right panel - sci-fi image area / panel derecho - area de imagen sci-fi */
+/*panel derecho - area de imagen sci-fi*/
 .welcome-right {
     -fx-background-color: -cc-bg-mid;
     -fx-background-radius: 0;

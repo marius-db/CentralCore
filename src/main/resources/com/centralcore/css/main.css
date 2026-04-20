@@ -1,10 +1,10 @@
-/* main.css - styles for the main app shell / estilos para el shell principal de la app */
+/*estilos para el shell principal de la app*/
 
 .shell-root {
     -fx-background-color: -cc-bg-dark;
 }
 
-/* ─── sidebar / barra lateral ────────────────────────────────────────────────── */
+/*barra lateral*/
 
 .sidebar {
     -fx-pref-width: 200px;
@@ -15,7 +15,7 @@
     -fx-padding: 0;
 }
 
-/* brand logo at the top of the sidebar / logo de marca en la parte superior del sidebar */
+/*logo de marca en la parte superior del sidebar*/
 .sidebar-brand {
     -fx-padding: 24 20 20 20;
     -fx-spacing: 0;
@@ -23,13 +23,13 @@
     -fx-border-width: 0 0 1 0;
 }
 
-/* nav items container / contenedor de items de navegacion */
+/*contenedor de items de navegacion*/
 .sidebar-nav {
     -fx-padding: 12 0 0 0;
     -fx-spacing: 2px;
 }
 
-/* individual nav button / boton de navegacion individual */
+/*boton de navegacion individual*/
 .nav-item {
     -fx-background-color: transparent;
     -fx-text-fill: -cc-text-secondary;
@@ -48,7 +48,7 @@
     -fx-text-fill: -cc-text-primary;
 }
 
-/* active nav item highlight / resaltado del item de navegacion activo */
+/*resaltado del item de navegacion activo*/
 .nav-item-active {
     -fx-background-color: derive(-cc-blue, -60%);
     -fx-text-fill: -cc-blue-light;
@@ -61,7 +61,7 @@
     -fx-background-color: derive(-cc-blue, -55%);
 }
 
-/* bottom section of sidebar / seccion inferior del sidebar */
+/*seccion inferior del sidebar*/
 .sidebar-bottom {
     -fx-padding: 0 0 0 0;
     -fx-spacing: 0;
@@ -69,7 +69,7 @@
     -fx-border-width: 1 0 0 0;
 }
 
-/* user info block at the bottom / bloque de informacion del usuario en la parte inferior */
+/*bloque de informacion del usuario en la parte inferior*/
 .sidebar-user {
     -fx-padding: 14 16 16 16;
     -fx-spacing: 6px;
@@ -95,15 +95,14 @@
     -fx-background-color: transparent;
 }
 
-/* ─── content pane / panel de contenido ──────────────────────────────────────── */
+/*panel de contenido*/
 
 .content-pane {
     -fx-background-color: -cc-bg-dark;
     -fx-padding: 0;
 }
 
-/* default placeholder shown before any module is selected */
-/* placeholder por defecto antes de seleccionar un modulo */
+/*placeholder por defecto antes de seleccionar un modulo*/
 .content-placeholder {
     -fx-alignment: center;
 }

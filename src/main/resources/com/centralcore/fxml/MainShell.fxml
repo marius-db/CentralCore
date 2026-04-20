@@ -3,57 +3,53 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<!--
-    main application shell / shell principal de la aplicacion
-    fixed sidebar on the left + dynamic content area on the right
+<!--shell principal de la aplicacion
     sidebar fijo a la izquierda + area de contenido dinamico a la derecha
 
-    the content area (contentPane) swaps its children when the user clicks sidebar items
-    el area de contenido (contentPane) cambia sus hijos cuando el usuario hace clic en items del sidebar
--->
+    el area de contenido (contentPane) cambia sus hijos cuando el usuario hace clic en items del sidebar-->
 <HBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.centralcore.controller.MainShellController"
       styleClass="shell-root">
 
-    <!-- sidebar / barra lateral -->
+    <!--barra lateral-->
     <VBox fx:id="sidebar" styleClass="sidebar" HBox.hgrow="NEVER">
 
-        <!-- app logo at top / logo de la app arriba -->
+        <!--logo de la app arriba-->
         <VBox styleClass="sidebar-brand">
             <Label text="CENTRAL" styleClass="logo-central-small"/>
             <Label text="CORE"    styleClass="logo-core-small"/>
         </VBox>
 
-        <!-- navigation items / items de navegacion -->
+        <!--items de navegacion -->
         <VBox styleClass="sidebar-nav" VBox.vgrow="ALWAYS">
-            <!-- modules nav item / item de navegacion modulos -->
+            <!--item de navegacion modulos-->
             <Button fx:id="btnModules"
                     text="Modules"
                     styleClass="nav-item"
                     onAction="#onModulesClicked"/>
 
-            <!-- installs nav item / item de navegacion instalaciones -->
+            <!--item de navegacion instalaciones-->
             <Button fx:id="btnInstalls"
                     text="Installs"
                     styleClass="nav-item"
                     onAction="#onInstallsClicked"/>
 
-            <!-- licences nav item / item de navegacion licencias -->
+            <!--item de navegacion licencias-->
             <Button fx:id="btnLicences"
                     text="Licences"
                     styleClass="nav-item"
                     onAction="#onLicencesClicked"/>
         </VBox>
 
-        <!-- settings at the bottom of sidebar / configuracion al fondo del sidebar -->
+        <!--configuracion al fondo del sidebar-->
         <VBox styleClass="sidebar-bottom">
             <Button fx:id="btnSettings"
                     text="Settings"
                     styleClass="nav-item"
                     onAction="#onSettingsClicked"/>
 
-            <!-- logged in user info / informacion del usuario conectado -->
+            <!--informacion del usuario conectado-->
             <VBox styleClass="sidebar-user">
                 <Label fx:id="lblUsername" text="User" styleClass="sidebar-username"/>
                 <Button fx:id="btnLogout"
@@ -65,13 +61,12 @@
 
     </VBox>
 
-    <!-- dynamic content area - modules load here / area de contenido dinamico - los modulos cargan aqui -->
+    <!--area de contenido dinamico - los modulos cargan aqui-->
     <StackPane fx:id="contentPane"
                styleClass="content-pane"
                HBox.hgrow="ALWAYS">
 
-        <!-- default placeholder shown before selecting a module -->
-        <!-- placeholder por defecto mostrado antes de seleccionar un modulo -->
+        <!--placeholder por defecto mostrado antes de seleccionar un modulo-->
         <VBox styleClass="content-placeholder">
             <Label text="Select a module from the sidebar"
                    styleClass="placeholder-text"/>

@@ -1,10 +1,10 @@
-/* auth.css - styles for the login screen / estilos para la pantalla de login */
+/*estilos para la pantalla de login*/
 
 .login-root {
     -fx-background-color: -cc-bg-dark;
 }
 
-/* centered login card / tarjeta de login centrada */
+/*tarjeta de login centrada*/
 .login-card {
     -fx-pref-width: 380px;
     -fx-max-width: 420px;
@@ -24,19 +24,19 @@
     -fx-alignment: center;
 }
 
-/* override logo alignment for login card / sobrescribir alineacion del logo para la tarjeta */
+/*sobrescribir alineacion del logo para la tarjeta*/
 .login-card .logo-central,
 .login-card .logo-core {
     -fx-alignment: center;
 }
 
-/* stretch inputs full width / estirar inputs al ancho completo */
+/*estirar inputs al ancho completo*/
 .login-card .field-input {
     -fx-pref-width: 300px;
     -fx-max-width: infinity;
 }
 
-/* stretch primary button full width / estirar boton primario al ancho completo */
+/*estirar boton primario al ancho completo*/
 .login-card .btn-primary {
     -fx-pref-width: 300px;
     -fx-max-width: infinity;

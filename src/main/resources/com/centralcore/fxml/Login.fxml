@@ -3,17 +3,14 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<!--
-    login screen / pantalla de inicio de sesion
-    centered card with email + password + login button
-    tarjeta centrada con email + contraseña + boton de inicio de sesion
--->
+<!--pantalla de inicio de sesion
+    tarjeta centrada con email + contraseña + boton de inicio de sesion-->
 <StackPane xmlns="http://javafx.com/javafx/21"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.centralcore.controller.LoginController"
            styleClass="login-root">
 
-    <!-- language selector at top-right / selector de idioma en la esquina superior derecha -->
+    <!--selector de idioma en la esquina superior derecha-->
     <HBox style="-fx-alignment: top-right; -fx-padding: 15;">
         <ComboBox fx:id="cmbLanguage" 
                   style="-fx-background-color: #2c3e50; -fx-text-fill: #ecf0f1; -fx-control-inner-background: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-padding: 5 10; -fx-font-size: 11; -fx-font-fill: #ecf0f1; -fx-focus-color: #3498db; -fx-cell-text-fill: #ecf0f1;" promptText="Language"/>
@@ -21,13 +18,13 @@
 
     <VBox styleClass="login-card">
 
-        <!-- logo / logo -->
+        <!--logo -->
         <VBox styleClass="login-brand">
             <Label text="CENTRAL" styleClass="logo-central"/>
             <Label text="CORE"    styleClass="logo-core"/>
         </VBox>
 
-        <!-- error message - hidden by default / mensaje de error - oculto por defecto -->
+        <!--mensaje de error - oculto por defecto-->
         <Label fx:id="lblError"
                styleClass="login-error"
                text=""
@@ -35,26 +32,26 @@
                visible="false"
                managed="false"/>
 
-        <!-- email field / campo de email -->
+        <!--campo de email-->
         <Label fx:id="lblEmail" text="Email" styleClass="field-label"/>
         <TextField fx:id="txtEmail"
                    promptText="admin@city.gov"
                    styleClass="field-input"/>
 
-        <!-- password field / campo de contraseña -->
+        <!--campo de contraseña-->
         <Label fx:id="lblPassword" text="Password" styleClass="field-label"/>
         <PasswordField fx:id="txtPassword"
                        promptText="••••••••"
                        styleClass="field-input"/>
 
-        <!-- login button / boton de inicio de sesion -->
+        <!--boton de inicio de sesion-->
         <Button fx:id="btnLogin"
                 text="Log In"
                 styleClass="btn-primary"
                 onAction="#onLoginClicked"
                 defaultButton="true"/>
 
-        <!-- back to welcome / volver a bienvenida -->
+        <!--volver a bienvenida-->
         <Button fx:id="btnBack"
                 text="← Back"
                 styleClass="btn-ghost"

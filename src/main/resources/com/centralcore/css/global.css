@@ -1,41 +1,38 @@
-/* global.css - applied to every scene in the app / aplicado a cada escena de la app */
-
-/* ─── color palette / paleta de colores ─────────────────────────────────────── */
-/* based on centralcore brand: white, blue, black / basado en la marca centralcore: blanco, azul, negro */
+/*paleta de colores*/
+/*basado en la marca centralcore: blanco, azul, negro*/
 
 .root {
-    /* background colors / colores de fondo */
+    /*colores de fondo*/
     -cc-bg-dark:       #0d0f14;
     -cc-bg-mid:        #151820;
     -cc-bg-card:       #1c1f2b;
     -cc-bg-hover:      #232737;
 
-    /* brand blue / azul de marca */
+    /*azul de marca*/
     -cc-blue:          #2b7fff;
     -cc-blue-dark:     #1a5fcc;
     -cc-blue-light:    #5a9fff;
 
-    /* text colors / colores de texto */
+    /*colores de texto*/
     -cc-text-primary:  #f0f2f8;
     -cc-text-secondary:#8b92a8;
     -cc-text-muted:    #555d75;
 
-    /* border and divider / borde y divisor */
+    /*borde y divisor*/
     -cc-border:        #252a3a;
 
-    /* status colors / colores de estado */
+    /*colores de estado*/
     -cc-success:       #22c55e;
     -cc-warning:       #f59e0b;
     -cc-error:         #ef4444;
 
-    /* font - orbitron for brand, system font for body */
-    /* fuente - orbitron para marca, fuente del sistema para cuerpo */
+    /*fuente - orbitron para marca, fuente del sistema para cuerpo*/
     -fx-font-family: "System";
     -fx-font-size: 13px;
     -fx-background-color: -cc-bg-dark;
 }
 
-/* ─── logo / logotipo ────────────────────────────────────────────────────────── */
+/*logotipo*/
 
 .logo-central {
     -fx-text-fill: -cc-text-primary;
@@ -67,7 +64,7 @@
     -fx-padding: -4 0 0 0;
 }
 
-/* ─── buttons / botones ──────────────────────────────────────────────────────── */
+/*botones*/
 
 .btn-primary {
     -fx-background-color: -cc-blue;
@@ -103,7 +100,7 @@
     -fx-text-fill: -cc-text-primary;
 }
 
-/* ─── form fields / campos de formulario ─────────────────────────────────────── */
+/*campos de formulario*/
 
 .field-label {
     -fx-text-fill: -cc-text-secondary;
@@ -129,7 +126,7 @@
     -fx-background-color: -cc-bg-card;
 }
 
-/* ─── error label / etiqueta de error ────────────────────────────────────────── */
+/*etiqueta de error*/
 
 .login-error {
     -fx-text-fill: -cc-error;
