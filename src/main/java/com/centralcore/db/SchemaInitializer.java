@@ -5,29 +5,27 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * runs all CREATE TABLE IF NOT EXISTS statements on startup
- * replaces the old schema.sql — h2 handles this in-process so no external script needed
- * safe to call every launch because IF NOT EXISTS means it won't wipe existing data
+ * ejecuta todas las sentencias CREATE TABLE IF NOT EXISTS al iniciar
+ * reemplaza el antiguo schema.sql — h2 maneja esto en proceso, asi que no se necesita script externo
+ * es seguro llamar cada lanzamiento porque IF NOT EXISTS significa que no borrara datos existentes
  *
- * also seeds the default admin user and demo licences if they aren't there yet
+ * tambien siembra el usuario admin por defecto y licencias demo si no estan presentes
  * uso: SchemaInitializer.initialize(connection);
  */
 public class SchemaInitializer {
 
-    //no instantiation needed / sin instanciacion necesaria
+    //sin instanciacion necesaria
     private SchemaInitializer() {}
 
     /**
-     * creates all tables and inserts seed data
-     * called automatically by DatabaseConnection on first open
      * crea todas las tablas e inserta datos iniciales
+     * se llama automaticamente por DatabaseConnection en la primera apertura
      *
-     * @param conn active h2 connection / conexion h2 activa
+     * @param conn conexion h2 activa
      */
     public static void initialize(Connection conn) {
         try (Statement stmt = conn.createStatement()) {
 
-            //users table - people who can log into centralcore
             //tabla de usuarios - personas que pueden iniciar sesion en centralcore
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS users (
@@ -41,7 +39,6 @@ public class SchemaInitializer {
                 )
             """);
 
-            //licences table - which modules this installation is allowed to use
             //tabla de licencias - que modulos tiene permitido usar esta instalacion
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS licences (
@@ -55,7 +52,6 @@ public class SchemaInitializer {
                 )
             """);
 
-            //ciudadanos - the main citizen registry for the citizen module
             //ciudadanos - el registro principal de ciudadanos para el modulo ciudadano
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS ciudadanos (
@@ -75,7 +71,6 @@ public class SchemaInitializer {
                 )
             """);
 
-            //vehiculos - vehicles registered to citizens, used by the traffic module
             //vehiculos - vehiculos registrados a ciudadanos, usados por el modulo de trafico
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS vehiculos (
@@ -92,7 +87,6 @@ public class SchemaInitializer {
                 )
             """);
 
-            //incidentes_trafico - traffic incidents reported in the city
             //incidentes_trafico - incidentes de trafico reportados en la ciudad
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS incidentes_trafico (
@@ -112,8 +106,6 @@ public class SchemaInitializer {
                 )
             """);
 
-            //seed default admin - password is Admin1234
-            //only inserts if the email doesn't exist yet so reruns are safe
             //insertar admin por defecto - contraseña Admin1234
             //solo inserta si el email no existe todavia, asi que es seguro relanzar
             stmt.execute("""
@@ -128,7 +120,6 @@ public class SchemaInitializer {
                 )
             """);
 
-            //seed demo licences for both modules
             //licencias de demo para ambos modulos
             stmt.execute("""
                 MERGE INTO licences (module_name, licence_key, issued_to, expiry_date)
@@ -141,10 +132,10 @@ public class SchemaInitializer {
                 VALUES ('traffic', 'CC-TRF-DEMO-0001', 'Demo City', '2027-12-31')
             """);
 
-            System.out.println("schema ready / esquema listo");
+            System.out.println("esquema listo");
 
         } catch (SQLException e) {
-            System.err.println("schema init failed / fallo la inicializacion del esquema: " + e.getMessage());
+            System.err.println("fallo la inicializacion del esquema: " + e.getMessage());
             e.printStackTrace();
         }
     }

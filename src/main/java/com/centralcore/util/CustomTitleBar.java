@@ -9,10 +9,8 @@ import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 
 /**
- * custom window title bar to replace the ugly windows default
  * barra de titulo de ventana personalizada para reemplazar la desagradable barra por defecto de windows
  *
- * draggable, includes window controls (minimize, maximize, close)
  * arrastrable, incluye controles de ventana (minimizar, maximizar, cerrar)
  */
 public class CustomTitleBar extends HBox {
@@ -27,7 +25,7 @@ public class CustomTitleBar extends HBox {
     }
 
     private void setupUI() {
-        //style the bar / estiliza la barra
+        //estiliza la barra
         setStyle(
             "-fx-background-color: #2c3e50; " +
             "-fx-padding: 4 12; " +
@@ -38,7 +36,7 @@ public class CustomTitleBar extends HBox {
         );
         setPrefHeight(20);
 
-        //app title / titulo de la app
+        //titulo de la app
         Label lblTitle = new Label("CentralCore");
         lblTitle.setStyle(
             "-fx-font-size: 11; " +
@@ -46,16 +44,16 @@ public class CustomTitleBar extends HBox {
             "-fx-text-fill: #ecf0f1;"
         );
 
-        //spacer to push buttons to the right / espaciador para empujar botones a la derecha
+        //espaciador para empujar botones a la derecha
         HBox spacer = new HBox();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        //window control buttons / botones de control de ventana
+        //botones de control de ventana
         Button btnMinimize = createWindowButton("−", "#7f8c8d");
         Button btnMaximize = createWindowButton("□", "#7f8c8d");
         Button btnClose = createWindowButton("✕", "#e74c3c");
 
-        //button actions / acciones de botones
+        //acciones de botones
         btnMinimize.setOnAction(e -> stage.setIconified(true));
         btnMaximize.setOnAction(e -> {
             if (stage.isMaximized()) {
@@ -68,7 +66,7 @@ public class CustomTitleBar extends HBox {
 
         getChildren().addAll(lblTitle, spacer, btnMinimize, btnMaximize, btnClose);
 
-        //make title bar draggable / hace la barra de titulo arrastrable
+        //hace la barra de titulo arrastrable
         setOnMousePressed(e -> {
             xOffset = e.getSceneX();
             yOffset = e.getSceneY();
@@ -84,12 +82,11 @@ public class CustomTitleBar extends HBox {
     }
 
     /**
-     * creates a styled window control button
      * crea un boton de control de ventana estilizado
      *
-     * @param text button label / etiqueta del boton
-     * @param color button color / color del boton
-     * @return the styled button / el boton estilizado
+     * @param text etiqueta del boton
+     * @param color color del boton
+     * @return el boton estilizado
      */
     private Button createWindowButton(String text, String color) {
         Button btn = new Button(text);

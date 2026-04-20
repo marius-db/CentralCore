@@ -1,10 +1,8 @@
 package com.centralcore.modules;
 
 /**
- * pojo for module.json configuration files
  * pojo para los archivos de configuracion module.json
  *
- * gson deserializes the json into this object
  * gson deserializa el json en este objeto
  */
 public class ModuleConfig {

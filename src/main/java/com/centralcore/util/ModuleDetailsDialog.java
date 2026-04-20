@@ -12,20 +12,17 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
- * modal dialog for viewing module details
  * dialogo modal para ver detalles del modulo
  *
- * shows module name, description, version and provides update/delete actions
  * muestra nombre del modulo, descripcion, version y proporciona acciones actualizar/eliminar
  */
 public class ModuleDetailsDialog {
 
     /**
-     * shows the module details dialog
      * muestra el dialogo de detalles del modulo
      *
-     * @param parentStage the parent window / la ventana padre
-     * @param module the module to display / el modulo a mostrar
+     * @param parentStage la ventana padre
+     * @param module el modulo a mostrar
      */
     public static void show(Stage parentStage, Module module) {
         Stage dialogStage = new Stage();
@@ -35,7 +32,7 @@ public class ModuleDetailsDialog {
         dialogStage.setWidth(450);
         dialogStage.setHeight(320);
 
-        //main content / contenido principal
+        //contenido principal
         VBox root = new VBox();
         root.setStyle(
             "-fx-background-color: #2c3e50; " +
@@ -43,7 +40,7 @@ public class ModuleDetailsDialog {
             "-fx-spacing: 15;"
         );
 
-        //module name / nombre del modulo
+        //nombre del modulo
         Label lblName = new Label("Module: " + module.getName());
         lblName.setStyle(
             "-fx-font-size: 18; " +
@@ -51,21 +48,21 @@ public class ModuleDetailsDialog {
             "-fx-text-fill: #ecf0f1;"
         );
 
-        //module id / id del modulo
+        //id del modulo
         Label lblId = new Label("ID: " + module.getModuleId());
         lblId.setStyle(
             "-fx-font-size: 12; " +
             "-fx-text-fill: #bdc3c7;"
         );
 
-        //module version / version del modulo
+        //version del modulo
         Label lblVersion = new Label("Version: " + module.getVersion());
         lblVersion.setStyle(
             "-fx-font-size: 12; " +
             "-fx-text-fill: #bdc3c7;"
         );
 
-        //module description / descripcion del modulo
+        //descripcion del modulo
         Label lblDescLabel = new Label("Description:");
         lblDescLabel.setStyle(
             "-fx-font-size: 13; " +
@@ -81,7 +78,7 @@ public class ModuleDetailsDialog {
         );
         lblDescription.setWrapText(true);
 
-        //action buttons / botones de accion
+        //botones de accion
         HBox buttonsBox = new HBox();
         buttonsBox.setStyle("-fx-spacing: 10; -fx-alignment: center-right;");
         buttonsBox.setPadding(new Insets(15, 0, 0, 0));
@@ -95,7 +92,7 @@ public class ModuleDetailsDialog {
             "-fx-text-fill: white;"
         );
         btnUpdate.setOnAction(e -> {
-            System.out.println("update module / actualizar modulo: " + module.getName());
+            System.out.println("actualizar modulo: " + module.getName());
             dialogStage.close();
         });
 
@@ -108,7 +105,7 @@ public class ModuleDetailsDialog {
             "-fx-text-fill: white;"
         );
         btnDelete.setOnAction(e -> {
-            System.out.println("delete module / eliminar modulo: " + module.getName());
+            System.out.println("eliminar modulo: " + module.getName());
             dialogStage.close();
         });
 
@@ -126,7 +123,7 @@ public class ModuleDetailsDialog {
 
         buttonsBox.getChildren().addAll(btnUpdate, btnDelete, btnClose);
 
-        //add everything to root / agrega todo a root
+        //agrega todo a root
         root.getChildren().addAll(
             lblName,
             lblId,
