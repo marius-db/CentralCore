@@ -4,6 +4,6 @@
   "version": "1.0.0",
   "description": "Manage city citizen records and profiles",
   "logoPath": "images/logo.png",
-  "mainClass": "citizenmodule.CitizenModule",
+  "mainClass": "modules.citizenmodule.CitizenModule",
   "author": "CentralCore Team"
 }

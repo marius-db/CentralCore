@@ -1,4 +1,4 @@
-package citizenmodule;
+package modules.citizenmodule;
 
 import com.centralcore.modules.Module;
 

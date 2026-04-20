@@ -1,4 +1,4 @@
-package trafficmodule;
+package modules.trafficmodule;
 
 import com.centralcore.modules.Module;
 
