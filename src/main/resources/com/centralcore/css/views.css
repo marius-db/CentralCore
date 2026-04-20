@@ -1,14 +1,13 @@
-/* views.css - shared styles for all inner content views */
 /* estilos compartidos para todas las vistas de contenido interno */
 
-/* ─── view root / raiz de la vista ──────────────────────────────────────────── */
+/*view root / raiz de la vista*/
 
 .view-root {
     -fx-background-color: -cc-bg-dark;
     -fx-padding: 0;
 }
 
-/* ─── page header / cabecera de pagina ───────────────────────────────────────── */
+/*cabecera de pagina*/
 
 .view-header {
     -fx-padding: 24 28 20 28;
@@ -24,7 +23,7 @@
     -fx-font-weight: bold;
 }
 
-/* ─── module cards grid / cuadricula de tarjetas de modulos ─────────────────── */
+/*cuadricula de tarjetas de modulos*/
 
 .modules-grid {
     -fx-padding: 24 28 24 28;
@@ -61,7 +60,7 @@
     -fx-font-size: 12px;
 }
 
-/* ─── data tables / tablas de datos ──────────────────────────────────────────── */
+/*tablas de datos*/
 
 .data-table {
     -fx-background-color: -cc-bg-dark;
@@ -99,7 +98,7 @@
     -fx-font-size: 13px;
 }
 
-/* ─── settings / configuracion ───────────────────────────────────────────────── */
+/*configuracion*/
 
 .settings-scroll {
     -fx-background-color: transparent;

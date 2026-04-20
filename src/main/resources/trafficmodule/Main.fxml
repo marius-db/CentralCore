@@ -3,10 +3,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<!--
-    traffic module main view
-    vista principal del modulo de trafico
--->
+<!--vista principal del modulo de trafico-->
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       spacing="10"

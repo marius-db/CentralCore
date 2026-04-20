@@ -4,21 +4,17 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 
-<!--
-    welcome screen / pantalla de bienvenida
-    split layout: left side = logo + text + login button / right side = sci-fi image placeholder
-    layout dividido: lado izquierdo = logo + texto + boton login / lado derecho = imagen sci-fi
--->
+<!--pantalla de bienvenida
+    layout dividido: lado izquierdo = logo + texto + boton login / lado derecho = imagen sci-fi-->
 <HBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.centralcore.controller.WelcomeController"
       styleClass="welcome-root">
 
-    <!-- left panel: branding + cta / panel izquierdo: marca + llamada a la accion -->
+    <!--panel izquierdo: marca + llamada a la accion-->
     <VBox styleClass="welcome-left" HBox.hgrow="NEVER">
         <VBox styleClass="welcome-brand">
-            <!-- logo placeholder - replace with actual ImageView when logo is ready -->
-            <!-- placeholder del logo - reemplazar con ImageView real cuando el logo este listo -->
+            <!--placeholder del logo - reemplazar con ImageView real cuando el logo este listo-->
             <Label text="CENTRAL" styleClass="logo-central"/>
             <Label text="CORE" styleClass="logo-core"/>
         </VBox>
@@ -35,10 +31,9 @@
                 onAction="#onLoginClicked"/>
     </VBox>
 
-    <!-- right panel: sci-fi decorative image / panel derecho: imagen decorativa sci-fi -->
+    <!--panel derecho: imagen decorativa sci-fi-->
     <StackPane styleClass="welcome-right" HBox.hgrow="ALWAYS">
-        <!-- placeholder label until actual image is added -->
-        <!-- label placeholder hasta que se agregue la imagen real -->
+        <!--label placeholder hasta que se agregue la imagen real-->
         <Label text="[City Image]" styleClass="image-placeholder"/>
     </StackPane>
 
