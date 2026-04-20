@@ -17,11 +17,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 /**
- * displays all loaded modules as a grid of clickable tiles
  * muestra todos los modulos cargados como una grilla de tiles clickeables
  *
- * dynamically creates tiles for each module found by ModuleManager
- * no hardcoding of specific modules anywhere
  * crea dinamicamente tiles para cada modulo encontrado por ModuleManager
  * sin hardcoding de modulos especificos en ningun lado
  */
@@ -36,16 +33,15 @@ public class ModulesViewController implements Initializable {
     }
 
     /**
-     * loads all modules and creates a tile for each one
      * carga todos los modulos y crea un tile para cada uno
      */
     private void setupTiles() {
         ModuleManager moduleManager = ModuleManager.getInstance();
 
-        //clear any existing tiles / limpia tiles existentes
+        //limpia tiles existentes
         tilePane.getChildren().clear();
 
-        //get all loaded modules / obtiene todos los modulos cargados
+        //obtiene todos los modulos cargados
         for (Module module : moduleManager.getAllModules()) {
             VBox tile = createModuleTile(module);
             tilePane.getChildren().add(tile);
@@ -53,7 +49,6 @@ public class ModulesViewController implements Initializable {
     }
 
     /**
-     * creates a single module tile with name and click handler
      * crea un tile individual del modulo con nombre y handler de click
      */
     private VBox createModuleTile(Module module) {
@@ -74,13 +69,13 @@ public class ModulesViewController implements Initializable {
             " -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 4, 0, 0, 2);"
         );
 
-        //placeholder logo rectangle / rectangulo placeholder para logo
+        //rectangulo placeholder para logo
         Rectangle logo = new Rectangle(150, 100);
         logo.setFill(Color.web("#3498db"));
         logo.setArcWidth(8);
         logo.setArcHeight(8);
 
-        //module name label / etiqueta del nombre del modulo
+        //etiqueta del nombre del modulo
         Label nameLabel = new Label(module.getName());
         nameLabel.setStyle(
             "-fx-font-size: 14; " +
@@ -92,10 +87,10 @@ public class ModulesViewController implements Initializable {
 
         tile.getChildren().addAll(logo, nameLabel);
 
-        //click handler to open module / handler para abrir modulo al hacer click
+        //handler para abrir modulo al hacer click
         tile.setOnMouseClicked(e -> openModule(module));
 
-        //hover effect / efecto de hover
+        //efecto de hover
         tile.setOnMouseEntered(e -> tile.setStyle(
             tile.getStyle().replace("-fx-background-color: #34495e;", "-fx-background-color: #2c3e50;")
         ));
@@ -107,7 +102,6 @@ public class ModulesViewController implements Initializable {
     }
 
     /**
-     * opens the selected module in the main shell
      * abre el modulo seleccionado en el shell principal
      */
     private void openModule(Module module) {
@@ -115,7 +109,7 @@ public class ModulesViewController implements Initializable {
             System.out.println("opening module: " + module.getName());
             SceneManager.showModule(module);
         } catch (Exception e) {
-            System.err.println("error opening module / error al abrir modulo: " + e.getMessage());
+            System.err.println("error al abrir modulo: " + e.getMessage());
             e.printStackTrace();
         }
     }

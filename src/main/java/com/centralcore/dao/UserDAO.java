@@ -11,31 +11,27 @@ import com.centralcore.db.DatabaseConnection;
 import com.centralcore.model.User;
 
 /**
- * data access object for user-related database operations
  * objeto de acceso a datos para operaciones de base de datos relacionadas con usuarios
  *
- * handles authentication, fetching and creating users
  * gestiona la autenticacion, consulta y creacion de usuarios
  */
 public class UserDAO {
 
     /**
-     * authenticates a user by email and password
      * autentica un usuario por email y contraseña
      *
-     * returns the User object if credentials are valid, null otherwise
      * devuelve el objeto User si las credenciales son validas, null en caso contrario
      *
-     * @param email    the user's email / el email del usuario
-     * @param password the plain text password to check / la contraseña en texto plano a verificar
+     * @param email    el email del usuario
+     * @param password la contraseña en texto plano a verificar
      */
     public User authenticate(String email, String password) {
-        //query to find user by email / consulta para encontrar usuario por email
+        //consulta para encontrar usuario por email
         String sql = "SELECT id, username, email, password_hash, role, active FROM users WHERE email = ? AND active = true";
 
         Connection conn = DatabaseConnection.getConnection();
         if (conn == null) {
-            System.err.println("no db connection for authentication / sin conexion a bd para autenticacion");
+            System.err.println("sin conexion a bd para autenticacion");
             return null;
         }
 
@@ -46,10 +42,8 @@ public class UserDAO {
             if (rs.next()) {
                 String storedHash = rs.getString("password_hash");
 
-                // compare the provided password against the stored bcrypt hash
                 // comparar la contraseña proporcionada con el hash bcrypt almacenado
                 if (BCrypt.checkpw(password, storedHash)) {
-                    // password matches - build and return the user object
                     // la contraseña coincide - construir y devolver el objeto usuario
                     User user = new User();
                     user.setId(rs.getInt("id"));
@@ -63,15 +57,14 @@ public class UserDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("authentication query failed / fallo la consulta de autenticacion: " + e.getMessage());
+            System.err.println("fallo la consulta de autenticacion: " + e.getMessage());
         }
 
-        //wrong email or password / email o contraseña incorrectos
+        //email o contraseña incorrectos
         return null;
     }
 
     /**
-     * finds a user by their id
      * encuentra un usuario por su id
      */
     public User findById(int id) {
@@ -95,24 +88,21 @@ public class UserDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("findById failed / findById fallo: " + e.getMessage());
+            System.err.println("findById fallo: " + e.getMessage());
         }
 
         return null;
     }
 
     /**
-     * hashes a plain text password using bcrypt
      * hashea una contraseña en texto plano usando bcrypt
      *
-     * use this when creating or updating users
      * usar esto al crear o actualizar usuarios
      *
-     * @param plainPassword the password to hash / la contraseña a hashear
-     * @return the bcrypt hash / el hash bcrypt
+     * @param plainPassword la contraseña a hashear
+     * @return el hash bcrypt
      */
     public static String hashPassword(String plainPassword) {
-        // bcrypt work factor 12 - good balance of security and speed
         // factor de trabajo bcrypt 12 - buen equilibrio entre seguridad y velocidad
         return BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
     }

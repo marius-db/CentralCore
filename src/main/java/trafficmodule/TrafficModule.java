@@ -6,10 +6,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 
 /**
- * traffic management module - demonstrates the plugin architecture
  * modulo de gestion de trafico - demuestra la arquitectura de plugins
  *
- * completely independent from the app shell, can be loaded/unloaded dynamically
  * completamente independiente del shell de la app, puede cargarse/descargarse dinamicamente
  */
 public class TrafficModule implements Module {
@@ -43,7 +41,6 @@ public class TrafficModule implements Module {
 
     @Override
     public void initialize() throws Exception {
-        //load the fxml layout for this module
         //carga el layout fxml para este modulo
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/trafficmodule/Main.fxml"));
         uiRoot = loader.load();
@@ -52,7 +49,6 @@ public class TrafficModule implements Module {
 
     @Override
     public void shutdown() {
-        //cleanup resources
         //limpia recursos
         uiRoot = null;
         System.out.println("traffic module shut down");

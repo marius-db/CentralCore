@@ -8,16 +8,13 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 /**
- * main javafx application class
  * clase principal de la aplicacion javafx
  *
- * handles the primary stage (main window) and bootstraps the scene manager
  * gestiona el stage principal (ventana principal) e inicializa el gestor de escenas
  */
 public class App extends Application {
 
-    // the single primary stage shared across the whole app
-    // el unico stage principal compartido en toda la app
+    //el unico stage principal compartido en toda la app
     private static Stage primaryStage;
 
     @Override
@@ -25,11 +22,9 @@ public class App extends Application {
         Font.loadFont(getClass().getResourceAsStream("/com/centralcore/fonts/Orbitron-VariableFont_wght.ttf"), 14);
         primaryStage = stage;
 
-        //remove default window decoration to use custom title bar
         //elimina la decoracion de ventana por defecto para usar la barra de titulo personalizada
         stage.initStyle(StageStyle.UNDECORATED);
 
-        //configure the main window
         //configurar la ventana principal
         stage.setTitle("CentralCore");
         stage.setMinWidth(1100);
@@ -37,11 +32,9 @@ public class App extends Application {
         stage.setWidth(1280);
         stage.setHeight(720);
 
-        //initialize the scene manager with our stage
         //inicializar el gestor de escenas con nuestro stage
         SceneManager.initialize(stage);
 
-        //load the welcome screen first
         //cargar la pantalla de bienvenida primero
         SceneManager.showWelcome();
 
@@ -49,7 +42,6 @@ public class App extends Application {
     }
 
     /**
-     * returns the primary stage for use anywhere in the app
      * devuelve el stage principal para su uso en cualquier parte de la app
      */
     public static Stage getPrimaryStage() {
@@ -58,9 +50,8 @@ public class App extends Application {
 
     @Override
     public void stop() throws Exception {
-        //close db connection on app exit
         //cerrar la conexion de la bd al salir de la app
         com.centralcore.db.DatabaseConnection.close();
-        System.out.println("centralcore closed / centralcore cerrado");
+        System.out.println("centralcore cerrado");
     }
 }

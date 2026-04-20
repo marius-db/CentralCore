@@ -24,10 +24,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 /**
- * controller for the installs view - shows all installed modules
  * controlador para la vista de instalaciones - muestra todos los modulos instalados
  *
- * displays modules in a list with view details and delete options
  * muestra modulos en una lista con opciones ver detalles y eliminar
  */
 public class InstallsController implements Initializable {
@@ -41,24 +39,21 @@ public class InstallsController implements Initializable {
     }
 
     /**
-     * loads all installed modules and displays them in the list
      * carga todos los modulos instalados y los muestra en la lista
      */
     private void setupModuleList() {
         ModuleManager moduleManager = ModuleManager.getInstance();
 
-        //populate list with modules / carga la lista con modulos
+        //carga la lista con modulos
         moduleListView.getItems().addAll(moduleManager.getAllModules());
 
-        //set custom cell factory for nice rows / define factory de celda personalizada para filas bonitas
+        //define factory de celda personalizada para filas bonitas
         moduleListView.setCellFactory(param -> new ModuleListCell());
     }
 
     /**
-     * custom list cell renderer for modules
      * renderizador de celda de lista personalizada para modulos
      *
-     * displays module image, name, description, and action menu
      * muestra imagen, nombre, descripcion del modulo y menu de acciones
      */
     private class ModuleListCell extends ListCell<Module> {
@@ -73,7 +68,7 @@ public class InstallsController implements Initializable {
         }
 
         private void setupCell() {
-            //main container / contenedor principal
+            //contenedor principal
             container = new HBox();
             container.setStyle(
                 "-fx-padding: 10; " +
@@ -84,13 +79,13 @@ public class InstallsController implements Initializable {
             );
             container.setMinHeight(70);
 
-            //module logo placeholder / placeholder del logo del modulo
+            //placeholder del logo del modulo
             Rectangle logo = new Rectangle(50, 50);
             logo.setFill(Color.web("#3498db"));
             logo.setArcWidth(4);
             logo.setArcHeight(4);
 
-            //module info (name + description) / info del modulo (nombre + descripcion)
+            //info del modulo (nombre + descripcion)
             VBox infoBox = new VBox();
             infoBox.setStyle("-fx-spacing: 5;");
             HBox.setHgrow(infoBox, Priority.ALWAYS);
@@ -112,7 +107,7 @@ public class InstallsController implements Initializable {
 
             infoBox.getChildren().addAll(lblName, lblDescription);
 
-            //menu button on the right / boton de menu a la derecha
+            //boton de menu a la derecha
             btnMenu = new Button("⋯");
             btnMenu.setStyle(
                 "-fx-font-size: 14; " +
@@ -134,11 +129,11 @@ public class InstallsController implements Initializable {
             if (empty || module == null) {
                 setGraphic(null);
             } else {
-                //update labels / actualiza etiquetas
+                //actualiza etiquetas
                 lblName.setText(module.getName());
                 lblDescription.setText(module.getDescription());
 
-                //create context menu / crea menu contextual
+                //crea menu contextual
                 ContextMenu contextMenu = createContextMenu(module);
                 btnMenu.setOnAction(e -> contextMenu.show(btnMenu, Side.BOTTOM, -60, 0));
 
@@ -147,7 +142,6 @@ public class InstallsController implements Initializable {
         }
 
         /**
-         * creates context menu with module actions
          * crea menu contextual con acciones del modulo
          */
         private ContextMenu createContextMenu(Module module) {
@@ -158,18 +152,18 @@ public class InstallsController implements Initializable {
                 "-fx-border-width: 1;"
             );
 
-            //view details menu item / item del menu ver detalles
+            //item del menu ver detalles
             MenuItem itemViewDetails = new MenuItem("View Details");
             itemViewDetails.setStyle("-fx-padding: 6 12; -fx-font-size: 11;");
             itemViewDetails.setOnAction(e -> {
                 ModuleDetailsDialog.show(SceneManager.getStage(), module);
             });
 
-            //delete menu item / item del menu eliminar
+            //item del menu eliminar
             MenuItem itemDelete = new MenuItem("Delete");
             itemDelete.setStyle("-fx-padding: 6 12; -fx-font-size: 11;");
             itemDelete.setOnAction(e -> {
-                System.out.println("delete module / eliminar modulo: " + module.getName());
+                System.out.println("eliminar modulo: " + module.getName());
             });
 
             menu.getItems().addAll(itemViewDetails, itemDelete);
