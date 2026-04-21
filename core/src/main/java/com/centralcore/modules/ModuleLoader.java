@@ -8,6 +8,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import com.google.gson.Gson;
 
@@ -87,13 +89,32 @@ public class ModuleLoader {
             //parsea la configuracion
             ModuleConfig config = gson.fromJson(new FileReader(configFile), ModuleConfig.class);
 
+            // construye la ruta al directorio de clases compiladas del modulo
+            File classesDir = new File(moduleDir, "build/classes/java/main");
+            System.out.println("DEBUG: Looking for classes in: " + classesDir.getAbsolutePath());
+            System.out.println("DEBUG: Classes dir exists? " + classesDir.exists());
+            System.out.println("DEBUG: URLClassLoader URL: " + classesDir.toURI().toURL());
+
+            // verifica si el directorio existe
+            if (!classesDir.exists()) {
+                System.err.println("classes directory not found for " + moduleDir.getName() + ": " + classesDir.getAbsolutePath());
+                return null;
+            }
+
             if (config.mainClass == null || config.mainClass.isEmpty()) {
                 System.err.println("invalid module config in " + moduleDir.getName() + ": missing mainClass");
                 return null;
             }
 
-            //carga la clase principal usando reflexion
-            Class<?> moduleClass = Class.forName(config.mainClass);
+            // crea un URLClassLoader que apunta al directorio de clases del modulo
+            URLClassLoader moduleClassLoader = new URLClassLoader(
+                    new URL[]{classesDir.toURI().toURL()},
+                    Module.class.getClassLoader()
+            );
+            System.out.println("DEBUG: Attempting to load class: " + config.mainClass);
+
+            // carga la clase usando el classloader del modulo
+            Class<?> moduleClass = Class.forName(config.mainClass, true, moduleClassLoader);
 
             //verifica que implemente Module
             if (!Module.class.isAssignableFrom(moduleClass)) {

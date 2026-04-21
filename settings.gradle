@@ -1,2 +1,5 @@
-// project name / nombre del proyecto
 rootProject.name = 'CentralCore'
+
+include 'core'
+include 'modules:CitizenModule'
+include 'modules:TrafficModule'
