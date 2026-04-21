@@ -4,29 +4,15 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-/**
- * ejecuta todas las sentencias CREATE TABLE IF NOT EXISTS al iniciar
- * reemplaza el antiguo schema.sql — h2 maneja esto en proceso, asi que no se necesita script externo
- * es seguro llamar cada lanzamiento porque IF NOT EXISTS significa que no borrara datos existentes
- *
- * tambien siembra el usuario admin por defecto y licencias demo si no estan presentes
- * uso: SchemaInitializer.initialize(connection);
- */
+//crea las tablas al arrancar y siembra datos iniciales si no existen
+//seguro llamarlo en cada lanzamiento por el IF NOT EXISTS y los MERGE KEY
 public class SchemaInitializer {
 
-    //sin instanciacion necesaria
     private SchemaInitializer() {}
 
-    /**
-     * crea todas las tablas e inserta datos iniciales
-     * se llama automaticamente por DatabaseConnection en la primera apertura
-     *
-     * @param conn conexion h2 activa
-     */
     public static void initialize(Connection conn) {
         try (Statement stmt = conn.createStatement()) {
 
-            //tabla de usuarios - personas que pueden iniciar sesion en centralcore
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS users (
                     id            INT          AUTO_INCREMENT PRIMARY KEY,
@@ -39,7 +25,6 @@ public class SchemaInitializer {
                 )
             """);
 
-            //tabla de licencias - que modulos tiene permitido usar esta instalacion
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS licences (
                     id            INT          AUTO_INCREMENT PRIMARY KEY,
@@ -52,7 +37,6 @@ public class SchemaInitializer {
                 )
             """);
 
-            //ciudadanos - el registro principal de ciudadanos para el modulo ciudadano
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS ciudadanos (
                     id            INT          AUTO_INCREMENT PRIMARY KEY,
@@ -71,7 +55,6 @@ public class SchemaInitializer {
                 )
             """);
 
-            //vehiculos - vehiculos registrados a ciudadanos, usados por el modulo de trafico
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS vehiculos (
                     id              INT         AUTO_INCREMENT PRIMARY KEY,
@@ -87,7 +70,6 @@ public class SchemaInitializer {
                 )
             """);
 
-            //incidentes_trafico - incidentes de trafico reportados en la ciudad
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS incidentes_trafico (
                     id              INT          AUTO_INCREMENT PRIMARY KEY,
@@ -106,8 +88,7 @@ public class SchemaInitializer {
                 )
             """);
 
-            //insertar admin por defecto - contraseña Admin1234
-            //solo inserta si el email no existe todavia, asi que es seguro relanzar
+            //contrasena: Admin1234
             stmt.execute("""
                 MERGE INTO users (username, email, password_hash, role, active)
                 KEY (email)
@@ -120,7 +101,6 @@ public class SchemaInitializer {
                 )
             """);
 
-            //licencias de demo para ambos modulos
             stmt.execute("""
                 MERGE INTO licences (module_name, licence_key, issued_to, expiry_date)
                 KEY (licence_key)
