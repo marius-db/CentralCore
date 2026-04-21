@@ -4,6 +4,6 @@
   "version": "1.0.0",
   "description": "Track vehicles and traffic incidents in the city",
   "logoPath": "images/logo.png",
-  "mainClass": "modules.trafficmodule.TrafficModule",
+  "mainClass": "com.centralcore.modules.trafficmodule.TrafficModule",
   "author": "CentralCore Team"
 }

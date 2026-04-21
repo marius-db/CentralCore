@@ -1,4 +1,4 @@
-package modules.trafficmodule;
+package com.centralcore.modules.citizenmodule;
 
 import com.centralcore.modules.Module;
 
@@ -6,22 +6,22 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 
 /**
- * modulo de gestion de trafico - demuestra la arquitectura de plugins
+ * modulo de base de datos de ciudadanos - demuestra la arquitectura de plugins
  *
  * completamente independiente del shell de la app, puede cargarse/descargarse dinamicamente
  */
-public class TrafficModule implements Module {
+public class CitizenModule implements Module {
 
     private Parent uiRoot;
 
     @Override
     public String getModuleId() {
-        return "traffic_module";
+        return "citizen_module";
     }
 
     @Override
     public String getName() {
-        return "Traffic Management";
+        return "Citizen Database";
     }
 
     @Override
@@ -31,7 +31,7 @@ public class TrafficModule implements Module {
 
     @Override
     public String getDescription() {
-        return "Track vehicles and traffic incidents in the city";
+        return "Manage city citizen records and profiles";
     }
 
     @Override
@@ -42,16 +42,16 @@ public class TrafficModule implements Module {
     @Override
     public void initialize() throws Exception {
         //carga el layout fxml para este modulo
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/trafficmodule/Main.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/citizenmodule/Main.fxml"));
         uiRoot = loader.load();
-        System.out.println("traffic module initialized");
+        System.out.println("citizen module initialized");
     }
 
     @Override
     public void shutdown() {
         //limpia recursos
         uiRoot = null;
-        System.out.println("traffic module shut down");
+        System.out.println("citizen module shut down");
     }
 
     @Override
