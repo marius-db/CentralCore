@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+group = 'com.centralcore.modules'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+javafx {
+    version = '21'
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics']
+}
+
+dependencies {
+    compileOnly rootProject.project(':core').sourceSets.main.output
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        resources {
+            srcDirs = ['resources', 'css', 'fxml', 'images']
+        }
+    }
+}
+
+jar {
+    archiveFileName = 'TrafficModule.jar'
+}
