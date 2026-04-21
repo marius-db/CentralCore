@@ -1,10 +1,6 @@
 package com.centralcore.modules;
 
-/**
- * pojo para los archivos de configuracion module.json
- *
- * gson deserializa el json en este objeto
- */
+//mapea el module.json de cada modulo, gson lo deserializa directamente
 public class ModuleConfig {
     public String id;
     public String name;

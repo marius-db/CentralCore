@@ -1,20 +1,13 @@
 package com.centralcore.model;
 
-/**
- * clase modelo que representa un usuario del sistema
- *
- * mapea directamente a la tabla 'users' en la base de datos
- */
 public class User {
 
     private int    id;
     private String username;
     private String email;
-    private String passwordHash; //hash bcrypt - nunca almacenar texto plano
-    private String role;         //ejemplo: "admin", "operador"
+    private String passwordHash; //hash bcrypt, nunca texto plano
+    private String role;
     private boolean active;
-
-    //constructores
 
     public User() {}
 
@@ -25,8 +18,6 @@ public class User {
         this.role     = role;
         this.active   = active;
     }
-
-    //getters y setters
 
     public int getId()                   { return id; }
     public void setId(int id)            { this.id = id; }

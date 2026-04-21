@@ -8,11 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-/**
- * controlador para la vista de licencias
- *
- * stub - implementacion completa viene despues de que el shell funcione
- */
+//stub - implementacion completa pendiente
 public class LicencesController implements Initializable {
 
     @FXML private TableView<?>      tableLicences;

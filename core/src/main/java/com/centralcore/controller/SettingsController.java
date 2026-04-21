@@ -13,11 +13,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 
-/**
- * controlador para la vista de configuracion
- *
- * escucha cambios de idioma y actualiza la ui automaticamente
- */
 public class SettingsController implements Initializable, TranslationManager.LanguageChangeListener {
 
     @FXML private Label          lblTitle;
@@ -44,53 +39,35 @@ public class SettingsController implements Initializable, TranslationManager.Lan
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //configura opciones de idioma
         cmbLanguage.getItems().addAll("English", "Español");
         cmbLanguage.setValue(TranslationManager.getCurrentLanguage().equals("en") ? "English" : "Español");
         cmbLanguage.setOnAction(e -> onLanguageComboChanged());
 
-        //registra escuchador de cambio de idioma
         TranslationManager.addLanguageChangeListener(this);
 
-        //configura checkboxes
         chkDarkMode.selectedProperty().addListener((obs, oldVal, newVal) -> onDarkModeToggled(newVal));
         chkModuleUpdates.selectedProperty().addListener((obs, oldVal, newVal) -> onModuleUpdatesToggled(newVal));
         chkSystemAlerts.selectedProperty().addListener((obs, oldVal, newVal) -> onSystemAlertsToggled(newVal));
 
-        //prueba conexion al iniciar
         testConnection();
-        
-        //actualiza etiquetas con idioma actual
         updateLabels();
     }
 
-    /**
-     * maneja cambio del combobox de idioma
-     */
     private void onLanguageComboChanged() {
         String selected = cmbLanguage.getValue();
         String langCode = selected.equals("English") ? "en" : "es";
         TranslationManager.setLanguage(langCode);
     }
 
-    /**
-     * devolucuon de observador para cambios de idioma de cualquier fuente
-     * llamado cada vez que se cambia el idioma en cualquier parte de la app
-     */
     @Override
     public void onLanguageChanged(String newLanguageCode) {
-        //actualiza combobox para que coincida con nuevo idioma
+        //sincroniza el combobox si el cambio vino de otra fuente
         if (!cmbLanguage.getValue().equals(newLanguageCode.equals("en") ? "English" : "Español")) {
             cmbLanguage.setValue(newLanguageCode.equals("en") ? "English" : "Español");
         }
-        
-        //actualiza todas las etiquetas
         updateLabels();
     }
 
-    /**
-     * actualiza todas las etiquetas con texto traducido del gestor de traducciones
-     */
     private void updateLabels() {
         lblTitle.setText(TranslationManager.get("settings.title"));
         lblAppearance.setText(TranslationManager.get("settings.appearance"));
@@ -110,31 +87,19 @@ public class SettingsController implements Initializable, TranslationManager.Lan
         btnTestConn.setText(TranslationManager.get("btn.test"));
     }
 
-    /**
-     * maneja toggle de modo oscuro
-     */
     private void onDarkModeToggled(boolean enabled) {
         System.out.println("dark mode toggled: " + enabled);
         //TODO: aplicar cambio de tema dinamicamente
     }
 
-    /**
-     * maneja toggle de notificaciones de actualizaciones de modulos
-     */
     private void onModuleUpdatesToggled(boolean enabled) {
         System.out.println("module updates notifications: " + enabled);
     }
 
-    /**
-     * maneja toggle de alertas del sistema
-     */
     private void onSystemAlertsToggled(boolean enabled) {
         System.out.println("system alerts: " + enabled);
     }
 
-    /**
-     * prueba la conexion a bd y muestra el resultado en la etiqueta de estado
-     */
     private void testConnection() {
         boolean ok = DatabaseConnection.testConnection();
         if (ok) {
