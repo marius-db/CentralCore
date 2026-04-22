@@ -1,5 +1,6 @@
 package com.centralcore;
 
+import com.centralcore.modules.ModuleManager;
 import com.centralcore.util.SceneManager;
 
 import javafx.application.Application;
@@ -37,6 +38,7 @@ public class App extends Application {
 
     @Override
     public void stop() throws Exception {
+        ModuleManager.getInstance().shutdownAllModules();
         com.centralcore.db.DatabaseConnection.close();
         System.out.println("centralcore cerrado");
     }
