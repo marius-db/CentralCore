@@ -70,6 +70,7 @@ public class ModuleLoader {
 
             //las clases compiladas del modulo se esperan en build/classes/java/main
             File classesDir = new File(moduleDir, "build/classes/java/main");
+            File resourcesDir = new File(moduleDir, "build/resources/main");
             System.out.println("DEBUG: Looking for classes in: " + classesDir.getAbsolutePath());
             System.out.println("DEBUG: Classes dir exists? " + classesDir.exists());
             System.out.println("DEBUG: URLClassLoader URL: " + classesDir.toURI().toURL());
@@ -86,7 +87,10 @@ public class ModuleLoader {
 
             //classloader aislado por modulo para evitar conflictos entre clases
             URLClassLoader moduleClassLoader = new URLClassLoader(
-                    new URL[]{classesDir.toURI().toURL()},
+                    new URL[]{
+                            classesDir.toURI().toURL(),
+                            resourcesDir.toURI().toURL()
+                    },
                     Module.class.getClassLoader()
             );
             System.out.println("DEBUG: Attempting to load class: " + config.mainClass);
