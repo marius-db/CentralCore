@@ -1,0 +1,360 @@
+/* citizen module styles — usa la misma paleta que el shell */
+
+.cm-root {
+    -fx-background-color: -cc-bg-dark;
+    -fx-spacing: 0;
+}
+
+/* panel izquierdo */
+
+.cm-list-panel {
+    -fx-background-color: -cc-bg-mid;
+    -fx-border-color: -cc-border;
+    -fx-border-width: 0 1 0 0;
+    -fx-spacing: 0;
+}
+
+.cm-list-header {
+    -fx-padding: 14 14 14 14;
+    -fx-background-color: -cc-bg-mid;
+    -fx-border-color: -cc-border;
+    -fx-border-width: 0 0 1 0;
+    -fx-spacing: 8;
+}
+
+.cm-search {
+    -fx-background-color: -cc-bg-card;
+    -fx-text-fill: -cc-text-primary;
+    -fx-prompt-text-fill: -cc-text-muted;
+    -fx-font-size: 12px;
+    -fx-padding: 7 10 7 10;
+    -fx-background-radius: 5px;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 5px;
+    -fx-border-width: 1px;
+}
+
+.cm-search:focused {
+    -fx-border-color: -cc-blue;
+}
+
+/* tabla */
+
+.cm-table {
+    -fx-background-color: -cc-bg-mid;
+    -fx-border-color: transparent;
+    -fx-table-cell-border-color: -cc-border;
+}
+
+.cm-table .column-header-background {
+    -fx-background-color: -cc-bg-mid;
+}
+
+.cm-table .column-header .label {
+    -fx-text-fill: -cc-text-secondary;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.cm-table .table-row-cell {
+    -fx-background-color: -cc-bg-mid;
+    -fx-border-color: -cc-border;
+    -fx-border-width: 0 0 1 0;
+    -fx-cursor: hand;
+}
+
+.cm-table .table-row-cell:selected {
+    -fx-background-color: derive(-cc-blue, -65%);
+}
+
+.cm-table .table-row-cell:hover {
+    -fx-background-color: -cc-bg-hover;
+}
+
+.cm-table .table-cell {
+    -fx-text-fill: -cc-text-primary;
+    -fx-font-size: 12px;
+    -fx-padding: 8 10 8 10;
+}
+
+/* separador */
+
+.cm-divider {
+    -fx-background-color: -cc-border;
+    -fx-pref-width: 1;
+}
+
+/* panel derecho */
+
+.cm-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background: -cc-bg-dark;
+}
+
+.cm-scroll > .viewport {
+    -fx-background-color: -cc-bg-dark;
+}
+
+/* estado vacio */
+
+.cm-empty-state {
+    -fx-background-color: -cc-bg-dark;
+    -fx-padding: 40;
+    -fx-alignment: center;
+}
+
+.cm-empty-title {
+    -fx-text-fill: -cc-text-secondary;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.cm-empty-subtitle {
+    -fx-text-fill: -cc-text-muted;
+    -fx-font-size: 12px;
+}
+
+/* panel detalle */
+
+.cm-detail-panel {
+    -fx-background-color: -cc-bg-dark;
+    -fx-spacing: 0;
+    -fx-padding: 0;
+}
+
+.cm-detail-header {
+    -fx-background-color: -cc-bg-card;
+    -fx-padding: 22 28 20 28;
+    -fx-border-color: -cc-border;
+    -fx-border-width: 0 0 1 0;
+    -fx-spacing: 6;
+}
+
+.cm-detail-name {
+    -fx-text-fill: -cc-text-primary;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.cm-detail-dni {
+    -fx-text-fill: -cc-text-secondary;
+    -fx-font-size: 13px;
+}
+
+.cm-detail-actions {
+    -fx-spacing: 8;
+    -fx-padding: 8 0 0 0;
+}
+
+/* secciones */
+
+.cm-section {
+    -fx-padding: 20 28 20 28;
+    -fx-border-color: -cc-border;
+    -fx-border-width: 0 0 1 0;
+    -fx-spacing: 12;
+}
+
+.cm-form-section {
+    -fx-background-color: -cc-bg-card;
+    -fx-padding: 18 20 18 20;
+    -fx-background-radius: 8px;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-spacing: 12;
+}
+
+.cm-section-title {
+    -fx-text-fill: -cc-text-muted;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 4 0;
+}
+
+/* campos de detalle */
+
+.cm-grid {
+    -fx-padding: 0;
+}
+
+.cm-field-label {
+    -fx-text-fill: -cc-text-muted;
+    -fx-font-size: 11px;
+    -fx-min-width: 140;
+}
+
+.cm-field-value {
+    -fx-text-fill: -cc-text-primary;
+    -fx-font-size: 13px;
+    -fx-wrap-text: true;
+}
+
+/* badges de estado */
+
+.status-active {
+    -fx-text-fill: -cc-success;
+    -fx-background-color: derive(-cc-success, 75%);
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 10px;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.status-inactive {
+    -fx-text-fill: -cc-text-muted;
+    -fx-background-color: -cc-bg-hover;
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 10px;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* documentos */
+
+.cm-doc-list {
+    -fx-background-color: -cc-bg-mid;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-border-width: 1px;
+}
+
+.cm-doc-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: -cc-border;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 8 12 8 12;
+}
+
+.cm-doc-list .list-cell:selected {
+    -fx-background-color: derive(-cc-blue, -65%);
+}
+
+.cm-doc-list .list-cell:hover {
+    -fx-background-color: -cc-bg-hover;
+}
+
+.doc-name {
+    -fx-text-fill: -cc-text-primary;
+    -fx-font-size: 12px;
+}
+
+.doc-type {
+    -fx-text-fill: -cc-text-muted;
+    -fx-font-size: 11px;
+}
+
+/* formulario de edicion */
+
+.cm-edit-panel {
+    -fx-background-color: -cc-bg-dark;
+    -fx-padding: 24 28 28 28;
+    -fx-spacing: 20;
+}
+
+.cm-edit-title {
+    -fx-text-fill: -cc-text-primary;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 4 0;
+}
+
+.cm-combo {
+    -fx-background-color: -cc-bg-mid;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-text-fill: -cc-text-primary;
+    -fx-font-size: 13px;
+    -fx-padding: 2 0 2 0;
+}
+
+.cm-combo:focused {
+    -fx-border-color: -cc-blue;
+}
+
+.cm-combo .list-cell {
+    -fx-text-fill: -cc-text-primary;
+    -fx-background-color: -cc-bg-mid;
+    -fx-font-size: 13px;
+    -fx-padding: 5 10 5 10;
+}
+
+.cm-datepicker {
+    -fx-background-color: -cc-bg-mid;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-font-size: 13px;
+}
+
+.cm-datepicker .text-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: -cc-text-primary;
+    -fx-font-size: 13px;
+    -fx-padding: 7 10 7 10;
+}
+
+.cm-datepicker:focused {
+    -fx-border-color: -cc-blue;
+}
+
+.cm-checkbox {
+    -fx-text-fill: -cc-text-primary;
+    -fx-font-size: 13px;
+}
+
+/* boton peligro */
+
+.btn-danger {
+    -fx-background-color: -cc-error;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+    -fx-border-width: 0;
+}
+
+.btn-danger:hover {
+    -fx-background-color: derive(-cc-error, -15%);
+}
+
+/* boton ghost azul */
+
+.btn-ghost-blue {
+    -fx-background-color: transparent;
+    -fx-text-fill: -cc-blue-light;
+    -fx-font-size: 12px;
+    -fx-padding: 6 12 6 12;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+    -fx-border-color: -cc-blue;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+}
+
+.btn-ghost-blue:hover {
+    -fx-background-color: derive(-cc-blue, -70%);
+}
+
+/* boton ghost danger */
+
+.btn-ghost-danger {
+    -fx-background-color: transparent;
+    -fx-text-fill: -cc-error;
+    -fx-font-size: 12px;
+    -fx-padding: 6 12 6 12;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+    -fx-border-width: 0;
+}
+
+.btn-ghost-danger:hover {
+    -fx-background-color: derive(-cc-error, 70%);
+}
