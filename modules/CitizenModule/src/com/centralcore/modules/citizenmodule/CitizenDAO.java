@@ -12,7 +12,7 @@ import java.util.List;
 //reutiliza la conexion h2 del core via DatabaseConnection
 public class CitizenDAO {
 
-    //crea las tablas del modulo si no existen — llamado desde CitizenModule.initialize()
+    //crea las tablas del modulo si no existen
     public static void initSchema() {
         Connection conn = DatabaseConnection.getConnection();
         if (conn == null) return;
@@ -42,7 +42,8 @@ public class CitizenDAO {
                 )
             """);
 
-            //columnas que el schema original del core no tenia — ALTER IF NOT EXISTS es h2-safe
+            //columnas que el schema original del core no tenia
+            //ALTER IF NOT EXISTS es h2-safe
             String[] newCols = {
                     "ALTER TABLE ciudadanos ADD COLUMN IF NOT EXISTS lugar_nac VARCHAR(100)",
                     "ALTER TABLE ciudadanos ADD COLUMN IF NOT EXISTS nacionalidad VARCHAR(80)",
@@ -74,7 +75,7 @@ public class CitizenDAO {
         }
     }
 
-    //--- ciudadanos ---
+    //ciudadanos
 
     public List<Citizen> getAll() {
         List<Citizen> list = new ArrayList<>();
@@ -155,7 +156,7 @@ public class CitizenDAO {
         }
     }
 
-    //--- documentos ---
+    //documentos
 
     public List<CitizenDocument> getDocuments(int citizenId) {
         List<CitizenDocument> list = new ArrayList<>();
@@ -200,7 +201,7 @@ public class CitizenDAO {
         }
     }
 
-    //--- mappers ---
+    //mappers
 
     private Citizen map(ResultSet rs) throws SQLException {
         Citizen c = new Citizen();

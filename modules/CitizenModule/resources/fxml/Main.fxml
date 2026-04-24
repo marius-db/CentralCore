@@ -10,7 +10,7 @@
       stylesheets="@../css/Citizen.css"
       VBox.vgrow="ALWAYS">
 
-    <!-- PANEL IZQUIERDO: lista de ciudadanos -->
+    <!--panel izquierdo: lista de ciudadanos-->
     <VBox styleClass="cm-list-panel" minWidth="340" maxWidth="340">
 
         <HBox styleClass="cm-list-header" alignment="CENTER_LEFT" spacing="8">
@@ -36,17 +36,17 @@
 
     <Separator orientation="VERTICAL" styleClass="cm-divider"/>
 
-    <!-- PANEL DERECHO -->
+    <!--panel derecho-->
     <StackPane fx:id="rightPanel" HBox.hgrow="ALWAYS">
 
-        <!-- ESTADO VACIO -->
+        <!--estado vacio-->
         <VBox fx:id="emptyState" styleClass="cm-empty-state" alignment="CENTER" spacing="12">
             <Label text="👤" style="-fx-font-size:48;"/>
             <Label text="Selecciona un ciudadano" styleClass="cm-empty-title"/>
             <Label text="o crea uno nuevo con el botón + Nuevo" styleClass="cm-empty-subtitle"/>
         </VBox>
 
-        <!-- VISTA DETALLE (lectura) -->
+        <!--vista detalle (lectura)-->
         <ScrollPane fx:id="detailView" styleClass="cm-scroll" fitToWidth="true"
                     visible="false" managed="false">
             <VBox styleClass="cm-detail-panel" spacing="0">
@@ -118,7 +118,7 @@
             </VBox>
         </ScrollPane>
 
-        <!-- FORMULARIO EDICION / CREACION -->
+        <!--formulario edicion / creacion-->
         <ScrollPane fx:id="editView" styleClass="cm-scroll" fitToWidth="true"
                     visible="false" managed="false">
             <VBox styleClass="cm-edit-panel" spacing="20">
