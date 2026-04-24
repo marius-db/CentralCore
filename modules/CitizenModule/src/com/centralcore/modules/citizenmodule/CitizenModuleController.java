@@ -27,63 +27,63 @@ import java.util.ResourceBundle;
 
 public class CitizenModuleController implements Initializable {
 
-    //--- tabla ---
+    //tabla
     @FXML private TextField searchField;
     @FXML private TableView<Citizen> citizenTable;
     @FXML private TableColumn<Citizen, String> colDni;
-    @FXML private TableColumn<Citizen, String> colNombre;
-    @FXML private TableColumn<Citizen, String> colMunicipio;
-    @FXML private TableColumn<Citizen, String> colTelefono;
-    @FXML private Button btnNuevo;
+    @FXML private TableColumn<Citizen, String> colName;
+    @FXML private TableColumn<Citizen, String> colMunicipality;
+    @FXML private TableColumn<Citizen, String> colPhone;
+    @FXML private Button btnNew;
 
-    //--- panel derecho: modos ---
+    //panel derecho
     @FXML private StackPane rightPanel;
     @FXML private VBox emptyState;
     @FXML private ScrollPane detailView;
     @FXML private ScrollPane editView;
 
-    //--- detalle (modo lectura) ---
-    @FXML private Label detailNombre;
+    //detalle (modo lectura)
+    @FXML private Label detailName;
     @FXML private Label detailDni;
-    @FXML private Label detailNacimiento;
-    @FXML private Label detailNacionalidad;
-    @FXML private Label detailSexo;
-    @FXML private Label detailDireccion;
-    @FXML private Label detailMunicipio;
-    @FXML private Label detailCp;
-    @FXML private Label detailTelefono;
+    @FXML private Label detailBirthDate;
+    @FXML private Label detailNationality;
+    @FXML private Label detailGender;
+    @FXML private Label detailAddress;
+    @FXML private Label detailMunicipality;
+    @FXML private Label detailPostalCode;
+    @FXML private Label detailPhone;
     @FXML private Label detailEmail;
-    @FXML private Label detailEstadoCivil;
-    @FXML private Label detailEstado;
-    @FXML private Button btnEditar;
-    @FXML private Button btnEliminar;
+    @FXML private Label detailMaritalStatus;
+    @FXML private Label detailStatus;
+    @FXML private Button btnEdit;
+    @FXML private Button btnDelete;
 
-    //--- documentos (en detailView) ---
+    //documentos
     @FXML private ListView<CitizenDocument> docList;
     @FXML private ComboBox<String> docTypeCombo;
     @FXML private Button btnAddDoc;
     @FXML private Button btnOpenDoc;
     @FXML private Button btnDeleteDoc;
 
-    //--- formulario edicion/creacion ---
+    //formulario editar/crear
     @FXML private Label editTitle;
     @FXML private TextField editDni;
-    @FXML private TextField editNombre;
-    @FXML private TextField editApellidos;
-    @FXML private DatePicker editFechaNac;
-    @FXML private TextField editLugarNac;
-    @FXML private TextField editNacionalidad;
-    @FXML private ComboBox<String> editSexo;
-    @FXML private TextField editDireccion;
-    @FXML private TextField editMunicipio;
-    @FXML private TextField editCp;
-    @FXML private TextField editTelefono;
+    @FXML private TextField editFirstName;
+    @FXML private TextField editLastName;
+    @FXML private DatePicker editBirthDate;
+    @FXML private TextField editBirthPlace;
+    @FXML private TextField editNationality;
+    @FXML private ComboBox<String> editGender;
+    @FXML private TextField editAddress;
+    @FXML private TextField editMunicipality;
+    @FXML private TextField editPostalCode;
+    @FXML private TextField editPhone;
     @FXML private TextField editEmail;
-    @FXML private ComboBox<String> editEstadoCivil;
-    @FXML private CheckBox editActivo;
+    @FXML private ComboBox<String> editMaritalStatus;
+    @FXML private CheckBox editActive;
     @FXML private Label editError;
-    @FXML private Button btnGuardar;
-    @FXML private Button btnCancelar;
+    @FXML private Button btnSave;
+    @FXML private Button btnCancel;
 
     private final CitizenDAO dao = new CitizenDAO();
     private final ObservableList<Citizen> citizenData = FXCollections.observableArrayList();
@@ -116,14 +116,14 @@ public class CitizenModuleController implements Initializable {
         });
     }
 
-    //--- setup ---
+    //configuración
 
     private void setupTable() {
         colDni.setCellValueFactory(new PropertyValueFactory<>("dni"));
-        colNombre.setCellValueFactory(cd ->
+        colName.setCellValueFactory(cd ->
                 new javafx.beans.property.SimpleStringProperty(cd.getValue().getNombreCompleto()));
-        colMunicipio.setCellValueFactory(new PropertyValueFactory<>("municipio"));
-        colTelefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
+        colMunicipality.setCellValueFactory(new PropertyValueFactory<>("municipio"));
+        colPhone.setCellValueFactory(new PropertyValueFactory<>("telefono"));
 
         citizenTable.setItems(citizenData);
         citizenTable.setPlaceholder(new Label("No se encontraron ciudadanos"));
@@ -137,8 +137,8 @@ public class CitizenModuleController implements Initializable {
     }
 
     private void setupForm() {
-        editSexo.setItems(FXCollections.observableArrayList("M", "F", "Otro"));
-        editEstadoCivil.setItems(FXCollections.observableArrayList(
+        editGender.setItems(FXCollections.observableArrayList("M", "F", "Otro"));
+        editMaritalStatus.setItems(FXCollections.observableArrayList(
                 "Soltero/a", "Casado/a", "Divorciado/a", "Viudo/a", "Pareja de hecho"
         ));
     }
@@ -168,7 +168,7 @@ public class CitizenModuleController implements Initializable {
         });
     }
 
-    //--- carga de datos ---
+    //cargar datos
 
     private void loadAllCitizens() {
         citizenData.setAll(dao.getAll());
@@ -178,7 +178,7 @@ public class CitizenModuleController implements Initializable {
         citizenData.setAll(dao.search(query));
     }
 
-    //--- visibilidad de paneles ---
+    //visibilidad del panel
 
     private void showEmptyState() {
         emptyState.setVisible(true);
@@ -219,86 +219,86 @@ public class CitizenModuleController implements Initializable {
         }
     }
 
-    //--- populate ---
+    //rellenar
 
     private void populateDetailPanel(Citizen c) {
-        detailNombre.setText(c.getNombreCompleto());
+        detailName.setText(c.getNombreCompleto());
         detailDni.setText(orDash(c.getDni()));
-        detailNacimiento.setText(
+        detailBirthDate.setText(
                 c.getFechaNacimiento() != null
                         ? c.getFechaNacimiento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                         + (c.getLugarNacimiento() != null && !c.getLugarNacimiento().isBlank()
                         ? "  ·  " + c.getLugarNacimiento() : "")
                         : "—"
         );
-        detailNacionalidad.setText(orDash(c.getNacionalidad()));
-        detailSexo.setText(orDash(c.getSexo()));
-        detailDireccion.setText(orDash(c.getDireccion()));
-        detailMunicipio.setText(orDash(c.getMunicipio()));
-        detailCp.setText(orDash(c.getCodigoPostal()));
-        detailTelefono.setText(orDash(c.getTelefono()));
+        detailNationality.setText(orDash(c.getNacionalidad()));
+        detailGender.setText(orDash(c.getSexo()));
+        detailAddress.setText(orDash(c.getDireccion()));
+        detailMunicipality.setText(orDash(c.getMunicipio()));
+        detailPostalCode.setText(orDash(c.getCodigoPostal()));
+        detailPhone.setText(orDash(c.getTelefono()));
         detailEmail.setText(orDash(c.getEmail()));
-        detailEstadoCivil.setText(orDash(c.getEstadoCivil()));
-        detailEstado.setText(c.isActivo() ? "Activo" : "Inactivo");
-        detailEstado.getStyleClass().removeAll("status-active", "status-inactive");
-        detailEstado.getStyleClass().add(c.isActivo() ? "status-active" : "status-inactive");
+        detailMaritalStatus.setText(orDash(c.getEstadoCivil()));
+        detailStatus.setText(c.isActivo() ? "Activo" : "Inactivo");
+        detailStatus.getStyleClass().removeAll("status-active", "status-inactive");
+        detailStatus.getStyleClass().add(c.isActivo() ? "status-active" : "status-inactive");
     }
 
     private void populateForm(Citizen c) {
         editDni.setText(c.getDni());
-        editNombre.setText(c.getNombre());
-        editApellidos.setText(c.getApellidos());
-        editFechaNac.setValue(c.getFechaNacimiento());
-        editLugarNac.setText(orEmpty(c.getLugarNacimiento()));
-        editNacionalidad.setText(orEmpty(c.getNacionalidad()));
-        editSexo.setValue(c.getSexo());
-        editDireccion.setText(orEmpty(c.getDireccion()));
-        editMunicipio.setText(orEmpty(c.getMunicipio()));
-        editCp.setText(orEmpty(c.getCodigoPostal()));
-        editTelefono.setText(orEmpty(c.getTelefono()));
+        editFirstName.setText(c.getNombre());
+        editLastName.setText(c.getApellidos());
+        editBirthDate.setValue(c.getFechaNacimiento());
+        editBirthPlace.setText(orEmpty(c.getLugarNacimiento()));
+        editNationality.setText(orEmpty(c.getNacionalidad()));
+        editGender.setValue(c.getSexo());
+        editAddress.setText(orEmpty(c.getDireccion()));
+        editMunicipality.setText(orEmpty(c.getMunicipio()));
+        editPostalCode.setText(orEmpty(c.getCodigoPostal()));
+        editPhone.setText(orEmpty(c.getTelefono()));
         editEmail.setText(orEmpty(c.getEmail()));
-        editEstadoCivil.setValue(c.getEstadoCivil());
-        editActivo.setSelected(c.isActivo());
+        editMaritalStatus.setValue(c.getEstadoCivil());
+        editActive.setSelected(c.isActivo());
     }
 
     private void clearForm() {
         editDni.clear();
-        editNombre.clear();
-        editApellidos.clear();
-        editFechaNac.setValue(null);
-        editLugarNac.clear();
-        editNacionalidad.clear();
-        editSexo.getSelectionModel().clearSelection();
-        editDireccion.clear();
-        editMunicipio.clear();
-        editCp.clear();
-        editTelefono.clear();
+        editFirstName.clear();
+        editLastName.clear();
+        editBirthDate.setValue(null);
+        editBirthPlace.clear();
+        editNationality.clear();
+        editGender.getSelectionModel().clearSelection();
+        editAddress.clear();
+        editMunicipality.clear();
+        editPostalCode.clear();
+        editPhone.clear();
         editEmail.clear();
-        editEstadoCivil.getSelectionModel().clearSelection();
-        editActivo.setSelected(true);
+        editMaritalStatus.getSelectionModel().clearSelection();
+        editActive.setSelected(true);
     }
 
-    //--- acciones tabla ---
+    //acciones tabla
 
     @FXML
-    private void onNuevo() {
+    private void onNew() {
         isNewRecord = true;
         selectedCitizen = null;
         citizenTable.getSelectionModel().clearSelection();
         showEditView(true);
     }
 
-    //--- acciones detalle ---
+    //acciones detalle
 
     @FXML
-    private void onEditar() {
+    private void onEdit() {
         if (selectedCitizen == null) return;
         isNewRecord = false;
         showEditView(false);
     }
 
     @FXML
-    private void onEliminar() {
+    private void onDelete() {
         if (selectedCitizen == null) return;
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
@@ -310,7 +310,7 @@ public class CitizenModuleController implements Initializable {
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                //eliminar archivos fisicos del disco
+                //eliminar archivos físicos del disco
                 deleteDocumentFiles(selectedCitizen.getId());
                 dao.delete(selectedCitizen.getId());
                 selectedCitizen = null;
@@ -322,10 +322,10 @@ public class CitizenModuleController implements Initializable {
         }
     }
 
-    //--- acciones formulario ---
+    //acciones formulario
 
     @FXML
-    private void onGuardar() {
+    private void onSave() {
         if (!validateForm()) return;
 
         Citizen c = isNewRecord ? new Citizen() : selectedCitizen;
@@ -354,7 +354,7 @@ public class CitizenModuleController implements Initializable {
     }
 
     @FXML
-    private void onCancelar() {
+    private void onCancel() {
         if (selectedCitizen != null) {
             showDetailView(selectedCitizen);
         } else {
@@ -362,7 +362,7 @@ public class CitizenModuleController implements Initializable {
         }
     }
 
-    //--- validacion ---
+    //validación
 
     private boolean validateForm() {
         editError.setVisible(false);
@@ -372,22 +372,22 @@ public class CitizenModuleController implements Initializable {
             editError.setVisible(true);
             return false;
         }
-        if (editNombre.getText().isBlank()) {
+        if (editFirstName.getText().isBlank()) {
             editError.setText("El nombre es obligatorio");
             editError.setVisible(true);
             return false;
         }
-        if (editApellidos.getText().isBlank()) {
+        if (editLastName.getText().isBlank()) {
             editError.setText("Los apellidos son obligatorios");
             editError.setVisible(true);
             return false;
         }
-        if (editFechaNac.getValue() == null) {
+        if (editBirthDate.getValue() == null) {
             editError.setText("La fecha de nacimiento es obligatoria");
             editError.setVisible(true);
             return false;
         }
-        if (editFechaNac.getValue().isAfter(LocalDate.now())) {
+        if (editBirthDate.getValue().isAfter(LocalDate.now())) {
             editError.setText("La fecha de nacimiento no puede ser futura");
             editError.setVisible(true);
             return false;
@@ -397,22 +397,22 @@ public class CitizenModuleController implements Initializable {
 
     private void readFormInto(Citizen c) {
         c.setDni(editDni.getText().trim().toUpperCase());
-        c.setNombre(editNombre.getText().trim());
-        c.setApellidos(editApellidos.getText().trim());
-        c.setFechaNacimiento(editFechaNac.getValue());
-        c.setLugarNacimiento(editLugarNac.getText().trim());
-        c.setNacionalidad(editNacionalidad.getText().trim());
-        c.setSexo(editSexo.getValue());
-        c.setDireccion(editDireccion.getText().trim());
-        c.setMunicipio(editMunicipio.getText().trim());
-        c.setCodigoPostal(editCp.getText().trim());
-        c.setTelefono(editTelefono.getText().trim());
+        c.setNombre(editFirstName.getText().trim());
+        c.setApellidos(editLastName.getText().trim());
+        c.setFechaNacimiento(editBirthDate.getValue());
+        c.setLugarNacimiento(editBirthPlace.getText().trim());
+        c.setNacionalidad(editNationality.getText().trim());
+        c.setSexo(editGender.getValue());
+        c.setDireccion(editAddress.getText().trim());
+        c.setMunicipio(editMunicipality.getText().trim());
+        c.setCodigoPostal(editPostalCode.getText().trim());
+        c.setTelefono(editPhone.getText().trim());
         c.setEmail(editEmail.getText().trim());
-        c.setEstadoCivil(editEstadoCivil.getValue());
-        c.setActivo(editActivo.isSelected());
+        c.setEstadoCivil(editMaritalStatus.getValue());
+        c.setActivo(editActive.isSelected());
     }
 
-    //--- documentos ---
+    //documentos
 
     private void loadDocuments(int citizenId) {
         List<CitizenDocument> docs = dao.getDocuments(citizenId);
@@ -440,7 +440,7 @@ public class CitizenModuleController implements Initializable {
                     String.valueOf(selectedCitizen.getId()));
             Files.createDirectories(destDir);
 
-            //si ya existe un archivo con ese nombre se le añade timestamp para no pisar
+            //si un archivo con ese nombre ya existe, se añade una marca de tiempo para evitar sobrescribir.
             String fileName = file.getName();
             Path dest = destDir.resolve(fileName);
             if (Files.exists(dest)) {
@@ -496,14 +496,14 @@ public class CitizenModuleController implements Initializable {
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Eliminar documento");
-        confirm.setHeaderText("¿Eliminar " + doc.getNombreArchivo() + "?");
+        confirm.setHeaderText("Eliminar " + doc.getNombreArchivo() + "?");
         confirm.setContentText("El archivo también se borrará del disco.");
         styleAlert(confirm);
 
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                //borra el archivo fisico
+                //eliminando el archivo del disco
                 File file = new File(doc.getRutaArchivo());
                 if (file.exists()) file.delete();
 
@@ -515,7 +515,7 @@ public class CitizenModuleController implements Initializable {
         }
     }
 
-    //--- helpers ---
+    //helpers
 
     private void deleteDocumentFiles(int citizenId) {
         List<CitizenDocument> docs = dao.getDocuments(citizenId);
