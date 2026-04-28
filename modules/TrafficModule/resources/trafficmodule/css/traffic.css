@@ -1,0 +1,242 @@
+/* traffic module styles — usa la misma paleta de variables del shell */
+
+.tm-root {
+    -fx-background-color: -cc-bg-dark;
+    -fx-spacing: 0;
+}
+
+/* area del mapa */
+
+.tm-map-pane {
+    -fx-background-color: #0b0d12;
+}
+
+/* panel lateral */
+
+.tm-side-panel {
+    -fx-background-color: -cc-bg-mid;
+    -fx-border-color: -cc-border;
+    -fx-border-width: 0 0 0 1;
+}
+
+/* barra de conexion */
+
+.tm-con-bar {
+    -fx-padding: 10 12 6 12;
+    -fx-background-color: -cc-bg-mid;
+}
+
+.tm-con-bar2 {
+    -fx-padding: 0 12 10 12;
+    -fx-background-color: -cc-bg-mid;
+    -fx-border-color: -cc-border;
+    -fx-border-width: 0 0 1 0;
+}
+
+.tm-con-label {
+    -fx-text-fill: -cc-text-secondary;
+    -fx-font-size: 11px;
+}
+
+.tm-url-field {
+    -fx-background-color: -cc-bg-card;
+    -fx-text-fill: -cc-text-primary;
+    -fx-prompt-text-fill: -cc-text-muted;
+    -fx-font-size: 11px;
+    -fx-padding: 5 8 5 8;
+    -fx-background-radius: 5px;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 5px;
+    -fx-border-width: 1px;
+}
+
+.tm-url-field:focused {
+    -fx-border-color: -cc-blue;
+}
+
+/* tabs */
+
+.tm-tabpane {
+    -fx-background-color: -cc-bg-mid;
+    -fx-tab-min-height: 32px;
+}
+
+.tm-tabpane .tab-header-area {
+    -fx-background-color: -cc-bg-mid;
+    -fx-border-color: -cc-border;
+    -fx-border-width: 0 0 1 0;
+}
+
+.tm-tabpane .tab {
+    -fx-background-color: transparent;
+    -fx-padding: 6 10 6 10;
+}
+
+.tm-tabpane .tab .tab-label {
+    -fx-text-fill: -cc-text-secondary;
+    -fx-font-size: 11px;
+}
+
+.tm-tabpane .tab:selected {
+    -fx-background-color: -cc-bg-dark;
+}
+
+.tm-tabpane .tab:selected .tab-label {
+    -fx-text-fill: -cc-blue;
+    -fx-font-weight: bold;
+}
+
+.tm-tabpane .tab-header-background {
+    -fx-background-color: -cc-bg-mid;
+}
+
+.tm-tabpane > .tab-content-area {
+    -fx-background-color: -cc-bg-dark;
+    -fx-padding: 0;
+}
+
+/* contenido de tabs */
+
+.tm-tab-content {
+    -fx-padding: 12;
+    -fx-background-color: -cc-bg-dark;
+    -fx-spacing: 10;
+}
+
+.tm-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background: -cc-bg-dark;
+}
+
+.tm-scroll > .viewport {
+    -fx-background-color: -cc-bg-dark;
+}
+
+/* titulos de seccion */
+
+.tm-section-title {
+    -fx-text-fill: -cc-text-muted;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 0 4 0;
+    -fx-letter-spacing: 0.8px;
+}
+
+/* card */
+
+.tm-card {
+    -fx-background-color: -cc-bg-card;
+    -fx-background-radius: 6px;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-padding: 12;
+}
+
+/* listas */
+
+.tm-list {
+    -fx-background-color: -cc-bg-mid;
+    -fx-border-color: -cc-border;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.tm-list .list-cell {
+    -fx-background-color: -cc-bg-mid;
+    -fx-text-fill: -cc-text-primary;
+    -fx-font-size: 11px;
+    -fx-border-color: -cc-border;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 6 8 6 8;
+}
+
+.tm-list .list-cell:selected {
+    -fx-background-color: derive(-cc-blue, -65%);
+}
+
+.tm-list .list-cell:hover {
+    -fx-background-color: -cc-bg-hover;
+}
+
+.tm-list .list-cell.inc-critico {
+    -fx-border-color: #ef444430;
+}
+
+.tm-list .list-cell.inc-abierto {
+    -fx-border-color: #f59e0b30;
+}
+
+.tm-list .list-cell.inc-resuelto {
+    -fx-border-color: #22c55e30;
+}
+
+/* labels de emergencia */
+
+.tm-hint {
+    -fx-text-fill: -cc-text-muted;
+    -fx-font-size: 10px;
+}
+
+.tm-field-label {
+    -fx-text-fill: -cc-text-secondary;
+    -fx-font-size: 11px;
+}
+
+.tm-point-a {
+    -fx-text-fill: #22c55e;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.tm-point-b {
+    -fx-text-fill: #ef4444;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.tm-route-status {
+    -fx-text-fill: -cc-text-secondary;
+    -fx-font-size: 11px;
+    -fx-padding: 4 0 0 0;
+}
+
+/* labels dentro de celdas de lista */
+
+.tm-list-label {
+    -fx-text-fill: -cc-text-primary;
+    -fx-font-size: 11px;
+}
+
+.tm-density-label {
+    -fx-text-fill: -cc-text-secondary;
+    -fx-font-size: 10px;
+    -fx-min-width: 30px;
+}
+
+/* combo */
+
+.tm-combo {
+    -fx-background-color: -cc-bg-card;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-border-width: 1px;
+}
+
+.tm-combo .list-cell {
+    -fx-background-color: -cc-bg-card;
+    -fx-text-fill: -cc-text-primary;
+    -fx-font-size: 11px;
+}
+
+.tm-combo:focused {
+    -fx-border-color: -cc-blue;
+}
+
+.tm-combo .combo-box-popup > .list-view {
+    -fx-background-color: -cc-bg-card;
+    -fx-border-color: -cc-border;
+}

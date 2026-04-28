@@ -17,6 +17,7 @@ javafx {
 }
 
 dependencies {
+    implementation 'com.google.code.gson:gson:2.10.1'
     compileOnly rootProject.project(':core').sourceSets.main.output
 }
 
@@ -26,7 +27,7 @@ sourceSets {
             srcDirs = ['src']
         }
         resources {
-            srcDirs = ['resources', 'css', 'fxml', 'images']
+            srcDirs = ['resources']
         }
     }
 }

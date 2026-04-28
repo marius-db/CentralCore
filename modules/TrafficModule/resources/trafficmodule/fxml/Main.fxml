@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.geometry.Insets?>
+
+<HBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.centralcore.modules.trafficmodule.TrafficModuleController"
+      styleClass="tm-root"
+      stylesheets="@../css/traffic.css"
+      VBox.vgrow="ALWAYS">
+
+    <!--area principal del mapa-->
+    <StackPane fx:id="mapPane" HBox.hgrow="ALWAYS" styleClass="tm-map-pane"/>
+
+    <!--panel lateral derecho-->
+    <VBox styleClass="tm-side-panel" minWidth="290" maxWidth="290" spacing="0">
+
+        <!--fila de conexion-->
+        <HBox styleClass="tm-con-bar" alignment="CENTER_LEFT" spacing="8">
+            <Circle fx:id="dotConStatus" radius="5" fill="#ef4444"/>
+            <Label  fx:id="lblConStatus" text="Sin conexión" styleClass="tm-con-label" HBox.hgrow="ALWAYS"/>
+        </HBox>
+
+        <HBox styleClass="tm-con-bar2" alignment="CENTER_LEFT" spacing="6">
+            <TextField fx:id="fieldWsUrl" styleClass="tm-url-field"
+                       promptText="ws://localhost:8765" HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnConectar" styleClass="btn-primary" text="Conectar"
+                    onAction="#onToggleConexion"/>
+        </HBox>
+
+        <!--tabs-->
+        <TabPane styleClass="tm-tabpane" VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE">
+
+            <!--tab semaforos-->
+            <Tab text="Semáforos">
+                <VBox styleClass="tm-tab-content" spacing="0">
+                    <Label text="ESTADO DE SEMÁFOROS" styleClass="tm-section-title"/>
+                    <ListView fx:id="listSemaforos" styleClass="tm-list" VBox.vgrow="ALWAYS"/>
+                </VBox>
+            </Tab>
+
+            <!--tab trafico-->
+            <Tab text="Tráfico">
+                <VBox styleClass="tm-tab-content" spacing="0">
+                    <Label text="DENSIDAD POR VÍA" styleClass="tm-section-title"/>
+                    <ListView fx:id="listTrafico" styleClass="tm-list" VBox.vgrow="ALWAYS"/>
+                </VBox>
+            </Tab>
+
+            <!--tab emergencia-->
+            <Tab text="Emergencia">
+                <ScrollPane fitToWidth="true" styleClass="tm-scroll">
+                    <VBox styleClass="tm-tab-content" spacing="12">
+
+                        <Label text="RUTA DE VEHÍCULO DE EMERGENCIA" styleClass="tm-section-title"/>
+
+                        <VBox styleClass="tm-card" spacing="8">
+                            <Label text="Clic derecho sobre un nodo del mapa para seleccionar los puntos."
+                                   styleClass="tm-hint" wrapText="true"/>
+
+                            <HBox spacing="8" alignment="CENTER_LEFT">
+                                <Label text="Punto A:" styleClass="tm-field-label" minWidth="60"/>
+                                <Label fx:id="lblPuntoA" text="Sin seleccionar" styleClass="tm-point-a"/>
+                            </HBox>
+                            <HBox spacing="8" alignment="CENTER_LEFT">
+                                <Label text="Punto B:" styleClass="tm-field-label" minWidth="60"/>
+                                <Label fx:id="lblPuntoB" text="Sin seleccionar" styleClass="tm-point-b"/>
+                            </HBox>
+                        </VBox>
+
+                        <HBox spacing="8">
+                            <Button fx:id="btnEnviarRuta" styleClass="btn-primary"
+                                    text="Enviar ruta" onAction="#onEnviarRuta"
+                                    disable="true" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                            <Button fx:id="btnCancelarRuta" styleClass="btn-danger"
+                                    text="Cancelar" onAction="#onCancelarRuta"
+                                    disable="true"/>
+                        </HBox>
+
+                        <Label fx:id="lblEstadoRuta" text="Sin ruta activa"
+                               styleClass="tm-route-status" wrapText="true"/>
+
+                    </VBox>
+                </ScrollPane>
+            </Tab>
+
+            <!--tab incidentes-->
+            <Tab text="Incidentes">
+                <ScrollPane fitToWidth="true" styleClass="tm-scroll">
+                    <VBox styleClass="tm-tab-content" spacing="10">
+
+                        <Label text="NUEVO INCIDENTE" styleClass="tm-section-title"/>
+
+                        <VBox styleClass="tm-card" spacing="8">
+                            <VBox spacing="4">
+                                <Label text="Tipo" styleClass="field-label"/>
+                                <ComboBox fx:id="comboTipoIncidente" styleClass="tm-combo"
+                                          maxWidth="Infinity"/>
+                            </VBox>
+                            <VBox spacing="4">
+                                <Label text="Estado inicial" styleClass="field-label"/>
+                                <ComboBox fx:id="comboEstadoIncidente" styleClass="tm-combo"
+                                          maxWidth="Infinity"/>
+                            </VBox>
+                            <VBox spacing="4">
+                                <Label text="Descripción" styleClass="field-label"/>
+                                <TextField fx:id="fieldDescIncidente" styleClass="field-input"
+                                           promptText="Descripción breve…"/>
+                            </VBox>
+                            <Button fx:id="btnMarcarMapa" styleClass="btn-ghost-blue"
+                                    text="Marcar en mapa" maxWidth="Infinity"/>
+                        </VBox>
+
+                        <Label text="INCIDENTES ACTIVOS" styleClass="tm-section-title"/>
+                        <ListView fx:id="listIncidentes" styleClass="tm-list" prefHeight="160"/>
+
+                        <VBox styleClass="tm-card" spacing="8">
+                            <Label text="ACTUALIZAR SELECCIONADO" styleClass="tm-section-title"
+                                   style="-fx-padding:0;"/>
+                            <VBox spacing="4">
+                                <Label text="Nuevo estado" styleClass="field-label"/>
+                                <ComboBox fx:id="comboEstadoUpdate" styleClass="tm-combo"
+                                          maxWidth="Infinity"/>
+                            </VBox>
+                            <VBox spacing="4">
+                                <Label text="Nota" styleClass="field-label"/>
+                                <TextField fx:id="fieldNotaUpdate" styleClass="field-input"
+                                           promptText="Nota de actualización…"/>
+                            </VBox>
+                            <HBox spacing="8">
+                                <Button fx:id="btnActualizarInc" styleClass="btn-primary"
+                                        text="Actualizar" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                <Button fx:id="btnCerrarInc" styleClass="btn-danger"
+                                        text="Cerrar inc."/>
+                            </HBox>
+                        </VBox>
+
+                    </VBox>
+                </ScrollPane>
+            </Tab>
+
+            <!--tab historial-->
+            <Tab text="Historial">
+                <VBox styleClass="tm-tab-content" spacing="0">
+                    <Label text="INCIDENTES CERRADOS" styleClass="tm-section-title"/>
+                    <ListView fx:id="listHistorial" styleClass="tm-list" VBox.vgrow="ALWAYS"/>
+                    <Label text="PROGRESIÓN DEL INCIDENTE" styleClass="tm-section-title"/>
+                    <ListView fx:id="listUpdates" styleClass="tm-list" prefHeight="160"/>
+                </VBox>
+            </Tab>
+
+        </TabPane>
+
+    </VBox>
+
+</HBox>
