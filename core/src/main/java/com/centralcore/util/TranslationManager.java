@@ -12,7 +12,7 @@ import java.util.ResourceBundle;
 public class TranslationManager {
 
     private static ResourceBundle bundle;
-    private static String currentLanguage = "en";
+    private static String currentLanguage = "";
     private static final String LANGUAGE_CONFIG_FILE = System.getProperty("user.home") + "/.centralcore/language.conf";
 
     private static List<LanguageChangeListener> listeners = new ArrayList<>();
@@ -23,7 +23,7 @@ public class TranslationManager {
 
     static {
         String savedLanguage = loadSavedLanguage();
-        setLanguage(savedLanguage != null ? savedLanguage : "en");
+        setLanguage(savedLanguage != null ? savedLanguage : "es");
     }
 
     public static void setLanguage(String languageCode) {
@@ -33,17 +33,14 @@ public class TranslationManager {
 
         currentLanguage = languageCode;
         try {
-            bundle = ResourceBundle.getBundle(
-                    "messages",
-                    new Locale(languageCode)
-            );
+            bundle = ResourceBundle.getBundle("messages", Locale.of(languageCode));
 
             saveLanguage(languageCode);
             notifyListeners(languageCode);
 
         } catch (Exception e) {
             System.err.println("error al cargar archivo de idioma: " + languageCode);
-            bundle = ResourceBundle.getBundle("messages", new Locale("en"));
+            bundle = ResourceBundle.getBundle("messages", Locale.of("en"));
         }
     }
 
