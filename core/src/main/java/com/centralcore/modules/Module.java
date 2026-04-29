@@ -7,9 +7,13 @@ import javafx.scene.Parent;
 public interface Module {
 
     String getModuleId();
+
     String getName();
+
     String getVersion();
+
     String getDescription();
+
     String getLogoPath();
 
     //llamado al cargar el modulo: inicializar recursos aqui

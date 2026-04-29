@@ -19,13 +19,13 @@ import javafx.scene.control.TextField;
 
 public class LoginController implements Initializable, TranslationManager.LanguageChangeListener {
 
-    @FXML private TextField     txtEmail;
+    @FXML private TextField txtEmail;
     @FXML private PasswordField txtPassword;
-    @FXML private Label         lblError;
-    @FXML private Label         lblEmail;
-    @FXML private Label         lblPassword;
-    @FXML private Button        btnLogin;
-    @FXML private Button        btnBack;
+    @FXML private Label lblError;
+    @FXML private Label lblEmail;
+    @FXML private Label lblPassword;
+    @FXML private Button btnLogin;
+    @FXML private Button btnBack;
     @FXML private ComboBox<String> cmbLanguage;
 
     @Override
@@ -63,7 +63,7 @@ public class LoginController implements Initializable, TranslationManager.Langua
 
     @FXML
     private void onLoginClicked() {
-        String email    = txtEmail.getText().trim();
+        String email = txtEmail.getText().trim();
         String password = txtPassword.getText();
 
         if (email.isEmpty() || password.isEmpty()) {

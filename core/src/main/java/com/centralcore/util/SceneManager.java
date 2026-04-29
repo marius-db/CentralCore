@@ -26,8 +26,6 @@ public class SceneManager {
     private static final String FXML_PATH = "/com/centralcore/fxml/";
     private static final String CSS_PATH = "/com/centralcore/css/";
 
-    private SceneManager() {}
-
     public static void initialize(Stage primaryStage) {
         stage = primaryStage;
     }

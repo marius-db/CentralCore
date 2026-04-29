@@ -17,12 +17,13 @@ public class DatabaseConnection {
                     + ";DB_CLOSE_DELAY=-1"
                     + ";NON_KEYWORDS=VALUE";
 
-    private static final String USER     = "sa";
+    private static final String USER = "sa";
     private static final String PASSWORD = "";
 
     private static Connection connection = null;
 
-    private DatabaseConnection() {}
+    private DatabaseConnection() {
+    }
 
     public static Connection getConnection() {
         try {

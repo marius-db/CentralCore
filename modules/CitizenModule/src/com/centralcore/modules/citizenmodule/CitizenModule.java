@@ -11,19 +11,29 @@ public class CitizenModule implements Module {
     private CitizenModuleController controller;
 
     @Override
-    public String getModuleId() { return "citizen_module"; }
+    public String getModuleId() {
+        return "citizen_module";
+    }
 
     @Override
-    public String getName() { return "Citizen Database"; }
+    public String getName() {
+        return "Citizen Database";
+    }
 
     @Override
-    public String getVersion() { return "1.0.0"; }
+    public String getVersion() {
+        return "1.0.0";
+    }
 
     @Override
-    public String getDescription() { return "Manage city citizen records and documents"; }
+    public String getDescription() {
+        return "Manage city citizen records and documents";
+    }
 
     @Override
-    public String getLogoPath() { return "images/logo.png"; }
+    public String getLogoPath() {
+        return "images/logo.png";
+    }
 
     @Override
     public void initialize() throws Exception {

@@ -7,7 +7,8 @@ public class SessionManager {
 
     private static User currentUser = null;
 
-    private SessionManager() {}
+    private SessionManager() {
+    }
 
     public static void setCurrentUser(User user) {
         currentUser = user;

@@ -20,28 +20,28 @@ public class TrafficDAO {
         try (Statement stmt = conn.createStatement()) {
 
             stmt.execute("""
-                CREATE TABLE IF NOT EXISTS traffic_incidents (
-                    id          INT           AUTO_INCREMENT PRIMARY KEY,
-                    tipo        VARCHAR(80)   NOT NULL,
-                    descripcion VARCHAR(1000),
-                    map_x       DECIMAL(10,3) NOT NULL DEFAULT 0,
-                    map_y       DECIMAL(10,3) NOT NULL DEFAULT 0,
-                    estado      VARCHAR(40)   NOT NULL DEFAULT 'Abierto',
-                    created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    closed_at   TIMESTAMP
-                )
-            """);
+                        CREATE TABLE IF NOT EXISTS traffic_incidents (
+                            id          INT           AUTO_INCREMENT PRIMARY KEY,
+                            tipo        VARCHAR(80)   NOT NULL,
+                            descripcion VARCHAR(1000),
+                            map_x       DECIMAL(10,3) NOT NULL DEFAULT 0,
+                            map_y       DECIMAL(10,3) NOT NULL DEFAULT 0,
+                            estado      VARCHAR(40)   NOT NULL DEFAULT 'Abierto',
+                            created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            closed_at   TIMESTAMP
+                        )
+                    """);
 
             stmt.execute("""
-                CREATE TABLE IF NOT EXISTS traffic_incident_updates (
-                    id          INT           AUTO_INCREMENT PRIMARY KEY,
-                    incident_id INT           NOT NULL,
-                    estado      VARCHAR(40)   NOT NULL,
-                    nota        VARCHAR(1000),
-                    created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (incident_id) REFERENCES traffic_incidents(id) ON DELETE CASCADE
-                )
-            """);
+                        CREATE TABLE IF NOT EXISTS traffic_incident_updates (
+                            id          INT           AUTO_INCREMENT PRIMARY KEY,
+                            incident_id INT           NOT NULL,
+                            estado      VARCHAR(40)   NOT NULL,
+                            nota        VARCHAR(1000),
+                            created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            FOREIGN KEY (incident_id) REFERENCES traffic_incidents(id) ON DELETE CASCADE
+                        )
+                    """);
 
             System.out.println("traffic module schema ready");
 
@@ -69,7 +69,7 @@ public class TrafficDAO {
         if (conn == null) return list;
 
         String sql = "SELECT id, tipo, descripcion, map_x, map_y, estado, created_at, closed_at " +
-                     "FROM traffic_incidents " + whereClause;
+                "FROM traffic_incidents " + whereClause;
 
         try (PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -181,7 +181,7 @@ public class TrafficDAO {
         if (conn == null) return list;
 
         String sql = "SELECT id, incident_id, estado, nota, created_at " +
-                     "FROM traffic_incident_updates WHERE incident_id = ? ORDER BY created_at ASC";
+                "FROM traffic_incident_updates WHERE incident_id = ? ORDER BY created_at ASC";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, incidentId);
@@ -204,7 +204,6 @@ public class TrafficDAO {
     }
 
     //helpers
-
     private Incident mapRow(ResultSet rs) throws SQLException {
         Incident i = new Incident();
         i.setId(rs.getInt("id"));

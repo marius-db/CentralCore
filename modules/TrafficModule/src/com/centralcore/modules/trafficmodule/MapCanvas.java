@@ -8,470 +8,686 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-//canvas personalizado para renderizar el mapa de trafico
-//soporta pan (arrastrar), zoom (scroll), clic derecho para menu contextual
+//canvas de trafico optimizado:
+//- colores y fuentes pre-cacheados (sin Color.web/Font.font en el render loop)
+//- sin gc.save/restore en bucles (causa freeze en zoom con muchos elementos)
+//- coches con separacion real entre carriles
+//- clic derecho funciona en cualquier punto (nodo, calle o vacio)
 public class MapCanvas extends Canvas {
 
-    //paleta de colores del mapa (tema oscuro, consistente con la app)
-    private static final Color BG            = Color.web("#0b0d12");
-    private static final Color ROAD_MAIN     = Color.web("#232840");
-    private static final Color ROAD_SIDE     = Color.web("#191c2a");
-    private static final Color ROAD_BORDER   = Color.web("#2e3450");
-    private static final Color LANE_LINE     = Color.web("#3a4060");
-    private static final Color NODE_FILL     = Color.web("#1e2236");
-    private static final Color NODE_STROKE   = Color.web("#2b7fff").deriveColor(0, 1, 1, 0.5);
-    private static final Color CAR_COLOR     = Color.web("#5a9fff");
-    private static final Color EV_COLOR      = Color.web("#00e5ff");
-    private static final Color ROUTE_COLOR   = Color.web("#2b7fff").deriveColor(0, 1, 1, 0.6);
-    private static final Color POINT_A       = Color.web("#22c55e");
-    private static final Color POINT_B       = Color.web("#ef4444");
-    private static final Color INCIDENT_OPEN = Color.web("#f59e0b");
-    private static final Color INCIDENT_CRI  = Color.web("#ef4444");
-    private static final Color INCIDENT_MIN  = Color.web("#22c55e");
-    private static final Color TEXT_MUTED    = Color.web("#555d75");
-    private static final Color LIGHT_GREEN   = Color.web("#22c55e");
-    private static final Color LIGHT_YELLOW  = Color.web("#f59e0b");
-    private static final Color LIGHT_RED     = Color.web("#ef4444");
+    //paleta: todas las constantes de color se crean una sola vez al cargar la clase
+    private static final Color BG = Color.web("#0b0d12");
+    private static final Color ROAD_MAIN = Color.web("#23283f");
+    private static final Color ROAD_SIDE = Color.web("#191c2a");
+    private static final Color ROAD_BORDER = Color.web("#2e3450");
+    private static final Color LANE_LINE = Color.web("#3a4060");
+    private static final Color NODE_FILL = Color.web("#1e2236");
+    private static final Color NODE_STROKE = Color.web("#2b7fff80");
+    private static final Color CAR_COLOR = Color.web("#5a9fff");
+    private static final Color EV_COLOR = Color.web("#00e5ff");
+    private static final Color ROUTE_COLOR = Color.web("#2b7fff99");
+    private static final Color POINT_A = Color.web("#22c55e");
+    private static final Color POINT_B = Color.web("#ef4444");
+    private static final Color POINT_A_FILL = Color.web("#22c55e40");
+    private static final Color POINT_B_FILL = Color.web("#ef444440");
+    private static final Color INC_OPEN = Color.web("#f59e0b");
+    private static final Color INC_CRI = Color.web("#ef4444");
+    private static final Color INC_MIN = Color.web("#22c55e");
+    private static final Color TEXT_MUTED = Color.web("#555d75");
+    private static final Color TEXT_ROAD = Color.web("#7882aa");
+    private static final Color LT_GREEN = Color.web("#22c55e");
+    private static final Color LT_YELLOW = Color.web("#f59e0b");
+    private static final Color LT_RED = Color.web("#ef4444");
+    private static final Color LT_BG = Color.web("#0d0f14");
+    private static final Color WHITE = Color.WHITE;
+    private static final Color DENS_MID = Color.web("#503510");
+    private static final Color DENS_HIGH = Color.web("#5a1414");
+    private static final Color HINT_INC_BG = Color.web("#f59e0bd9");
+    private static final Color HINT_A_BG = Color.web("#22c55ed9");
+    private static final Color HINT_B_BG = Color.web("#ef4444d9");
+    private static final Color HINT_FG = Color.web("#0d0f14");
 
-    //estado de la simulacion y datos de incidentes
-    private SimState        simState   = null;
-    private List<Incident>  incidents  = new ArrayList<>();
-    private String          pointAId   = null;
-    private String          pointBId   = null;
-    private List<String>    routeNodes = new ArrayList<>();
+    //fuentes pre-cacheadas
+    private static final Font FONT_ROAD = Font.font("System", 10);
+    private static final Font FONT_LABEL = Font.font("System", FontWeight.BOLD, 11);
+    private static final Font FONT_HINT = Font.font("System", 12);
+    private static final Font FONT_BIG = Font.font("System", 13);
+    private static final Font FONT_SMALL = Font.font("System", 11);
 
-    //transformacion del canvas: pan + zoom
-    private double offsetX = 50;
-    private double offsetY = 50;
-    private double scale   = 1.0;
-    private double dragStartX;
-    private double dragStartY;
-    private double dragOffsetX;
-    private double dragOffsetY;
+    private static final double ROAD_MAIN_W = 28;
+    private static final double ROAD_SIDE_W = 16;
+    private static final double EDGE_HIT = 14;
+    //separacion entre carriles: suficiente para coches de 9px sin solapamiento
+    private static final double LANE_SEP = 7.0;
 
-    //modo colocacion de incidente (clic izquierdo planta un pin)
+    private SimState simState = null;
+    private List<Incident> incidents = new ArrayList<>();
+
+    private String pointAId = null, pointBId = null;
+    private double pointAX = Double.NaN, pointAY = Double.NaN;
+    private double pointBX = Double.NaN, pointBY = Double.NaN;
+
+    private List<String> routeNodes = new ArrayList<>();
+    private double offsetX = 50, offsetY = 50, scale = 1.0;
+    private double dragStartX, dragStartY, dragOffX, dragOffY;
+    private boolean isDragging = false;
+
     private boolean placingIncident = false;
+    private boolean placingPointA = false;
+    private boolean placingPointB = false;
+    private Incident selectedInc = null;
 
-    //incidente seleccionado (para highlight)
-    private Incident selectedIncident = null;
+    private final DropShadow evGlow = new DropShadow(12, EV_COLOR);
 
-    //efecto glow para el vehiculo de emergencia
-    private final DropShadow evGlow;
-
-    //callbacks
-    private BiConsumer<Double, Double>    onIncidentPlaced;
-    private Consumer<TrafficNode>         onNodeRightClicked;
-    private Consumer<double[]>            onMapRightClicked;
-    private Consumer<Incident>            onIncidentSelected;
+    private BiConsumer<Double, Double> onIncidentPlaced;
+    private Consumer<double[]> onPointAPlaced;
+    private Consumer<double[]> onPointBPlaced;
+    private Consumer<TrafficNode> onNodeRightClicked;
+    private Consumer<double[]> onRoadRightClicked;
+    private Consumer<Incident> onIncidentSelected;
 
     private volatile boolean dirty = true;
 
     public MapCanvas() {
-        evGlow = new DropShadow(12, EV_COLOR);
-
         setupInput();
         startRenderLoop();
-
-        //redibujar al cambiar el tamaño
         widthProperty().addListener((o, v, n) -> dirty = true);
         heightProperty().addListener((o, v, n) -> dirty = true);
     }
 
-    @Override public boolean isResizable()              { return true; }
-    @Override public double prefWidth(double h)         { return getWidth(); }
-    @Override public double prefHeight(double w)        { return getHeight(); }
+    @Override
+    public boolean isResizable() {
+        return true;
+    }
+
+    @Override
+    public double prefWidth(double h) {
+        return getWidth();
+    }
+
+    @Override
+    public double prefHeight(double w) {
+        return getHeight();
+    }
 
     //api publica
 
-    public void setState(SimState state)                { this.simState = state; dirty = true; }
-    public void setIncidents(List<Incident> list)       { this.incidents = list; dirty = true; }
-    public void setPointA(String nodeId)                { this.pointAId = nodeId; dirty = true; }
-    public void setPointB(String nodeId)                { this.pointBId = nodeId; dirty = true; }
-    public void setRouteNodes(List<String> route)       { this.routeNodes = route; dirty = true; }
-    public void setPlacingIncident(boolean placing)     { this.placingIncident = placing; dirty = true; }
-    public boolean isPlacingIncident()                  { return placingIncident; }
-    public double getScaleValue()                       { return scale; }
-    public double getOffsetX()                          { return offsetX; }
-    public double getOffsetY()                          { return offsetY; }
-    public void setSelectedIncident(Incident i)         { this.selectedIncident = i; dirty = true; }
+    public void setState(SimState s) {
+        simState = s;
+        dirty = true;
+    }
 
-    public void setOnIncidentPlaced(BiConsumer<Double, Double> cb)  { this.onIncidentPlaced   = cb; }
-    public void setOnNodeRightClicked(Consumer<TrafficNode> cb)     { this.onNodeRightClicked = cb; }
-    public void setOnMapRightClicked(Consumer<double[]> cb)         { this.onMapRightClicked  = cb; }
-    public void setOnIncidentSelected(Consumer<Incident> cb)        { this.onIncidentSelected = cb; }
+    public void setIncidents(List<Incident> list) {
+        incidents = list;
+        dirty = true;
+    }
 
-    //convierte coordenadas del canvas a coordenadas del simulador
+    public void setRouteNodes(List<String> r) {
+        routeNodes = r;
+        dirty = true;
+    }
+
+    public void setPlacingIncident(boolean p) {
+        placingIncident = p;
+        dirty = true;
+    }
+
+    public void setPlacingPointA(boolean p) {
+        placingPointA = p;
+        dirty = true;
+    }
+
+    public void setPlacingPointB(boolean p) {
+        placingPointB = p;
+        dirty = true;
+    }
+
+    public boolean isPlacingIncident() {
+        return placingIncident;
+    }
+
+    public boolean isPlacingPointA() {
+        return placingPointA;
+    }
+
+    public boolean isPlacingPointB() {
+        return placingPointB;
+    }
+
+    public double getScaleValue() {
+        return scale;
+    }
+
+    public double getOffsetX() {
+        return offsetX;
+    }
+
+    public double getOffsetY() {
+        return offsetY;
+    }
+
+    public void setSelectedIncident(Incident i) {
+        selectedInc = i;
+        dirty = true;
+    }
+
+    public void setPointA(String id, double x, double y) {
+        pointAId = id;
+        pointAX = x;
+        pointAY = y;
+        dirty = true;
+    }
+
+    public void setPointB(String id, double x, double y) {
+        pointBId = id;
+        pointBX = x;
+        pointBY = y;
+        dirty = true;
+    }
+
+    public void clearPoints() {
+        pointAId = pointBId = null;
+        pointAX = pointAY = pointBX = pointBY = Double.NaN;
+        dirty = true;
+    }
+
+    public double getPointAX() {
+        return pointAX;
+    }
+
+    public double getPointAY() {
+        return pointAY;
+    }
+
+    public double getPointBX() {
+        return pointBX;
+    }
+
+    public double getPointBY() {
+        return pointBY;
+    }
+
+    public String getPointAId() {
+        return pointAId;
+    }
+
+    public String getPointBId() {
+        return pointBId;
+    }
+
+    public void setOnIncidentPlaced(BiConsumer<Double, Double> cb) {
+        onIncidentPlaced = cb;
+    }
+
+    public void setOnPointAPlaced(Consumer<double[]> cb) {
+        onPointAPlaced = cb;
+    }
+
+    public void setOnPointBPlaced(Consumer<double[]> cb) {
+        onPointBPlaced = cb;
+    }
+
+    public void setOnNodeRightClicked(Consumer<TrafficNode> cb) {
+        onNodeRightClicked = cb;
+    }
+
+    public void setOnRoadRightClicked(Consumer<double[]> cb) {
+        onRoadRightClicked = cb;
+    }
+
+    public void setOnIncidentSelected(Consumer<Incident> cb) {
+        onIncidentSelected = cb;
+    }
+
     public double[] canvasToSim(double cx, double cy) {
-        return new double[]{ (cx - offsetX) / scale, (cy - offsetY) / scale };
+        return new double[]{(cx - offsetX) / scale, (cy - offsetY) / scale};
     }
 
-    //encuentra el nodo mas cercano a las coordenadas del simulador dado un umbral
-    public TrafficNode findNearestNode(double simX, double simY, double threshold) {
+    //hit testing
+
+    public TrafficNode findNearestNode(double sx, double sy, double thresh) {
         if (simState == null) return null;
-        TrafficNode nearest  = null;
-        double      minDist = Double.MAX_VALUE;
+        TrafficNode best = null;
+        double min = Double.MAX_VALUE;
         for (TrafficNode n : simState.getNodes()) {
-            double d = Math.hypot(n.getX() - simX, n.getY() - simY);
-            if (d < minDist) { minDist = d; nearest = n; }
+            double d = Math.hypot(n.getX() - sx, n.getY() - sy);
+            if (d < min) {
+                min = d;
+                best = n;
+            }
         }
-        return (minDist <= threshold) ? nearest : null;
+        return min <= thresh ? best : null;
     }
 
-    //encuentra el incidente cuyo pin esta cerca de las coordenadas del canvas
-    private Incident findNearestIncident(double cx, double cy) {
-        if (incidents.isEmpty()) return null;
+    //proyeccion de punto sobre segmento, devuelve {dist, projX, projY}
+    private double[] project(double px, double py, double ax, double ay, double bx, double by) {
+        double dx = bx - ax, dy = by - ay, len2 = dx * dx + dy * dy;
+        if (len2 < 1e-6) return new double[]{Double.MAX_VALUE, ax, ay};
+        double t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2));
+        double qx = ax + t * dx, qy = ay + t * dy;
+        return new double[]{Math.hypot(px - qx, py - qy), qx, qy};
+    }
+
+    private Object[] nearestEdgePoint(double sx, double sy) {
+        if (simState == null) return null;
+        TrafficEdge best = null;
+        double bd = EDGE_HIT;
+        double bx = 0, by = 0;
+        for (TrafficEdge e : simState.getEdges()) {
+            TrafficNode a = simState.findNode(e.getFrom());
+            TrafficNode b = simState.findNode(e.getTo());
+            if (a == null || b == null) continue;
+            double[] p = project(sx, sy, a.getX(), a.getY(), b.getX(), b.getY());
+            if (p[0] < bd) {
+                bd = p[0];
+                best = e;
+                bx = p[1];
+                by = p[2];
+            }
+        }
+        return best != null ? new Object[]{best, bx, by} : null;
+    }
+
+    private Incident nearestIncident(double cx, double cy) {
         for (Incident i : incidents) {
-            double px = i.getMapX() * scale + offsetX;
-            double py = i.getMapY() * scale + offsetY;
+            double px = i.getMapX() * scale + offsetX, py = i.getMapY() * scale + offsetY;
             if (Math.hypot(px - cx, py - cy) < 14) return i;
         }
         return null;
     }
 
-    //configuracion de eventos de entrada
-
+    // input
     private void setupInput() {
-        //inicio del drag
         setOnMousePressed(e -> {
             if (e.getButton() == MouseButton.PRIMARY) {
-                dragStartX  = e.getX();
-                dragStartY  = e.getY();
-                dragOffsetX = offsetX;
-                dragOffsetY = offsetY;
+                dragStartX = e.getX();
+                dragStartY = e.getY();
+                dragOffX = offsetX;
+                dragOffY = offsetY;
+                isDragging = false;
             }
         });
-
-        //pan con drag
         setOnMouseDragged(e -> {
             if (e.getButton() == MouseButton.PRIMARY) {
-                offsetX = dragOffsetX + (e.getX() - dragStartX);
-                offsetY = dragOffsetY + (e.getY() - dragStartY);
-                dirty   = true;
+                double dx = e.getX() - dragStartX, dy = e.getY() - dragStartY;
+                if (Math.hypot(dx, dy) > 4) isDragging = true;
+                offsetX = dragOffX + dx;
+                offsetY = dragOffY + dy;
+                dirty = true;
             }
         });
-
-        //zoom centrado en el cursor
         setOnScroll(e -> {
-            double factor = e.getDeltaY() > 0 ? 1.1 : 0.91;
-            double newScale = Math.max(0.3, Math.min(6.0, scale * factor));
-            //ajustar offset para que el zoom sea relativo al cursor
-            double mx = e.getX();
-            double my = e.getY();
-            offsetX = mx - (mx - offsetX) * (newScale / scale);
-            offsetY = my - (my - offsetY) * (newScale / scale);
-            scale   = newScale;
-            dirty   = true;
+            double f = e.getDeltaY() > 0 ? 1.1 : 0.91, ns = Math.max(0.3, Math.min(8.0, scale * f));
+            double mx = e.getX(), my = e.getY();
+            offsetX = mx - (mx - offsetX) * (ns / scale);
+            offsetY = my - (my - offsetY) * (ns / scale);
+            scale = ns;
+            dirty = true;
         });
-
-        //clic izquierdo: colocar incidente o seleccionar pin
         setOnMouseClicked(e -> {
-            if (e.getButton() != MouseButton.PRIMARY) return;
-
-            Incident near = findNearestIncident(e.getX(), e.getY());
+            if (e.getButton() != MouseButton.PRIMARY || isDragging) return;
+            double[] sim = canvasToSim(e.getX(), e.getY());
+            Incident near = nearestIncident(e.getX(), e.getY());
             if (near != null) {
-                selectedIncident = near;
+                selectedInc = near;
                 dirty = true;
                 if (onIncidentSelected != null) onIncidentSelected.accept(near);
                 return;
             }
-
-            if (placingIncident && onIncidentPlaced != null) {
-                double[] sim = canvasToSim(e.getX(), e.getY());
-                onIncidentPlaced.accept(sim[0], sim[1]);
+            if (placingIncident) {
+                Object[] hit = nearestEdgePoint(sim[0], sim[1]);
+                double px = hit != null ? (double) hit[1] : sim[0], py = hit != null ? (double) hit[2] : sim[1];
+                placingIncident = false;
+                dirty = true;
+                if (onIncidentPlaced != null) onIncidentPlaced.accept(px, py);
+                return;
+            }
+            if (placingPointA) {
+                placePoint(sim[0], sim[1], true);
+                return;
+            }
+            if (placingPointB) {
+                placePoint(sim[0], sim[1], false);
             }
         });
-
-        //clic derecho: notificar al controlador con coordenadas sim
         setOnContextMenuRequested(e -> {
             double[] sim = canvasToSim(e.getX(), e.getY());
-            TrafficNode node = findNearestNode(sim[0], sim[1], 40);
-            if (node != null && onNodeRightClicked != null) {
-                onNodeRightClicked.accept(node);
-            } else if (onMapRightClicked != null) {
-                onMapRightClicked.accept(sim);
+            TrafficNode node = findNearestNode(sim[0], sim[1], 30);
+            if (node != null) {
+                if (onNodeRightClicked != null) onNodeRightClicked.accept(node);
+            } else {
+                // clic en calle o espacio vacio: usar el punto proyectado sobre la calle mas cercana
+                Object[] hit = nearestEdgePoint(sim[0], sim[1]);
+                double[] coords = hit != null ? new double[]{(double) hit[1], (double) hit[2]} : sim;
+                if (onRoadRightClicked != null) onRoadRightClicked.accept(coords);
             }
         });
     }
 
-    //loop de animacion a ~60fps, solo redibuja si dirty=true
+    private void placePoint(double sx, double sy, boolean isA) {
+        TrafficNode n = findNearestNode(sx, sy, 30);
+        double fx, fy;
+        String fid;
+        if (n != null) {
+            fx = n.getX();
+            fy = n.getY();
+            fid = n.getId();
+        } else {
+            Object[] hit = nearestEdgePoint(sx, sy);
+            if (hit == null) return;
+            fx = (double) hit[1];
+            fy = (double) hit[2];
+            fid = null;
+        }
+        if (isA) {
+            setPointA(fid, fx, fy);
+            placingPointA = false;
+            if (onPointAPlaced != null) onPointAPlaced.accept(new double[]{fx, fy});
+        } else {
+            setPointB(fid, fx, fy);
+            placingPointB = false;
+            if (onPointBPlaced != null) onPointBPlaced.accept(new double[]{fx, fy});
+        }
+        dirty = true;
+    }
 
+    //render loop
     private void startRenderLoop() {
         new AnimationTimer() {
-            @Override public void handle(long now) {
-                if (dirty) { render(); dirty = false; }
+            @Override
+            public void handle(long now) {
+                if (dirty) {
+                    render();
+                    dirty = false;
+                }
             }
         }.start();
     }
 
-    //renderizado principal
-
     private void render() {
         GraphicsContext gc = getGraphicsContext2D();
-        double w = getWidth();
-        double h = getHeight();
+        double w = getWidth(), h = getHeight();
         if (w <= 0 || h <= 0) return;
-
-        //fondo
         gc.setFill(BG);
         gc.fillRect(0, 0, w, h);
-
         if (simState == null || simState.getNodes().isEmpty()) {
-            drawNoConnectionMessage(gc, w, h);
+            drawNoConn(gc, w, h);
             return;
         }
 
-        gc.save();
+        //transform una sola vez — revertir manualmente al final
         gc.translate(offsetX, offsetY);
         gc.scale(scale, scale);
 
         drawEdges(gc);
-        drawRouteOverlay(gc);
+        drawRoute(gc);
         drawNodes(gc);
-        drawTrafficLights(gc);
+        drawLights(gc);
         drawCars(gc);
-        drawEmergencyVehicle(gc);
-        drawIncidentPins(gc);
-        drawPointMarkers(gc);
+        drawEV(gc);
+        drawPins(gc);
+        drawMarkers(gc);
 
-        gc.restore();
+        gc.scale(1.0 / scale, 1.0 / scale);
+        gc.translate(-offsetX, -offsetY);
 
-        //indicador de modo colocacion (fuera del transform, en esquina inferior)
-        if (placingIncident) {
-            gc.setFill(Color.web("#f59e0b", 0.85));
-            gc.fillRoundRect(12, h - 36, 260, 26, 6, 6);
-            gc.setFill(Color.web("#0d0f14"));
-            gc.setFont(Font.font(12));
-            gc.setTextAlign(TextAlignment.LEFT);
-            gc.fillText("  📍 Haz clic en el mapa para colocar el incidente", 16, h - 18);
-        }
+        drawHint(gc, w, h);
     }
 
-    //dibuja mensaje cuando no hay conexion
-
-    private void drawNoConnectionMessage(GraphicsContext gc, double w, double h) {
-        gc.setFill(TEXT_MUTED);
-        gc.setFont(Font.font(13));
-        gc.setTextAlign(TextAlignment.CENTER);
-        gc.fillText("Sin conexión con la simulación", w / 2, h / 2 - 10);
-        gc.setFont(Font.font(11));
-        gc.fillText("Conecta desde el panel lateral para cargar el mapa", w / 2, h / 2 + 12);
-    }
-
-    //dibuja calles (aristas del grafo)
-
+    //dibujo
     private void drawEdges(GraphicsContext gc) {
-        for (TrafficEdge edge : simState.getEdges()) {
-            TrafficNode a = simState.findNode(edge.getFrom());
-            TrafficNode b = simState.findNode(edge.getTo());
+        List<TrafficEdge> edges = simState.getEdges();
+
+        //pasada 1: borde
+        gc.setLineDashes((double[]) null);
+        for (TrafficEdge e : edges) {
+            TrafficNode a = simState.findNode(e.getFrom()), b = simState.findNode(e.getTo());
             if (a == null || b == null) continue;
-
-            double roadWidth = edge.isMain() ? 22 : 14;
-
-            //cuerpo de la calle
-            gc.setStroke(edge.isMain() ? ROAD_MAIN : ROAD_SIDE);
-            gc.setLineWidth(roadWidth);
-            gc.strokeLine(a.getX(), a.getY(), b.getX(), b.getY());
-
-            //borde de la calle
             gc.setStroke(ROAD_BORDER);
-            gc.setLineWidth(roadWidth + 2);
+            gc.setLineWidth(e.isMain() ? ROAD_MAIN_W + 4 : ROAD_SIDE_W + 4);
             gc.strokeLine(a.getX(), a.getY(), b.getX(), b.getY());
-
-            //repasar el cuerpo encima del borde
-            gc.setStroke(edge.isMain() ? ROAD_MAIN : ROAD_SIDE);
-            gc.setLineWidth(roadWidth);
+        }
+        //pasada 2: cuerpo
+        for (TrafficEdge e : edges) {
+            TrafficNode a = simState.findNode(e.getFrom()), b = simState.findNode(e.getTo());
+            if (a == null || b == null) continue;
+            gc.setStroke(densColor(e.isMain(), e.getDensity()));
+            gc.setLineWidth(e.isMain() ? ROAD_MAIN_W : ROAD_SIDE_W);
             gc.strokeLine(a.getX(), a.getY(), b.getX(), b.getY());
-
-            //lineas de carril punteadas en calles principales
-            if (edge.isMain() && edge.getLanes() > 1) {
-                drawLaneLines(gc, a.getX(), a.getY(), b.getX(), b.getY(), edge.getLanes());
+        }
+        //pasada 3: lineas de carril
+        if (scale > 0.55) {
+            gc.setStroke(LANE_LINE);
+            gc.setLineWidth(0.7);
+            gc.setLineDashes(8, 6);
+            for (TrafficEdge e : edges) {
+                if (!e.isMain() || e.getLanes() <= 1) continue;
+                TrafficNode a = simState.findNode(e.getFrom()), b = simState.findNode(e.getTo());
+                if (a == null || b == null) continue;
+                laneLines(gc, a.getX(), a.getY(), b.getX(), b.getY(), e.getLanes());
+            }
+            gc.setLineDashes((double[]) null);
+        }
+        //pasada 4: nombres (save/restore solo al rotar texto, aceptable una vez por nombre)
+        if (scale >= 0.5) {
+            gc.setFont(FONT_ROAD);
+            gc.setFill(TEXT_ROAD);
+            gc.setTextAlign(TextAlignment.CENTER);
+            Set<String> drawn = new HashSet<>();
+            for (TrafficEdge e : edges) {
+                String name = e.getName();
+                if (name == null || name.isBlank()) continue;
+                String key = name + e.getFrom() + e.getTo();
+                String rev = name + e.getTo() + e.getFrom();
+                if (drawn.contains(key) || drawn.contains(rev)) continue;
+                drawn.add(key);
+                drawn.add(rev);
+                TrafficNode a = simState.findNode(e.getFrom()), b = simState.findNode(e.getTo());
+                if (a == null || b == null) continue;
+                double dx = b.getX() - a.getX(), dy = b.getY() - a.getY(), len = Math.hypot(dx, dy);
+                if (len < 40) continue;
+                double mx = (a.getX() + b.getX()) / 2, my = (a.getY() + b.getY()) / 2;
+                double ang = Math.toDegrees(Math.atan2(dy, dx));
+                if (ang > 90 || ang < -90) ang += 180;
+                gc.save();
+                gc.translate(mx, my);
+                gc.rotate(ang);
+                gc.fillText(name, 0, -(e.isMain() ? ROAD_MAIN_W : ROAD_SIDE_W) / 2.0 - 3);
+                gc.restore();
             }
         }
     }
 
-    //dibuja lineas discontinuas de carril entre dos puntos
-
-    private void drawLaneLines(GraphicsContext gc, double x1, double y1, double x2, double y2, int lanes) {
-        double dx = x2 - x1;
-        double dy = y2 - y1;
-        double len = Math.hypot(dx, dy);
-        if (len < 1) return;
-
-        double nx = -dy / len;
-        double ny =  dx / len;
-
-        gc.setStroke(LANE_LINE);
-        gc.setLineWidth(0.6);
-        gc.setLineDashes(8, 6);
-
-        for (int i = 1; i < lanes; i++) {
-            double offset = (i - lanes / 2.0) * 5.5;
-            gc.strokeLine(
-                    x1 + nx * offset, y1 + ny * offset,
-                    x2 + nx * offset, y2 + ny * offset
-            );
-        }
-        gc.setLineDashes(null);
+    private Color densColor(boolean main, double d) {
+        Color base = main ? ROAD_MAIN : ROAD_SIDE;
+        if (d < 0.4) return base;
+        if (d < 0.7) return lerp(base, DENS_MID, (d - 0.4) / 0.3);
+        return lerp(DENS_MID, DENS_HIGH, (d - 0.7) / 0.3);
     }
 
-    //highlight de la ruta activa del vehiculo de emergencia
+    private Color lerp(Color a, Color b, double t) {
+        t = Math.max(0, Math.min(1, t));
+        return Color.color(
+                a.getRed() + (b.getRed() - a.getRed()) * t,
+                a.getGreen() + (b.getGreen() - a.getGreen()) * t,
+                a.getBlue() + (b.getBlue() - a.getBlue()) * t);
+    }
 
-    private void drawRouteOverlay(GraphicsContext gc) {
+    private void laneLines(GraphicsContext gc, double x1, double y1, double x2, double y2, int lanes) {
+        double dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy);
+        if (len < 1) return;
+        double nx = -dy / len, ny = dx / len;
+        for (int i = 1; i < lanes; i++) {
+            double off = (i - lanes / 2.0) * 5.5;
+            gc.strokeLine(x1 + nx * off, y1 + ny * off, x2 + nx * off, y2 + ny * off);
+        }
+    }
+
+    private void drawRoute(GraphicsContext gc) {
         if (routeNodes.size() < 2) return;
         gc.setStroke(ROUTE_COLOR);
         gc.setLineWidth(8);
-        gc.setLineDashes(null);
-
         for (int i = 0; i < routeNodes.size() - 1; i++) {
-            TrafficNode a = simState.findNode(routeNodes.get(i));
-            TrafficNode b = simState.findNode(routeNodes.get(i + 1));
-            if (a == null || b == null) continue;
-            gc.strokeLine(a.getX(), a.getY(), b.getX(), b.getY());
+            TrafficNode a = simState.findNode(routeNodes.get(i)), b = simState.findNode(routeNodes.get(i + 1));
+            if (a != null && b != null) gc.strokeLine(a.getX(), a.getY(), b.getX(), b.getY());
         }
     }
-
-    //dibuja los nodos (intersecciones)
 
     private void drawNodes(GraphicsContext gc) {
-        for (TrafficNode node : simState.getNodes()) {
-            double r = node.isMain() ? 10 : 7;
+        gc.setLineWidth(1);
+        for (TrafficNode n : simState.getNodes()) {
+            double r = n.isMain() ? 9 : 5;
             gc.setFill(NODE_FILL);
-            gc.fillOval(node.getX() - r, node.getY() - r, r * 2, r * 2);
+            gc.fillOval(n.getX() - r, n.getY() - r, r * 2, r * 2);
             gc.setStroke(NODE_STROKE);
-            gc.setLineWidth(1);
-            gc.strokeOval(node.getX() - r, node.getY() - r, r * 2, r * 2);
+            gc.strokeOval(n.getX() - r, n.getY() - r, r * 2, r * 2);
         }
     }
 
-    //dibuja los semaforos como pequenos circulos coloreados junto al nodo
-
-    private void drawTrafficLights(GraphicsContext gc) {
-        for (TrafficLight light : simState.getLights()) {
-            TrafficNode node = simState.findNode(light.getNodeId());
-            if (node == null) continue;
-
-            Color color = switch (light.getState()) {
-                case "ns_green", "ew_green" -> LIGHT_GREEN;
-                case "yellow"               -> LIGHT_YELLOW;
-                default                     -> LIGHT_RED;
-            };
-
-            //offset del circulo del semaforo respecto al centro del nodo
-            double lx = node.getX() + 13;
-            double ly = node.getY() - 13;
-
-            gc.setFill(Color.web("#12141e"));
-            gc.fillOval(lx - 5, ly - 5, 10, 10);
-            gc.setFill(color);
-            gc.fillOval(lx - 3.5, ly - 3.5, 7, 7);
+    private void drawLights(GraphicsContext gc) {
+        if (scale < 0.45) return;
+        final double dist = 15, r = 4;
+        for (TrafficNode n : simState.getNodes()) {
+            List<TrafficLight> lts = simState.findLightsAtNode(n.getId());
+            if (lts == null || lts.isEmpty()) continue;
+            for (TrafficLight lt : lts) {
+                double[] off = dirOff(lt.getDir(), dist);
+                double lx = n.getX() + off[0], ly = n.getY() + off[1];
+                gc.setFill(LT_BG);
+                gc.fillOval(lx - r - 1, ly - r - 1, (r + 1) * 2, (r + 1) * 2);
+                gc.setFill(ltColor(lt.getState()));
+                gc.fillOval(lx - r, ly - r, r * 2, r * 2);
+            }
         }
     }
 
-    //dibuja los coches
+    private double[] dirOff(String d, double dist) {
+        return switch (d != null ? d : "N") {
+            case "N" -> new double[]{0, -dist};
+            case "S" -> new double[]{0, dist};
+            case "E" -> new double[]{dist, 0};
+            case "W" -> new double[]{-dist, 0};
+            default -> new double[]{0, 0};
+        };
+    }
+
+    private Color ltColor(String s) {
+        if (s == null) return LT_RED;
+        return switch (s) {
+            case "green" -> LT_GREEN;
+            case "yellow" -> LT_YELLOW;
+            default -> LT_RED;
+        };
+    }
 
     private void drawCars(GraphicsContext gc) {
         gc.setFill(CAR_COLOR);
         for (SimCar car : simState.getCars()) {
-            //calcula orientacion del coche segun la arista en que viaja
-            TrafficNode a = simState.findNode(car.getNodeA());
-            TrafficNode b = simState.findNode(car.getNodeB());
+            TrafficNode a = simState.findNode(car.getNodeA()), b = simState.findNode(car.getNodeB());
             if (a == null || b == null) {
                 gc.fillRect(car.getX() - 4, car.getY() - 2, 8, 4);
                 continue;
             }
-            double dx = b.getX() - a.getX();
-            double dy = b.getY() - a.getY();
-            double angle = Math.atan2(dy, dx);
-            drawRotatedRect(gc, car.getX(), car.getY(), 9, 4, angle, CAR_COLOR, car.getLane());
+            double angle = Math.atan2(b.getY() - a.getY(), b.getX() - a.getX());
+            double nx = -Math.sin(angle), ny = Math.cos(angle);
+            // carril 1 a la izquierda de la direccion de marcha, carril 2 a la derecha
+            double off = car.getLane() == 1 ? -LANE_SEP : LANE_SEP;
+            double fx = car.getX() + nx * off, fy = car.getY() + ny * off;
+            // rotar sin save/restore: aplicar y revertir el transform manualmente
+            gc.translate(fx, fy);
+            gc.rotate(Math.toDegrees(angle));
+            gc.fillRoundRect(-4.5, -2, 9, 4, 2, 2);
+            gc.rotate(-Math.toDegrees(angle));
+            gc.translate(-fx, -fy);
         }
     }
 
-    //dibuja el vehiculo de emergencia con efecto glow
-
-    private void drawEmergencyVehicle(GraphicsContext gc) {
+    private void drawEV(GraphicsContext gc) {
         if (!simState.isEvActive()) return;
+        double ex = simState.getEvX(), ey = simState.getEvY();
         gc.setEffect(evGlow);
         gc.setFill(EV_COLOR);
-        gc.fillRoundRect(simState.getEvX() - 7, simState.getEvY() - 4, 14, 8, 3, 3);
+        gc.fillRoundRect(ex - 7, ey - 4, 14, 8, 3, 3);
         gc.setEffect(null);
-        //cruz pequeña encima del vehiculo
-        gc.setStroke(Color.WHITE);
+        gc.setStroke(WHITE);
         gc.setLineWidth(1.5);
-        gc.strokeLine(simState.getEvX() - 3, simState.getEvY() - 9, simState.getEvX() + 3, simState.getEvY() - 9);
-        gc.strokeLine(simState.getEvX(),     simState.getEvY() - 12, simState.getEvX(),     simState.getEvY() - 6);
+        gc.strokeLine(ex - 3, ey - 9, ex + 3, ey - 9);
+        gc.strokeLine(ex, ey - 12, ex, ey - 6);
     }
 
-    //rectangulo rotado para los coches (desplazado por carril)
-
-    private void drawRotatedRect(GraphicsContext gc, double cx, double cy,
-                                 double w, double h, double angle, Color color, int lane) {
-        double nx = -Math.sin(angle);
-        double ny =  Math.cos(angle);
-        double laneOffset = (lane - 1.5) * 4.5;
-
-        gc.save();
-        gc.translate(cx + nx * laneOffset, cy + ny * laneOffset);
-        gc.rotate(Math.toDegrees(angle));
-        gc.setFill(color);
-        gc.fillRoundRect(-w / 2, -h / 2, w, h, 2, 2);
-        gc.restore();
-    }
-
-    //dibuja pines de incidentes activos
-
-    private void drawIncidentPins(GraphicsContext gc) {
+    private void drawPins(GraphicsContext gc) {
         for (Incident i : incidents) {
-            Color pinColor = switch (i.getEstado().toLowerCase()) {
-                case "crítico", "critico" -> INCIDENT_CRI;
-                case "resuelto"           -> INCIDENT_MIN;
-                default                   -> INCIDENT_OPEN;
+            Color col = switch (i.getEstado().toLowerCase()) {
+                case "crítico", "critico" -> INC_CRI;
+                case "resuelto" -> INC_MIN;
+                default -> INC_OPEN;
             };
-
-            boolean selected = (selectedIncident != null && selectedIncident.getId() == i.getId());
-            double  r        = selected ? 9 : 7;
-
-            gc.setFill(pinColor);
-            gc.fillOval(i.getMapX() - r, i.getMapY() - r - 12, r * 2, r * 2);
-            //triangulo del pin
-            double[] px = { i.getMapX() - 5, i.getMapX() + 5, i.getMapX() };
-            double[] py = { i.getMapY() - 12, i.getMapY() - 12, i.getMapY() - 2 };
-            gc.fillPolygon(px, py, 3);
-
-            if (selected) {
-                gc.setStroke(Color.WHITE);
+            boolean sel = selectedInc != null && selectedInc.getId() == i.getId();
+            double r = sel ? 9 : 7, ix = i.getMapX(), iy = i.getMapY();
+            gc.setFill(col);
+            gc.fillOval(ix - r, iy - r - 12, r * 2, r * 2);
+            gc.fillPolygon(new double[]{ix - 5, ix + 5, ix}, new double[]{iy - 12, iy - 12, iy - 2}, 3);
+            if (sel) {
+                gc.setStroke(WHITE);
                 gc.setLineWidth(1.5);
-                gc.strokeOval(i.getMapX() - r, i.getMapY() - r - 12, r * 2, r * 2);
+                gc.strokeOval(ix - r, iy - r - 12, r * 2, r * 2);
             }
         }
     }
 
-    //marcadores de punto A y B de la ruta de emergencia
-
-    private void drawPointMarkers(GraphicsContext gc) {
-        if (pointAId != null) drawPointMarker(gc, pointAId, POINT_A, "A");
-        if (pointBId != null) drawPointMarker(gc, pointBId, POINT_B, "B");
+    private void drawMarkers(GraphicsContext gc) {
+        if (!Double.isNaN(pointAX)) drawMarker(gc, pointAX, pointAY, POINT_A, POINT_A_FILL, "A");
+        if (!Double.isNaN(pointBX)) drawMarker(gc, pointBX, pointBY, POINT_B, POINT_B_FILL, "B");
     }
 
-    private void drawPointMarker(GraphicsContext gc, String nodeId, Color color, String label) {
-        TrafficNode n = simState.findNode(nodeId);
-        if (n == null) return;
-
-        gc.setFill(color.deriveColor(0, 1, 1, 0.25));
-        gc.fillOval(n.getX() - 14, n.getY() - 14, 28, 28);
-        gc.setStroke(color);
+    private void drawMarker(GraphicsContext gc, double x, double y, Color stroke, Color fill, String lbl) {
+        gc.setFill(fill);
+        gc.fillOval(x - 14, y - 14, 28, 28);
+        gc.setStroke(stroke);
         gc.setLineWidth(2);
-        gc.strokeOval(n.getX() - 14, n.getY() - 14, 28, 28);
-
-        gc.setFill(color);
-        gc.setFont(Font.font("System", javafx.scene.text.FontWeight.BOLD, 11));
+        gc.strokeOval(x - 14, y - 14, 28, 28);
+        gc.setFill(stroke);
+        gc.setFont(FONT_LABEL);
         gc.setTextAlign(TextAlignment.CENTER);
-        gc.fillText(label, n.getX(), n.getY() + 4);
+        gc.fillText(lbl, x, y + 4);
+    }
+
+    private void drawNoConn(GraphicsContext gc, double w, double h) {
+        gc.setFill(TEXT_MUTED);
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setFont(FONT_BIG);
+        gc.fillText("Sin conexión con la simulación", w / 2, h / 2 - 10);
+        gc.setFont(FONT_SMALL);
+        gc.fillText("Conecta desde el panel lateral para cargar el mapa", w / 2, h / 2 + 12);
+    }
+
+    private void drawHint(GraphicsContext gc, double w, double h) {
+        String hint = null;
+        Color bg = HINT_INC_BG;
+        if (placingIncident) hint = "Haz clic en cualquier punto de una calle para colocar el incidente";
+        else if (placingPointA) {
+            hint = "Haz clic en una calle o intersección para marcar el Punto A";
+            bg = HINT_A_BG;
+        } else if (placingPointB) {
+            hint = "Haz clic en una calle o intersección para marcar el Punto B";
+            bg = HINT_B_BG;
+        }
+        if (hint == null) return;
+        gc.setFill(bg);
+        gc.fillRoundRect(12, h - 36, hint.length() * 6.5 + 16, 26, 6, 6);
+        gc.setFill(HINT_FG);
+        gc.setFont(FONT_HINT);
+        gc.setTextAlign(TextAlignment.LEFT);
+        gc.fillText(hint, 20, h - 18);
     }
 }

@@ -20,7 +20,8 @@ public class ModuleLoader {
     private static final Gson gson = new Gson();
     private static final String MODULES_FOLDER = "modules";
 
-    private ModuleLoader() {}
+    private ModuleLoader() {
+    }
 
     public static List<Module> loadAllModules() {
         List<Module> loadedModules = new ArrayList<>();
