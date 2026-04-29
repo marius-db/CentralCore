@@ -18,11 +18,9 @@ import javafx.scene.shape.Rectangle;
 
 public class ModulesViewController implements Initializable {
 
-    @FXML
-    private TilePane tilePane;
+    @FXML private TilePane tilePane;
 
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    @Override public void initialize(URL url, ResourceBundle rb) {
         setupTiles();
     }
 

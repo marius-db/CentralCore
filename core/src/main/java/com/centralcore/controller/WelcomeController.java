@@ -9,8 +9,7 @@ public class WelcomeController {
 
     @FXML private Button btnLogin;
 
-    @FXML
-    private void onLoginClicked() {
+    @FXML private void onLoginClicked() {
         SceneManager.showLogin();
     }
 }

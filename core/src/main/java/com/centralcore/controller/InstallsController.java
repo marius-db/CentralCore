@@ -25,8 +25,7 @@ import javafx.scene.shape.Rectangle;
 
 public class InstallsController implements Initializable {
 
-    @FXML
-    private ListView<Module> moduleListView;
+    @FXML private ListView<Module> moduleListView;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {

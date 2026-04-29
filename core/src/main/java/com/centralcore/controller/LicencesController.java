@@ -11,7 +11,7 @@ import javafx.scene.control.TableView;
 //stub - implementacion completa pendiente
 public class LicencesController implements Initializable {
 
-    @FXML private TableView<?>      tableLicences;
+    @FXML private TableView<?> tableLicences;
     @FXML private TableColumn<?, ?> colModule;
     @FXML private TableColumn<?, ?> colKey;
     @FXML private TableColumn<?, ?> colExpiry;

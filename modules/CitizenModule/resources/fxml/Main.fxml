@@ -22,10 +22,10 @@
 
         <TableView fx:id="citizenTable" styleClass="cm-table" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="colDni"          text="DNI / NIE"       prefWidth="90"/>
-                <TableColumn fx:id="colName"         text="Nombre completo"  prefWidth="160"/>
-                <TableColumn fx:id="colMunicipality" text="Municipio"        prefWidth="80"/>
-                <TableColumn fx:id="colPhone"        text="Teléfono"         prefWidth="110"/>
+                <TableColumn fx:id="colDni" text="DNI / NIE" prefWidth="90"/>
+                <TableColumn fx:id="colName" text="Nombre completo" prefWidth="160"/>
+                <TableColumn fx:id="colMunicipality" text="Municipio" prefWidth="80"/>
+                <TableColumn fx:id="colPhone" text="Teléfono" prefWidth="110"/>
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
@@ -58,8 +58,8 @@
                         <Label fx:id="detailStatus" styleClass="status-active" text="Activo"/>
                     </HBox>
                     <HBox styleClass="cm-detail-actions" spacing="8">
-                        <Button fx:id="btnEdit"   styleClass="btn-primary" text="Editar"   onAction="#onEdit"/>
-                        <Button fx:id="btnDelete" styleClass="btn-danger"  text="Eliminar" onAction="#onDelete"/>
+                        <Button fx:id="btnEdit" styleClass="btn-primary" text="Editar" onAction="#onEdit"/>
+                        <Button fx:id="btnDelete" styleClass="btn-danger" text="Eliminar" onAction="#onDelete"/>
                     </HBox>
                 </VBox>
 
@@ -70,14 +70,21 @@
                             <ColumnConstraints minWidth="150" maxWidth="150"/>
                             <ColumnConstraints hgrow="ALWAYS"/>
                         </columnConstraints>
-                        <Label text="Fecha / lugar nac."   styleClass="cm-field-label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                        <Label fx:id="detailBirthDate"     styleClass="cm-field-value" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                        <Label text="Nacionalidad"         styleClass="cm-field-label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                        <Label fx:id="detailNationality"   styleClass="cm-field-value" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                        <Label text="Sexo"                 styleClass="cm-field-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                        <Label fx:id="detailGender"        styleClass="cm-field-value" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                        <Label text="Estado civil"         styleClass="cm-field-label" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                        <Label fx:id="detailMaritalStatus" styleClass="cm-field-value" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                        <Label text="Fecha / lugar nac." styleClass="cm-field-label" GridPane.columnIndex="0"
+                               GridPane.rowIndex="0"/>
+                        <Label fx:id="detailBirthDate" styleClass="cm-field-value" GridPane.columnIndex="1"
+                               GridPane.rowIndex="0"/>
+                        <Label text="Nacionalidad" styleClass="cm-field-label" GridPane.columnIndex="0"
+                               GridPane.rowIndex="1"/>
+                        <Label fx:id="detailNationality" styleClass="cm-field-value" GridPane.columnIndex="1"
+                               GridPane.rowIndex="1"/>
+                        <Label text="Sexo" styleClass="cm-field-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <Label fx:id="detailGender" styleClass="cm-field-value" GridPane.columnIndex="1"
+                               GridPane.rowIndex="2"/>
+                        <Label text="Estado civil" styleClass="cm-field-label" GridPane.columnIndex="0"
+                               GridPane.rowIndex="3"/>
+                        <Label fx:id="detailMaritalStatus" styleClass="cm-field-value" GridPane.columnIndex="1"
+                               GridPane.rowIndex="3"/>
                     </GridPane>
                 </VBox>
 
@@ -88,16 +95,25 @@
                             <ColumnConstraints minWidth="150" maxWidth="150"/>
                             <ColumnConstraints hgrow="ALWAYS"/>
                         </columnConstraints>
-                        <Label text="Dirección"           styleClass="cm-field-label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                        <Label fx:id="detailAddress"      styleClass="cm-field-value" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                        <Label text="Municipio"           styleClass="cm-field-label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                        <Label fx:id="detailMunicipality" styleClass="cm-field-value" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                        <Label text="Código postal"       styleClass="cm-field-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                        <Label fx:id="detailPostalCode"   styleClass="cm-field-value" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                        <Label text="Teléfono"            styleClass="cm-field-label" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                        <Label fx:id="detailPhone"        styleClass="cm-field-value" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-                        <Label text="Email"               styleClass="cm-field-label" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-                        <Label fx:id="detailEmail"        styleClass="cm-field-value" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                        <Label text="Dirección" styleClass="cm-field-label" GridPane.columnIndex="0"
+                               GridPane.rowIndex="0"/>
+                        <Label fx:id="detailAddress" styleClass="cm-field-value" GridPane.columnIndex="1"
+                               GridPane.rowIndex="0"/>
+                        <Label text="Municipio" styleClass="cm-field-label" GridPane.columnIndex="0"
+                               GridPane.rowIndex="1"/>
+                        <Label fx:id="detailMunicipality" styleClass="cm-field-value" GridPane.columnIndex="1"
+                               GridPane.rowIndex="1"/>
+                        <Label text="Código postal" styleClass="cm-field-label" GridPane.columnIndex="0"
+                               GridPane.rowIndex="2"/>
+                        <Label fx:id="detailPostalCode" styleClass="cm-field-value" GridPane.columnIndex="1"
+                               GridPane.rowIndex="2"/>
+                        <Label text="Teléfono" styleClass="cm-field-label" GridPane.columnIndex="0"
+                               GridPane.rowIndex="3"/>
+                        <Label fx:id="detailPhone" styleClass="cm-field-value" GridPane.columnIndex="1"
+                               GridPane.rowIndex="3"/>
+                        <Label text="Email" styleClass="cm-field-label" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                        <Label fx:id="detailEmail" styleClass="cm-field-value" GridPane.columnIndex="1"
+                               GridPane.rowIndex="4"/>
                     </GridPane>
                 </VBox>
 
@@ -110,8 +126,9 @@
                     </HBox>
                     <ListView fx:id="docList" styleClass="cm-doc-list" prefHeight="200"/>
                     <HBox spacing="8">
-                        <Button fx:id="btnOpenDoc"   styleClass="btn-ghost"        text="Abrir"        onAction="#onOpenDoc"/>
-                        <Button fx:id="btnDeleteDoc" styleClass="btn-ghost-danger"  text="Eliminar doc" onAction="#onDeleteDoc"/>
+                        <Button fx:id="btnOpenDoc" styleClass="btn-ghost" text="Abrir" onAction="#onOpenDoc"/>
+                        <Button fx:id="btnDeleteDoc" styleClass="btn-ghost-danger" text="Eliminar doc"
+                                onAction="#onDeleteDoc"/>
                     </HBox>
                 </VBox>
 
@@ -169,7 +186,8 @@
                         </VBox>
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label text="Estado civil" styleClass="field-label"/>
-                            <ComboBox fx:id="editMaritalStatus" styleClass="cm-combo" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                            <ComboBox fx:id="editMaritalStatus" styleClass="cm-combo" maxWidth="Infinity"
+                                      HBox.hgrow="ALWAYS"/>
                         </VBox>
                     </HBox>
                 </VBox>
@@ -210,8 +228,8 @@
                 <Label fx:id="editError" styleClass="login-error" visible="false" managed="false" wrapText="true"/>
 
                 <HBox spacing="10">
-                    <Button fx:id="btnSave"   styleClass="btn-primary" text="Guardar"  onAction="#onSave"/>
-                    <Button fx:id="btnCancel" styleClass="btn-ghost"   text="Cancelar" onAction="#onCancel"/>
+                    <Button fx:id="btnSave" styleClass="btn-primary" text="Guardar" onAction="#onSave"/>
+                    <Button fx:id="btnCancel" styleClass="btn-ghost" text="Cancelar" onAction="#onCancel"/>
                 </HBox>
 
             </VBox>

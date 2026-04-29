@@ -6,14 +6,33 @@ import javafx.scene.Parent;
 
 public class TrafficModule implements Module {
 
-    private Parent                  uiRoot;
+    private Parent uiRoot;
     private TrafficModuleController controller;
 
-    @Override public String getModuleId()   { return "traffic_module"; }
-    @Override public String getName()       { return "Traffic Management"; }
-    @Override public String getVersion()    { return "1.0.0"; }
-    @Override public String getDescription(){ return "Control de tráfico, semáforos y vehículos de emergencia"; }
-    @Override public String getLogoPath()   { return "images/logo.png"; }
+    @Override
+    public String getModuleId() {
+        return "traffic_module";
+    }
+
+    @Override
+    public String getName() {
+        return "Traffic Management";
+    }
+
+    @Override
+    public String getVersion() {
+        return "1.0.0";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Control de tráfico, semáforos y vehículos de emergencia";
+    }
+
+    @Override
+    public String getLogoPath() {
+        return "images/logo.png";
+    }
 
     @Override
     public void initialize() throws Exception {
@@ -22,7 +41,7 @@ public class TrafficModule implements Module {
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/trafficmodule/fxml/Main.fxml"));
         loader.setClassLoader(getClass().getClassLoader());
-        uiRoot     = loader.load();
+        uiRoot = loader.load();
         controller = loader.getController();
         System.out.println("traffic module initialized");
     }
@@ -30,7 +49,7 @@ public class TrafficModule implements Module {
     @Override
     public void shutdown() {
         if (controller != null) controller.onShutdown();
-        uiRoot     = null;
+        uiRoot = null;
         controller = null;
         System.out.println("traffic module shut down");
     }

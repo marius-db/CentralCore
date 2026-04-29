@@ -20,7 +20,7 @@
         <!--fila de conexion-->
         <HBox styleClass="tm-con-bar" alignment="CENTER_LEFT" spacing="8">
             <Circle fx:id="dotConStatus" radius="5" fill="#ef4444"/>
-            <Label  fx:id="lblConStatus" text="Sin conexión" styleClass="tm-con-label" HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblConStatus" text="Sin conexión" styleClass="tm-con-label" HBox.hgrow="ALWAYS"/>
         </HBox>
 
         <HBox styleClass="tm-con-bar2" alignment="CENTER_LEFT" spacing="6">
@@ -57,16 +57,20 @@
                         <Label text="RUTA DE VEHÍCULO DE EMERGENCIA" styleClass="tm-section-title"/>
 
                         <VBox styleClass="tm-card" spacing="8">
-                            <Label text="Clic derecho sobre un nodo del mapa para seleccionar los puntos."
+                            <Label text="Haz clic en 'Marcar A/B' y luego en cualquier punto del mapa (calle o intersección)."
                                    styleClass="tm-hint" wrapText="true"/>
 
                             <HBox spacing="8" alignment="CENTER_LEFT">
                                 <Label text="Punto A:" styleClass="tm-field-label" minWidth="60"/>
-                                <Label fx:id="lblPuntoA" text="Sin seleccionar" styleClass="tm-point-a"/>
+                                <Label fx:id="lblPuntoA" text="Sin seleccionar" styleClass="tm-point-a"
+                                       HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="btnMarcarA" styleClass="btn-ghost-blue" text="Marcar A"/>
                             </HBox>
                             <HBox spacing="8" alignment="CENTER_LEFT">
                                 <Label text="Punto B:" styleClass="tm-field-label" minWidth="60"/>
-                                <Label fx:id="lblPuntoB" text="Sin seleccionar" styleClass="tm-point-b"/>
+                                <Label fx:id="lblPuntoB" text="Sin seleccionar" styleClass="tm-point-b"
+                                       HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="btnMarcarB" styleClass="btn-ghost-blue" text="Marcar B"/>
                             </HBox>
                         </VBox>
 
@@ -95,18 +99,18 @@
 
                         <VBox styleClass="tm-card" spacing="8">
                             <VBox spacing="4">
-                                <Label text="Tipo" styleClass="field-label"/>
+                                <Label text="Tipo" styleClass="tm-field-label"/>
                                 <ComboBox fx:id="comboTipoIncidente" styleClass="tm-combo"
                                           maxWidth="Infinity"/>
                             </VBox>
                             <VBox spacing="4">
-                                <Label text="Estado inicial" styleClass="field-label"/>
+                                <Label text="Estado inicial" styleClass="tm-field-label"/>
                                 <ComboBox fx:id="comboEstadoIncidente" styleClass="tm-combo"
                                           maxWidth="Infinity"/>
                             </VBox>
                             <VBox spacing="4">
-                                <Label text="Descripción" styleClass="field-label"/>
-                                <TextField fx:id="fieldDescIncidente" styleClass="field-input"
+                                <Label text="Descripción" styleClass="tm-field-label"/>
+                                <TextField fx:id="fieldDescIncidente" styleClass="tm-url-field"
                                            promptText="Descripción breve…"/>
                             </VBox>
                             <Button fx:id="btnMarcarMapa" styleClass="btn-ghost-blue"
@@ -120,13 +124,13 @@
                             <Label text="ACTUALIZAR SELECCIONADO" styleClass="tm-section-title"
                                    style="-fx-padding:0;"/>
                             <VBox spacing="4">
-                                <Label text="Nuevo estado" styleClass="field-label"/>
+                                <Label text="Nuevo estado" styleClass="tm-field-label"/>
                                 <ComboBox fx:id="comboEstadoUpdate" styleClass="tm-combo"
                                           maxWidth="Infinity"/>
                             </VBox>
                             <VBox spacing="4">
-                                <Label text="Nota" styleClass="field-label"/>
-                                <TextField fx:id="fieldNotaUpdate" styleClass="field-input"
+                                <Label text="Nota" styleClass="tm-field-label"/>
+                                <TextField fx:id="fieldNotaUpdate" styleClass="tm-url-field"
                                            promptText="Nota de actualización…"/>
                             </VBox>
                             <HBox spacing="8">

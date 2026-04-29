@@ -20,14 +20,14 @@ import javafx.scene.layout.VBox;
 
 public class MainShellController implements Initializable, TranslationManager.LanguageChangeListener {
 
-    @FXML private VBox      sidebar;
+    @FXML private VBox sidebar;
     @FXML private StackPane contentPane;
-    @FXML private Label     lblUsername;
-    @FXML private Button    btnModules;
-    @FXML private Button    btnInstalls;
-    @FXML private Button    btnLicences;
-    @FXML private Button    btnSettings;
-    @FXML private Button    btnLogout;
+    @FXML private Label lblUsername;
+    @FXML private Button btnModules;
+    @FXML private Button btnInstalls;
+    @FXML private Button btnLicences;
+    @FXML private Button btnSettings;
+    @FXML private Button btnLogout;
 
     private static final String FXML_PATH = "/com/centralcore/fxml/";
 

@@ -15,27 +15,27 @@ import javafx.scene.control.Label;
 
 public class SettingsController implements Initializable, TranslationManager.LanguageChangeListener {
 
-    @FXML private Label          lblTitle;
-    @FXML private Label          lblAppearance;
-    @FXML private Label          lblDarkMode;
-    @FXML private Label          lblDarkModeDesc;
-    @FXML private Label          lblLanguageSection;
-    @FXML private Label          lblInterfaceLanguage;
-    @FXML private Label          lblLanguageDesc;
-    @FXML private Label          lblNotifications;
-    @FXML private Label          lblModuleUpdates;
-    @FXML private Label          lblModuleUpdatesDesc;
-    @FXML private Label          lblSystemAlerts;
-    @FXML private Label          lblSystemAlertsDesc;
-    @FXML private Label          lblDatabase;
-    @FXML private Label          lblConnectionStatus;
-    @FXML private Label          lblAbout;
-    @FXML private CheckBox       chkDarkMode;
-    @FXML private CheckBox       chkModuleUpdates;
-    @FXML private CheckBox       chkSystemAlerts;
+    @FXML private Label lblTitle;
+    @FXML private Label lblAppearance;
+    @FXML private Label lblDarkMode;
+    @FXML private Label lblDarkModeDesc;
+    @FXML private Label lblLanguageSection;
+    @FXML private Label lblInterfaceLanguage;
+    @FXML private Label lblLanguageDesc;
+    @FXML private Label lblNotifications;
+    @FXML private Label lblModuleUpdates;
+    @FXML private Label lblModuleUpdatesDesc;
+    @FXML private Label lblSystemAlerts;
+    @FXML private Label lblSystemAlertsDesc;
+    @FXML private Label lblDatabase;
+    @FXML private Label lblConnectionStatus;
+    @FXML private Label lblAbout;
+    @FXML private CheckBox chkDarkMode;
+    @FXML private CheckBox chkModuleUpdates;
+    @FXML private CheckBox chkSystemAlerts;
     @FXML private ComboBox<String> cmbLanguage;
-    @FXML private Label          lblConnStatus;
-    @FXML private Button         btnTestConn;
+    @FXML private Label lblConnStatus;
+    @FXML private Button btnTestConn;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {

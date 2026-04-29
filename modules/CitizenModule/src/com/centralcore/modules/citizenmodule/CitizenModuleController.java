@@ -7,7 +7,8 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;import javafx.scene.layout.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -526,7 +527,10 @@ public class CitizenModuleController implements Initializable {
         //directorio del ciudadano
         Path dir = Paths.get(System.getProperty("user.home"), ".centralcore", "documents",
                 String.valueOf(citizenId));
-        try { Files.deleteIfExists(dir); } catch (IOException ignored) {}
+        try {
+            Files.deleteIfExists(dir);
+        } catch (IOException ignored) {
+        }
     }
 
     private void showError(String msg) {
@@ -548,6 +552,11 @@ public class CitizenModuleController implements Initializable {
         }
     }
 
-    private String orDash(String s) { return (s == null || s.isBlank()) ? "—" : s; }
-    private String orEmpty(String s) { return s == null ? "" : s; }
+    private String orDash(String s) {
+        return (s == null || s.isBlank()) ? "—" : s;
+    }
+
+    private String orEmpty(String s) {
+        return s == null ? "" : s;
+    }
 }

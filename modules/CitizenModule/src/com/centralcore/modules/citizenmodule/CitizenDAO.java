@@ -21,26 +21,26 @@ public class CitizenDAO {
 
             //extiende la tabla ciudadanos existente si le faltan columnas nuevas
             stmt.execute("""
-                CREATE TABLE IF NOT EXISTS ciudadanos (
-                    id              INT          AUTO_INCREMENT PRIMARY KEY,
-                    dni             VARCHAR(20)  NOT NULL UNIQUE,
-                    nombre          VARCHAR(100) NOT NULL,
-                    apellidos       VARCHAR(150) NOT NULL,
-                    fecha_nac       DATE         NOT NULL,
-                    lugar_nac       VARCHAR(100),
-                    nacionalidad    VARCHAR(80),
-                    sexo            CHAR(1)      NOT NULL DEFAULT 'M',
-                    direccion       VARCHAR(255),
-                    municipio       VARCHAR(100),
-                    codigo_postal   VARCHAR(10),
-                    telefono        VARCHAR(20),
-                    email           VARCHAR(150),
-                    estado_civil    VARCHAR(30),
-                    activo          BOOLEAN      NOT NULL DEFAULT TRUE,
-                    created_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    updated_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
-                )
-            """);
+                        CREATE TABLE IF NOT EXISTS ciudadanos (
+                            id              INT          AUTO_INCREMENT PRIMARY KEY,
+                            dni             VARCHAR(20)  NOT NULL UNIQUE,
+                            nombre          VARCHAR(100) NOT NULL,
+                            apellidos       VARCHAR(150) NOT NULL,
+                            fecha_nac       DATE         NOT NULL,
+                            lugar_nac       VARCHAR(100),
+                            nacionalidad    VARCHAR(80),
+                            sexo            CHAR(1)      NOT NULL DEFAULT 'M',
+                            direccion       VARCHAR(255),
+                            municipio       VARCHAR(100),
+                            codigo_postal   VARCHAR(10),
+                            telefono        VARCHAR(20),
+                            email           VARCHAR(150),
+                            estado_civil    VARCHAR(30),
+                            activo          BOOLEAN      NOT NULL DEFAULT TRUE,
+                            created_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            updated_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+                        )
+                    """);
 
             //columnas que el schema original del core no tenia
             //ALTER IF NOT EXISTS es h2-safe
@@ -52,20 +52,23 @@ public class CitizenDAO {
                     "ALTER TABLE ciudadanos ADD COLUMN IF NOT EXISTS sexo CHAR(1) NOT NULL DEFAULT 'M'"
             };
             for (String sql : newCols) {
-                try { stmt.execute(sql); } catch (SQLException ignored) {}
+                try {
+                    stmt.execute(sql);
+                } catch (SQLException ignored) {
+                }
             }
 
             stmt.execute("""
-                CREATE TABLE IF NOT EXISTS ciudadano_documentos (
-                    id              INT          AUTO_INCREMENT PRIMARY KEY,
-                    ciudadano_id    INT          NOT NULL,
-                    tipo_documento  VARCHAR(80)  NOT NULL,
-                    nombre_archivo  VARCHAR(255) NOT NULL,
-                    ruta_archivo    VARCHAR(512) NOT NULL,
-                    subido_en       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (ciudadano_id) REFERENCES ciudadanos(id) ON DELETE CASCADE
-                )
-            """);
+                        CREATE TABLE IF NOT EXISTS ciudadano_documentos (
+                            id              INT          AUTO_INCREMENT PRIMARY KEY,
+                            ciudadano_id    INT          NOT NULL,
+                            tipo_documento  VARCHAR(80)  NOT NULL,
+                            nombre_archivo  VARCHAR(255) NOT NULL,
+                            ruta_archivo    VARCHAR(512) NOT NULL,
+                            subido_en       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            FOREIGN KEY (ciudadano_id) REFERENCES ciudadanos(id) ON DELETE CASCADE
+                        )
+                    """);
 
             System.out.println("citizen module schema ready");
 
@@ -96,11 +99,11 @@ public class CitizenDAO {
         List<Citizen> list = new ArrayList<>();
         String q = "%" + query.toLowerCase() + "%";
         String sql = """
-            SELECT * FROM ciudadanos
-            WHERE LOWER(nombre) LIKE ? OR LOWER(apellidos) LIKE ? OR LOWER(dni) LIKE ?
-               OR LOWER(email) LIKE ? OR LOWER(municipio) LIKE ?
-            ORDER BY apellidos, nombre
-        """;
+                    SELECT * FROM ciudadanos
+                    WHERE LOWER(nombre) LIKE ? OR LOWER(apellidos) LIKE ? OR LOWER(dni) LIKE ?
+                       OR LOWER(email) LIKE ? OR LOWER(municipio) LIKE ?
+                    ORDER BY apellidos, nombre
+                """;
         Connection conn = DatabaseConnection.getConnection();
         if (conn == null) return list;
 
@@ -117,11 +120,11 @@ public class CitizenDAO {
 
     public void insert(Citizen c) throws SQLException {
         String sql = """
-            INSERT INTO ciudadanos
-            (dni, nombre, apellidos, fecha_nac, lugar_nac, nacionalidad, sexo,
-             direccion, municipio, codigo_postal, telefono, email, estado_civil, activo)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-        """;
+                    INSERT INTO ciudadanos
+                    (dni, nombre, apellidos, fecha_nac, lugar_nac, nacionalidad, sexo,
+                     direccion, municipio, codigo_postal, telefono, email, estado_civil, activo)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                """;
         Connection conn = DatabaseConnection.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             bind(ps, c);
@@ -134,12 +137,12 @@ public class CitizenDAO {
 
     public void update(Citizen c) throws SQLException {
         String sql = """
-            UPDATE ciudadanos SET
-                dni=?, nombre=?, apellidos=?, fecha_nac=?, lugar_nac=?, nacionalidad=?,
-                sexo=?, direccion=?, municipio=?, codigo_postal=?, telefono=?,
-                email=?, estado_civil=?, activo=?, updated_at=CURRENT_TIMESTAMP
-            WHERE id=?
-        """;
+                    UPDATE ciudadanos SET
+                        dni=?, nombre=?, apellidos=?, fecha_nac=?, lugar_nac=?, nacionalidad=?,
+                        sexo=?, direccion=?, municipio=?, codigo_postal=?, telefono=?,
+                        email=?, estado_civil=?, activo=?, updated_at=CURRENT_TIMESTAMP
+                    WHERE id=?
+                """;
         Connection conn = DatabaseConnection.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             bind(ps, c);
@@ -177,9 +180,9 @@ public class CitizenDAO {
 
     public void insertDocument(CitizenDocument doc) throws SQLException {
         String sql = """
-            INSERT INTO ciudadano_documentos (ciudadano_id, tipo_documento, nombre_archivo, ruta_archivo)
-            VALUES (?,?,?,?)
-        """;
+                    INSERT INTO ciudadano_documentos (ciudadano_id, tipo_documento, nombre_archivo, ruta_archivo)
+                    VALUES (?,?,?,?)
+                """;
         Connection conn = DatabaseConnection.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, doc.getCitizenId());

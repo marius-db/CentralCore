@@ -11,25 +11,56 @@ public class CitizenDocument {
     private String rutaArchivo;
     private LocalDateTime subidoEn;
 
-    public CitizenDocument() {}
+    public CitizenDocument() {
+    }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getId() {
+        return id;
+    }
 
-    public int getCitizenId() { return citizenId; }
-    public void setCitizenId(int citizenId) { this.citizenId = citizenId; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public String getTipoDocumento() { return tipoDocumento; }
-    public void setTipoDocumento(String tipoDocumento) { this.tipoDocumento = tipoDocumento; }
+    public int getCitizenId() {
+        return citizenId;
+    }
 
-    public String getNombreArchivo() { return nombreArchivo; }
-    public void setNombreArchivo(String nombreArchivo) { this.nombreArchivo = nombreArchivo; }
+    public void setCitizenId(int citizenId) {
+        this.citizenId = citizenId;
+    }
 
-    public String getRutaArchivo() { return rutaArchivo; }
-    public void setRutaArchivo(String rutaArchivo) { this.rutaArchivo = rutaArchivo; }
+    public String getTipoDocumento() {
+        return tipoDocumento;
+    }
 
-    public LocalDateTime getSubidoEn() { return subidoEn; }
-    public void setSubidoEn(LocalDateTime subidoEn) { this.subidoEn = subidoEn; }
+    public void setTipoDocumento(String tipoDocumento) {
+        this.tipoDocumento = tipoDocumento;
+    }
+
+    public String getNombreArchivo() {
+        return nombreArchivo;
+    }
+
+    public void setNombreArchivo(String nombreArchivo) {
+        this.nombreArchivo = nombreArchivo;
+    }
+
+    public String getRutaArchivo() {
+        return rutaArchivo;
+    }
+
+    public void setRutaArchivo(String rutaArchivo) {
+        this.rutaArchivo = rutaArchivo;
+    }
+
+    public LocalDateTime getSubidoEn() {
+        return subidoEn;
+    }
+
+    public void setSubidoEn(LocalDateTime subidoEn) {
+        this.subidoEn = subidoEn;
+    }
 
     @Override
     public String toString() {

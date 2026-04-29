@@ -10,7 +10,8 @@ public class ModuleConfig {
     public String mainClass;
     public String author;
 
-    public ModuleConfig() {}
+    public ModuleConfig() {
+    }
 
     @Override
     public String toString() {
