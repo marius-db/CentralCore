@@ -1,0 +1,83 @@
+@startuml arch_trafficmodule
+skinparam componentStyle rectangle
+skinparam defaultFontName Segoe UI
+skinparam defaultFontSize 12
+skinparam shadowing false
+skinparam componentBorderColor #2c3e50
+skinparam componentBackgroundColor #ecf0f1
+skinparam packageBorderColor #7f8c8d
+skinparam packageBackgroundColor #fafafa
+skinparam arrowColor #2c3e50
+skinparam databaseBackgroundColor #d5e8d4
+skinparam databaseBorderColor #27ae60
+skinparam cloudBorderColor #8e44ad
+skinparam cloudBackgroundColor #f5eef8
+skinparam noteBorderColor #e67e22
+skinparam noteBackgroundColor #fdebd0
+
+title Arquitectura - Módulo de Tráfico (TrafficModule)
+
+together {
+    package "Presentación (JavaFX)" as UI {
+        component [TrafficModuleController] as Ctrl
+        component [MapCanvas\n(Canvas JavaFX)] as Canvas
+        component [Tabs: Semáforos\nTráfico / Emergencia\nIncidentes / Historial] as Tabs
+    }
+
+    package "Modelo Simulador" as MODEL {
+        component [SimState] as SS
+        component [TrafficNode\nTrafficEdge\nTrafficLight\nSimCar] as Entities
+        component [Incident\nIncidentUpdate] as IncModel
+    }
+}
+
+together {
+    package "Comunicación WebSocket" as WS_PKG {
+        component [SimConnection\n(WS client)] as WS
+        component [HttpClient\n(Java 11 async)] as HC
+        component [Reconnect Scheduler\n(daemon, 3s)] as Sched
+    }
+
+    package "Acceso a Datos" as DAL {
+        component [TrafficDAO\n(CRUD incidentes)] as DAO
+    }
+}
+
+cloud "Simulador Python\nws://localhost:8765" as PY {
+    component [simulation.py\n+ city.py] as PyCore
+    component [visualizer.py\n(pygame)] as PyVis
+}
+
+database "H2 Shared\ntraffic_incidents\ntraffic_incident_updates" as H2
+
+Ctrl --> Canvas
+Ctrl --> Tabs
+Ctrl --> WS
+Ctrl --> DAO
+Canvas --> SS
+Canvas --> Entities
+Tabs --> IncModel
+WS --> HC
+WS --> Sched
+HC <--> PY : JSON / WebSocket
+PY --> PyCore
+PY --> PyVis
+WS --> SS : onStateReceived
+WS --> Ctrl : onMapReceived\nonEvDone
+Ctrl --> WS : sendRoute()\ncancelRoute()\noverrideLight()
+DAO --> H2
+
+note right of WS
+  StringBuilder buffer
+  para frames fragmentados.
+  Reconexión automática
+  cada 3 segundos.
+end note
+
+note bottom of PyCore
+  1200 coches, 80ms/tick.
+  Dijkstra traffic-aware
+  recalculado cada 8s.
+end note
+
+@enduml

@@ -1,0 +1,53 @@
+@startuml er_trafficmodule
+skinparam defaultFontName Segoe UI
+skinparam defaultFontSize 13
+skinparam shadowing false
+skinparam linetype ortho
+skinparam entityBorderColor #2c3e50
+skinparam entityBackgroundColor #ecf0f1
+skinparam arrowColor #2c3e50
+
+title Diagrama Entidad-Relación - Módulo de Tráfico
+
+entity "traffic_incidents" as Incident {
+    * id : INT <<PK>> <<AUTO_INCREMENT>>
+    --
+    * tipo : VARCHAR(80)
+    descripcion : VARCHAR(1000)
+    * map_x : DECIMAL(10,3)
+    * map_y : DECIMAL(10,3)
+    * estado : VARCHAR(40)
+    * created_at : TIMESTAMP
+    closed_at : TIMESTAMP
+}
+
+entity "traffic_incident_updates" as Update {
+    * id : INT <<PK>> <<AUTO_INCREMENT>>
+    --
+    * incident_id : INT <<FK>>
+    * estado : VARCHAR(40)
+    nota : VARCHAR(1000)
+    * created_at : TIMESTAMP
+}
+
+Incident ||--o{ Update : "historial (incident_id)"
+
+note right of Incident
+  tipo: 'Accidente', 'Corte de tráfico',
+  'Obras', 'Avería', 'Otro', etc.
+  estado: 'Abierto' | 'En curso' |
+  'Cerrado'
+  map_x / map_y: coordenadas en el
+  espacio de simulación (0-1000 / 0-780)
+  closed_at: NULL = incidente activo
+end note
+
+note right of Update
+  Cada actualización registra el nuevo
+  estado + nota del operador.
+  ON DELETE CASCADE desde incidents.
+  Permite trazabilidad completa del
+  ciclo de vida del incidente.
+end note
+
+@enduml

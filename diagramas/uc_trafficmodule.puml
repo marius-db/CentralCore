@@ -1,0 +1,91 @@
+@startuml uc_trafficmodule
+skinparam actorStyle awesome
+skinparam usecaseBorderColor #2c3e50
+skinparam usecaseBackgroundColor #ecf0f1
+skinparam actorBorderColor #2c3e50
+skinparam arrowColor #2c3e50
+skinparam shadowing false
+skinparam defaultFontName Segoe UI
+skinparam defaultFontSize 12
+
+top to bottom direction
+
+actor "Administrador" as Admin #dae8fc
+actor "Operador" as Op #fff2cc
+actor "Simulador Python" as Sim #d5e8d4
+
+rectangle "Módulo de Tráfico (TrafficModule)" {
+
+    rectangle "  Conexión y Visualización  " as CON {
+        usecase "Conectar con\nsimulador" as UC_Connect
+        usecase "Desconectar del\nsimulador" as UC_Disconnect
+        usecase "Visualizar mapa\nen tiempo real" as UC_ViewMap
+        usecase "Ver densidad\nde tráfico" as UC_Density
+    }
+
+    rectangle "  Control de Semáforos  " as LIG {
+        usecase "Ver estado de\nsemáforos" as UC_ViewLights
+        usecase "Aplicar override\na semáforo" as UC_Override
+        usecase "Restablecer\nsemáforo" as UC_Reset
+    }
+
+    rectangle "  Gestión de Emergencias  " as EMR {
+        usecase "Marcar punto\nde origen" as UC_MarkA
+        usecase "Marcar punto\nde destino" as UC_MarkB
+        usecase "Enviar ruta de\nemergencia" as UC_SendRoute
+        usecase "Cancelar ruta de\nemergencia" as UC_Cancel
+        usecase "Ver progreso\ndel vehículo" as UC_ViewEV
+    }
+
+    rectangle "  Gestión de Incidentes  " as INC {
+        usecase "Ver incidentes\nactivos" as UC_ViewInc
+        usecase "Registrar incidente\nen mapa" as UC_CreateInc
+        usecase "Actualizar estado\nde incidente" as UC_UpdateInc
+        usecase "Cerrar incidente" as UC_CloseInc
+        usecase "Ver historial\nde incidentes" as UC_History
+    }
+}
+
+UC_SendRoute ..> UC_MarkA : <<include>>
+UC_SendRoute ..> UC_MarkB : <<include>>
+UC_ViewEV ..> UC_SendRoute : <<extend>>
+UC_ViewMap ..> UC_Connect : <<include>>
+
+Sim -down-> UC_ViewMap
+Sim -down-> UC_ViewLights
+Sim -down-> UC_Density
+
+Admin -down-> UC_Connect
+Admin -down-> UC_Disconnect
+Admin -down-> UC_ViewMap
+Admin -down-> UC_Density
+Admin -down-> UC_ViewLights
+Admin -down-> UC_Override
+Admin -down-> UC_Reset
+Admin -down-> UC_MarkA
+Admin -down-> UC_MarkB
+Admin -down-> UC_SendRoute
+Admin -down-> UC_Cancel
+Admin -down-> UC_ViewEV
+Admin -down-> UC_ViewInc
+Admin -down-> UC_CreateInc
+Admin -down-> UC_UpdateInc
+Admin -down-> UC_CloseInc
+Admin -down-> UC_History
+
+Op -down-> UC_Connect
+Op -down-> UC_ViewMap
+Op -down-> UC_Density
+Op -down-> UC_ViewLights
+Op -down-> UC_MarkA
+Op -down-> UC_MarkB
+Op -down-> UC_SendRoute
+Op -down-> UC_Cancel
+Op -down-> UC_ViewEV
+Op -down-> UC_ViewInc
+Op -down-> UC_CreateInc
+Op -down-> UC_UpdateInc
+Op -down-> UC_CloseInc
+Op -down-> UC_History
+
+@enduml
