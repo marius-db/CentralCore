@@ -1,0 +1,76 @@
+@startuml uc_appshell
+skinparam actorStyle awesome
+skinparam usecaseBorderColor #2c3e50
+skinparam usecaseBackgroundColor #ecf0f1
+skinparam actorBorderColor #2c3e50
+skinparam arrowColor #2c3e50
+skinparam shadowing false
+skinparam defaultFontName Segoe UI
+skinparam defaultFontSize 12
+
+top to bottom direction
+
+actor "Administrador" as Admin #dae8fc
+actor "Operador" as Op #fff2cc
+
+rectangle "CentralCore - Shell Principal" {
+
+    rectangle "  Autenticación  " as AUTH {
+        usecase "Iniciar sesión" as UC_Login
+        usecase "Cerrar sesión" as UC_Logout
+    }
+
+    rectangle "  Módulos  " as MODS {
+        usecase "Ver módulos\ndisponibles" as UC_ViewMods
+        usecase "Abrir módulo" as UC_OpenMod
+        usecase "Volver al panel\nprincipal" as UC_Back
+    }
+
+    rectangle "  Licencias  " as LIC {
+        usecase "Ver licencias\nactivas" as UC_ViewLic
+        usecase "Activar\nlicencia" as UC_ActivateLic
+        usecase "Desactivar\nlicencia" as UC_DeactivateLic
+    }
+
+    rectangle "  Configuración  " as CFG {
+        usecase "Cambiar idioma" as UC_Lang
+        usecase "Cambiar\napariencia" as UC_Theme
+        usecase "Ver estado de\nbase de datos" as UC_DBStatus
+    }
+
+    rectangle "  Gestión de Usuarios  " as USR {
+        usecase "Ver listado\nde usuarios" as UC_ListUsers
+        usecase "Crear usuario" as UC_CreateUser
+        usecase "Editar usuario" as UC_EditUser
+        usecase "Desactivar\nusuario" as UC_DisableUser
+    }
+}
+
+UC_OpenMod ..> UC_ViewMods : <<include>>
+
+Admin -down-> UC_Login
+Admin -down-> UC_Logout
+Admin -down-> UC_ViewMods
+Admin -down-> UC_OpenMod
+Admin -down-> UC_Back
+Admin -down-> UC_ViewLic
+Admin -down-> UC_ActivateLic
+Admin -down-> UC_DeactivateLic
+Admin -down-> UC_Lang
+Admin -down-> UC_Theme
+Admin -down-> UC_DBStatus
+Admin -down-> UC_ListUsers
+Admin -down-> UC_CreateUser
+Admin -down-> UC_EditUser
+Admin -down-> UC_DisableUser
+
+Op -down-> UC_Login
+Op -down-> UC_Logout
+Op -down-> UC_ViewMods
+Op -down-> UC_OpenMod
+Op -down-> UC_Back
+Op -down-> UC_ViewLic
+Op -down-> UC_Lang
+Op -down-> UC_Theme
+
+@enduml
