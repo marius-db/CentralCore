@@ -3,8 +3,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<!--pantalla de inicio de sesion
-    tarjeta centrada con email + contraseña + boton de inicio de sesion-->
+<!--pantalla de inicio de sesion / registro
+    cambia entre modo login y modo crear cuenta sin cambiar de escena-->
 <StackPane xmlns="http://javafx.com/javafx/21"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.centralcore.controller.LoginController"
@@ -12,19 +12,24 @@
 
     <!--selector de idioma en la esquina superior derecha-->
     <HBox style="-fx-alignment: top-right; -fx-padding: 15;">
-        <ComboBox fx:id="cmbLanguage" 
+        <ComboBox fx:id="cmbLanguage"
                   style="-fx-background-color: #2c3e50; -fx-text-fill: #ecf0f1; -fx-control-inner-background: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-padding: 5 10; -fx-font-size: 11; -fx-font-fill: #ecf0f1; -fx-focus-color: #3498db; -fx-cell-text-fill: #ecf0f1;" promptText="Language"/>
     </HBox>
 
-    <VBox styleClass="login-card">
+    <!--alignment=CENTER hace que el stackpane centre la tarjeta sin estirarla-->
+    <VBox styleClass="login-card" maxHeight="Infinity" StackPane.alignment="CENTER">
 
-        <!--logo -->
+        <!--logo-->
         <VBox styleClass="login-brand">
             <Label text="CENTRAL" styleClass="logo-central"/>
             <Label text="CORE"    styleClass="logo-core"/>
         </VBox>
 
-        <!--mensaje de error - oculto por defecto-->
+        <!--titulo dinamico que cambia segun el modo-->
+        <Label fx:id="lblTitle"
+               styleClass="login-mode-title"/>
+
+        <!--mensaje de error/exito - oculto por defecto-->
         <Label fx:id="lblError"
                styleClass="login-error"
                text=""
@@ -32,30 +37,54 @@
                visible="false"
                managed="false"/>
 
+        <!--campo de usuario - solo visible en modo registro-->
+        <Label fx:id="lblUsername"
+               styleClass="field-label"
+               visible="false"
+               managed="false"/>
+        <TextField fx:id="txtUsername"
+                   styleClass="field-input"
+                   visible="false"
+                   managed="false"/>
+
         <!--campo de email-->
-        <Label fx:id="lblEmail" text="Email" styleClass="field-label"/>
+        <Label fx:id="lblEmail" styleClass="field-label"/>
         <TextField fx:id="txtEmail"
                    promptText="admin@city.gov"
                    styleClass="field-input"/>
 
         <!--campo de contraseña-->
-        <Label fx:id="lblPassword" text="Password" styleClass="field-label"/>
+        <Label fx:id="lblPassword" styleClass="field-label"/>
         <PasswordField fx:id="txtPassword"
                        promptText="••••••••"
                        styleClass="field-input"/>
 
-        <!--boton de inicio de sesion-->
+        <!--campo de confirmar contraseña - solo visible en modo registro-->
+        <Label fx:id="lblConfirmPassword"
+               styleClass="field-label"
+               visible="false"
+               managed="false"/>
+        <PasswordField fx:id="txtConfirmPassword"
+                       promptText="••••••••"
+                       styleClass="field-input"
+                       visible="false"
+                       managed="false"/>
+
+        <!--boton principal (login o register segun modo)-->
         <Button fx:id="btnLogin"
-                text="Log In"
                 styleClass="btn-primary"
                 onAction="#onLoginClicked"
                 defaultButton="true"/>
 
         <!--volver a bienvenida-->
         <Button fx:id="btnBack"
-                text="← Back"
                 styleClass="btn-ghost"
                 onAction="#onBackClicked"/>
+
+        <!--enlace para cambiar entre modos-->
+        <Label fx:id="lblSwitchLink"
+               styleClass="login-switch-link"
+               onMouseClicked="#onSwitchModeClicked"/>
 
     </VBox>
 

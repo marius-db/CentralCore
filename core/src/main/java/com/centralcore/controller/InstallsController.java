@@ -121,20 +121,14 @@ public class InstallsController implements Initializable {
 
         private ContextMenu createContextMenu(Module module) {
             ContextMenu menu = new ContextMenu();
-            menu.setStyle(
-                    "-fx-background-color: #34495e; " +
-                            "-fx-border-color: #7f8c8d; " +
-                            "-fx-border-width: 1;"
-            );
+
 
             MenuItem itemViewDetails = new MenuItem("View Details");
-            itemViewDetails.setStyle("-fx-padding: 6 12; -fx-font-size: 11;");
             itemViewDetails.setOnAction(e -> {
                 ModuleDetailsDialog.show(SceneManager.getStage(), module);
             });
 
             MenuItem itemDelete = new MenuItem("Delete");
-            itemDelete.setStyle("-fx-padding: 6 12; -fx-font-size: 11;");
             itemDelete.setOnAction(e -> {
                 System.out.println("eliminar modulo: " + module.getName());
             });

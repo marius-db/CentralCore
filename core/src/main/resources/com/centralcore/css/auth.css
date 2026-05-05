@@ -8,6 +8,7 @@
 .login-card {
     -fx-pref-width: 380px;
     -fx-max-width: 420px;
+    -fx-max-height: 620px;
     -fx-background-color: -cc-bg-card;
     -fx-padding: 48 44 48 44;
     -fx-spacing: 14px;
@@ -22,6 +23,14 @@
     -fx-spacing: 0px;
     -fx-padding: 0 0 16 0;
     -fx-alignment: center;
+}
+
+/*titulo dinamico del modo (solo visible en modo registro)*/
+.login-mode-title {
+    -fx-font-size: 13px;
+    -fx-text-fill: -cc-text-muted;
+    -fx-alignment: center;
+    -fx-padding: 0 0 4 0;
 }
 
 /*sobrescribir alineacion del logo para la tarjeta*/
@@ -46,5 +55,27 @@
 }
 
 .login-card .btn-ghost {
+    -fx-alignment: center;
+}
+
+/*enlace azul para cambiar entre login y registro*/
+.login-switch-link {
+    -fx-text-fill: #3498db;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-underline: true;
+    -fx-padding: 4 0 0 0;
+    -fx-alignment: center;
+}
+
+.login-switch-link:hover {
+    -fx-text-fill: #5dade2;
+}
+
+/*mensaje de exito en verde (registro completado)*/
+.login-success {
+    -fx-text-fill: #27ae60;
+    -fx-font-size: 12px;
+    -fx-wrap-text: true;
     -fx-alignment: center;
 }
