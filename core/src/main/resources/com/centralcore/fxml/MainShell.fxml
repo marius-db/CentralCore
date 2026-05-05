@@ -10,10 +10,14 @@
 <HBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.centralcore.controller.MainShellController"
-      styleClass="shell-root">
+      styleClass="shell-root"
+      minHeight="0"
+      minWidth="0">
 
-    <!--barra lateral-->
-    <VBox fx:id="sidebar" styleClass="sidebar" HBox.hgrow="NEVER">
+    <!--barra lateral - ancho fijo, altura completa-->
+    <VBox fx:id="sidebar" styleClass="sidebar"
+          HBox.hgrow="NEVER"
+          minHeight="0">
 
         <!--logo de la app arriba-->
         <VBox styleClass="sidebar-brand">
@@ -21,35 +25,28 @@
             <Label text="CORE"    styleClass="logo-core-small"/>
         </VBox>
 
-        <!--items de navegacion -->
+        <!--items de navegacion - ocupa el espacio disponible entre logo y fondo-->
         <VBox styleClass="sidebar-nav" VBox.vgrow="ALWAYS">
-            <!--item de navegacion modulos-->
             <Button fx:id="btnModules"
                     text="Modules"
                     styleClass="nav-item"
                     onAction="#onModulesClicked"/>
-
-            <!--item de navegacion instalaciones-->
             <Button fx:id="btnInstalls"
                     text="Installs"
                     styleClass="nav-item"
                     onAction="#onInstallsClicked"/>
-
-            <!--item de navegacion licencias-->
             <Button fx:id="btnLicences"
                     text="Licences"
                     styleClass="nav-item"
                     onAction="#onLicencesClicked"/>
         </VBox>
 
-        <!--configuracion al fondo del sidebar-->
-        <VBox styleClass="sidebar-bottom">
+        <!--configuracion y usuario al fondo del sidebar-->
+        <VBox styleClass="sidebar-bottom" VBox.vgrow="NEVER">
             <Button fx:id="btnSettings"
                     text="Settings"
                     styleClass="nav-item"
                     onAction="#onSettingsClicked"/>
-
-            <!--informacion del usuario conectado-->
             <VBox styleClass="sidebar-user">
                 <Label fx:id="lblUsername" text="User" styleClass="sidebar-username"/>
                 <Button fx:id="btnLogout"
@@ -61,12 +58,13 @@
 
     </VBox>
 
-    <!--area de contenido dinamico - los modulos cargan aqui-->
+    <!--area de contenido dinamico - crece para llenar todo el espacio restante-->
     <StackPane fx:id="contentPane"
                styleClass="content-pane"
-               HBox.hgrow="ALWAYS">
+               HBox.hgrow="ALWAYS"
+               minWidth="0"
+               minHeight="0">
 
-        <!--placeholder por defecto mostrado antes de seleccionar un modulo-->
         <VBox styleClass="content-placeholder">
             <Label text="Select a module from the sidebar"
                    styleClass="placeholder-text"/>

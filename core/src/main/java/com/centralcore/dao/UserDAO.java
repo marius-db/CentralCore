@@ -47,6 +47,32 @@ public class UserDAO {
         return null;
     }
 
+    //registra un nuevo usuario con rol operator por defecto
+    //devuelve true si se creó correctamente, false si el email ya existe u otro error
+    public boolean register(String username, String email, String plainPassword) {
+        String sql = "INSERT INTO users (username, email, password_hash, role, active) VALUES (?, ?, ?, 'operator', TRUE)";
+
+        Connection conn = DatabaseConnection.getConnection();
+        if (conn == null) {
+            System.err.println("sin conexion a bd para registro");
+            return false;
+        }
+
+        String hash = hashPassword(plainPassword);
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            stmt.setString(2, email);
+            stmt.setString(3, hash);
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            //unicidad del email lanza duplicate key - no es un error critico
+            System.err.println("fallo el registro de usuario: " + e.getMessage());
+            return false;
+        }
+    }
+
     public User findById(int id) {
         String sql = "SELECT id, username, email, role, active FROM users WHERE id = ?";
 

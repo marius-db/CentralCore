@@ -135,3 +135,53 @@
     -fx-background-color: derive(-cc-error, 80%);
     -fx-background-radius: 4px;
 }
+
+/*combobox (estado cerrado - valor seleccionado) */
+.combo-box .list-cell {
+    -fx-text-fill: white;
+}
+
+/*elementos del desplegable del combobox */
+.combo-box-popup .list-cell {
+    -fx-background-color: -cc-bg-mid;
+    -fx-text-fill: -cc-text-primary;
+}
+
+/*elemento al pasar el cursor */
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: -cc-bg-hover;
+}
+
+/*elemento seleccionado en el desplegable */
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: -cc-blue;
+    -fx-text-fill: white;
+}
+
+/*context menu container*/
+.context-menu {
+    -fx-background-color: -cc-bg-mid;
+    -fx-border-color: -cc-border;
+}
+
+/*each menu item*/
+.menu-item {
+    -fx-background-color: transparent;
+}
+
+/*menu item text*/
+.menu-item .label {
+    -fx-text-fill: white;
+}
+
+/*hover*/
+.menu-item:focused,
+.menu-item:hover {
+    -fx-background-color: -cc-bg-hover;
+}
+
+/*hover text*/
+.menu-item:focused .label,
+.menu-item:hover .label {
+    -fx-text-fill: white;
+}
