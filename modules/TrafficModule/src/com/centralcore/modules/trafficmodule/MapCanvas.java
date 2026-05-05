@@ -4,7 +4,6 @@ import com.centralcore.modules.trafficmodule.model.*;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -56,6 +55,9 @@ public class MapCanvas extends Canvas {
     private static final Color HINT_A_BG = Color.web("#22c55ed9");
     private static final Color HINT_B_BG = Color.web("#ef4444d9");
     private static final Color HINT_FG = Color.web("#0d0f14");
+    private static final Color EV_GLOW_OUTER = Color.web("#00e5ff18");
+    private static final Color EV_GLOW_MID   = Color.web("#00e5ff40");
+    private static final Color EV_GLOW_INNER  = Color.web("#00e5ff70");
 
     //fuentes pre-cacheadas
     private static final Font FONT_ROAD = Font.font("System", 10);
@@ -72,6 +74,9 @@ public class MapCanvas extends Canvas {
 
     private SimState simState = null;
     private List<Incident> incidents = new ArrayList<>();
+    //listas pre-divididas para no separar main/side en cada frame
+    private List<TrafficEdge> mainEdgesCache = new ArrayList<>();
+    private List<TrafficEdge> sideEdgesCache = new ArrayList<>();
 
     private String pointAId = null, pointBId = null;
     private double pointAX = Double.NaN, pointAY = Double.NaN;
@@ -86,8 +91,6 @@ public class MapCanvas extends Canvas {
     private boolean placingPointA = false;
     private boolean placingPointB = false;
     private Incident selectedInc = null;
-
-    private final DropShadow evGlow = new DropShadow(12, EV_COLOR);
 
     private BiConsumer<Double, Double> onIncidentPlaced;
     private Consumer<double[]> onPointAPlaced;
@@ -124,6 +127,13 @@ public class MapCanvas extends Canvas {
 
     public void setState(SimState s) {
         simState = s;
+        mainEdgesCache.clear();
+        sideEdgesCache.clear();
+        if (s != null) {
+            for (TrafficEdge e : s.getEdges()) {
+                if (e.isMain()) mainEdgesCache.add(e); else sideEdgesCache.add(e);
+            }
+        }
         dirty = true;
     }
 
@@ -425,7 +435,8 @@ public class MapCanvas extends Canvas {
             return;
         }
 
-        //transform una sola vez — revertir manualmente al final
+        //transform una sola vez — save/restore elimina drift acumulado por float
+        gc.save();
         gc.translate(offsetX, offsetY);
         gc.scale(scale, scale);
 
@@ -438,74 +449,119 @@ public class MapCanvas extends Canvas {
         drawPins(gc);
         drawMarkers(gc);
 
-        gc.scale(1.0 / scale, 1.0 / scale);
-        gc.translate(-offsetX, -offsetY);
+        gc.restore();
 
         drawHint(gc, w, h);
     }
 
     //dibujo
     private void drawEdges(GraphicsContext gc) {
-        List<TrafficEdge> edges = simState.getEdges();
+        //pre-calcular posiciones de nodos para cada arista (evita 4+ lookups HashMap por arista por frame)
+        //orden: secundarias primero, principales encima — main siempre visible sobre side
+        int totalEdges = mainEdgesCache.size() + sideEdgesCache.size();
+        if (totalEdges == 0) return;
 
-        //pasada 1: borde
+        //arrays de coordenadas pre-resueltas para cada lista
+        double[] sxA = new double[sideEdgesCache.size()], syA = new double[sideEdgesCache.size()];
+        double[] sxB = new double[sideEdgesCache.size()], syB = new double[sideEdgesCache.size()];
+        boolean[] sValid = new boolean[sideEdgesCache.size()];
+        for (int i = 0; i < sideEdgesCache.size(); i++) {
+            TrafficEdge e = sideEdgesCache.get(i);
+            TrafficNode a = simState.findNode(e.getFrom()), b = simState.findNode(e.getTo());
+            sValid[i] = a != null && b != null;
+            if (sValid[i]) { sxA[i] = a.getX(); syA[i] = a.getY(); sxB[i] = b.getX(); syB[i] = b.getY(); }
+        }
+        double[] mxA = new double[mainEdgesCache.size()], myA = new double[mainEdgesCache.size()];
+        double[] mxB = new double[mainEdgesCache.size()], myB = new double[mainEdgesCache.size()];
+        boolean[] mValid = new boolean[mainEdgesCache.size()];
+        for (int i = 0; i < mainEdgesCache.size(); i++) {
+            TrafficEdge e = mainEdgesCache.get(i);
+            TrafficNode a = simState.findNode(e.getFrom()), b = simState.findNode(e.getTo());
+            mValid[i] = a != null && b != null;
+            if (mValid[i]) { mxA[i] = a.getX(); myA[i] = a.getY(); mxB[i] = b.getX(); myB[i] = b.getY(); }
+        }
+
         gc.setLineDashes((double[]) null);
-        for (TrafficEdge e : edges) {
-            TrafficNode a = simState.findNode(e.getFrom()), b = simState.findNode(e.getTo());
-            if (a == null || b == null) continue;
-            gc.setStroke(ROAD_BORDER);
-            gc.setLineWidth(e.isMain() ? ROAD_MAIN_W + 4 : ROAD_SIDE_W + 4);
-            gc.strokeLine(a.getX(), a.getY(), b.getX(), b.getY());
+
+        //pasada 1: borde de secundarias
+        gc.setStroke(ROAD_BORDER);
+        gc.setLineWidth(ROAD_SIDE_W + 4);
+        for (int i = 0; i < sideEdgesCache.size(); i++) {
+            if (sValid[i]) gc.strokeLine(sxA[i], syA[i], sxB[i], syB[i]);
         }
-        //pasada 2: cuerpo
-        for (TrafficEdge e : edges) {
-            TrafficNode a = simState.findNode(e.getFrom()), b = simState.findNode(e.getTo());
-            if (a == null || b == null) continue;
-            gc.setStroke(densColor(e.isMain(), e.getDensity()));
-            gc.setLineWidth(e.isMain() ? ROAD_MAIN_W : ROAD_SIDE_W);
-            gc.strokeLine(a.getX(), a.getY(), b.getX(), b.getY());
+        //pasada 2: borde de principales (encima de las secundarias)
+        gc.setLineWidth(ROAD_MAIN_W + 4);
+        for (int i = 0; i < mainEdgesCache.size(); i++) {
+            if (mValid[i]) gc.strokeLine(mxA[i], myA[i], mxB[i], myB[i]);
         }
-        //pasada 3: lineas de carril
+        //pasada 3: cuerpo de secundarias
+        for (int i = 0; i < sideEdgesCache.size(); i++) {
+            if (!sValid[i]) continue;
+            gc.setStroke(densColor(false, sideEdgesCache.get(i).getDensity()));
+            gc.setLineWidth(ROAD_SIDE_W);
+            gc.strokeLine(sxA[i], syA[i], sxB[i], syB[i]);
+        }
+        //pasada 4: cuerpo de principales (encima de todo)
+        for (int i = 0; i < mainEdgesCache.size(); i++) {
+            if (!mValid[i]) continue;
+            gc.setStroke(densColor(true, mainEdgesCache.get(i).getDensity()));
+            gc.setLineWidth(ROAD_MAIN_W);
+            gc.strokeLine(mxA[i], myA[i], mxB[i], myB[i]);
+        }
+
+        //pasada 5: lineas de carril (solo principales con >1 carril)
         if (scale > 0.55) {
             gc.setStroke(LANE_LINE);
             gc.setLineWidth(0.7);
             gc.setLineDashes(8, 6);
-            for (TrafficEdge e : edges) {
-                if (!e.isMain() || e.getLanes() <= 1) continue;
-                TrafficNode a = simState.findNode(e.getFrom()), b = simState.findNode(e.getTo());
-                if (a == null || b == null) continue;
-                laneLines(gc, a.getX(), a.getY(), b.getX(), b.getY(), e.getLanes());
+            for (int i = 0; i < mainEdgesCache.size(); i++) {
+                if (!mValid[i]) continue;
+                TrafficEdge e = mainEdgesCache.get(i);
+                if (e.getLanes() <= 1) continue;
+                laneLines(gc, mxA[i], myA[i], mxB[i], myB[i], e.getLanes());
             }
             gc.setLineDashes((double[]) null);
         }
-        //pasada 4: nombres (save/restore solo al rotar texto, aceptable una vez por nombre)
+
+        //pasada 6: nombres de calle
         if (scale >= 0.5) {
             gc.setFont(FONT_ROAD);
             gc.setFill(TEXT_ROAD);
             gc.setTextAlign(TextAlignment.CENTER);
             Set<String> drawn = new HashSet<>();
-            for (TrafficEdge e : edges) {
-                String name = e.getName();
-                if (name == null || name.isBlank()) continue;
-                String key = name + e.getFrom() + e.getTo();
-                String rev = name + e.getTo() + e.getFrom();
-                if (drawn.contains(key) || drawn.contains(rev)) continue;
-                drawn.add(key);
-                drawn.add(rev);
-                TrafficNode a = simState.findNode(e.getFrom()), b = simState.findNode(e.getTo());
-                if (a == null || b == null) continue;
-                double dx = b.getX() - a.getX(), dy = b.getY() - a.getY(), len = Math.hypot(dx, dy);
-                if (len < 40) continue;
-                double mx = (a.getX() + b.getX()) / 2, my = (a.getY() + b.getY()) / 2;
-                double ang = Math.toDegrees(Math.atan2(dy, dx));
-                if (ang > 90 || ang < -90) ang += 180;
-                gc.save();
-                gc.translate(mx, my);
-                gc.rotate(ang);
-                gc.fillText(name, 0, -(e.isMain() ? ROAD_MAIN_W : ROAD_SIDE_W) / 2.0 - 3);
-                gc.restore();
+            //secundarias
+            for (int i = 0; i < sideEdgesCache.size(); i++) {
+                if (!sValid[i]) continue;
+                drawEdgeName(gc, sideEdgesCache.get(i), sxA[i], syA[i], sxB[i], syB[i], false, drawn);
+            }
+            //principales
+            for (int i = 0; i < mainEdgesCache.size(); i++) {
+                if (!mValid[i]) continue;
+                drawEdgeName(gc, mainEdgesCache.get(i), mxA[i], myA[i], mxB[i], myB[i], true, drawn);
             }
         }
+    }
+
+    private void drawEdgeName(GraphicsContext gc, TrafficEdge e,
+                              double x1, double y1, double x2, double y2,
+                              boolean main, Set<String> drawn) {
+        String name = e.getName();
+        if (name == null || name.isBlank()) return;
+        String key = name + e.getFrom() + e.getTo();
+        String rev = name + e.getTo() + e.getFrom();
+        if (drawn.contains(key) || drawn.contains(rev)) return;
+        drawn.add(key);
+        drawn.add(rev);
+        double dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy);
+        if (len < 40) return;
+        double mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+        double ang = Math.toDegrees(Math.atan2(dy, dx));
+        if (ang > 90 || ang < -90) ang += 180;
+        gc.save();
+        gc.translate(mx, my);
+        gc.rotate(ang);
+        gc.fillText(name, 0, -(main ? ROAD_MAIN_W : ROAD_SIDE_W) / 2.0 - 3);
+        gc.restore();
     }
 
     private Color densColor(boolean main, double d) {
@@ -592,6 +648,8 @@ public class MapCanvas extends Canvas {
 
     private void drawCars(GraphicsContext gc) {
         gc.setFill(CAR_COLOR);
+        //en vez de translate/rotate/undo por coche (acumula error float y toca el transform stack),
+        //calculamos los 4 vertices del rectangulo rotado directamente en espacio mundo
         for (SimCar car : simState.getCars()) {
             TrafficNode a = simState.findNode(car.getNodeA()), b = simState.findNode(car.getNodeB());
             if (a == null || b == null) {
@@ -600,25 +658,38 @@ public class MapCanvas extends Canvas {
             }
             double angle = Math.atan2(b.getY() - a.getY(), b.getX() - a.getX());
             double nx = -Math.sin(angle), ny = Math.cos(angle);
-            // carril 1 a la izquierda de la direccion de marcha, carril 2 a la derecha
             double off = car.getLane() == 1 ? -LANE_SEP : LANE_SEP;
             double fx = car.getX() + nx * off, fy = car.getY() + ny * off;
-            // rotar sin save/restore: aplicar y revertir el transform manualmente
-            gc.translate(fx, fy);
-            gc.rotate(Math.toDegrees(angle));
-            gc.fillRoundRect(-4.5, -2, 9, 4, 2, 2);
-            gc.rotate(-Math.toDegrees(angle));
-            gc.translate(-fx, -fy);
+            double cos = Math.cos(angle), sin = Math.sin(angle);
+            //rectangulo 9x4 centrado en (fx,fy), eje largo en direccion del angulo
+            double[] px = {
+                    fx + 4.5*cos - 2.0*sin,
+                    fx - 4.5*cos - 2.0*sin,
+                    fx - 4.5*cos + 2.0*sin,
+                    fx + 4.5*cos + 2.0*sin
+            };
+            double[] py = {
+                    fy + 4.5*sin + 2.0*cos,
+                    fy - 4.5*sin + 2.0*cos,
+                    fy - 4.5*sin - 2.0*cos,
+                    fy + 4.5*sin - 2.0*cos
+            };
+            gc.fillPolygon(px, py, 4);
         }
     }
 
     private void drawEV(GraphicsContext gc) {
         if (!simState.isEvActive()) return;
         double ex = simState.getEvX(), ey = simState.getEvY();
-        gc.setEffect(evGlow);
+        //glow manual con ovales semi-transparentes: evita el path de DropShadow por software
+        gc.setFill(EV_GLOW_OUTER);
+        gc.fillOval(ex - 18, ey - 12, 36, 24);
+        gc.setFill(EV_GLOW_MID);
+        gc.fillOval(ex - 13, ey - 9, 26, 18);
+        gc.setFill(EV_GLOW_INNER);
+        gc.fillOval(ex - 9, ey - 6, 18, 12);
         gc.setFill(EV_COLOR);
         gc.fillRoundRect(ex - 7, ey - 4, 14, 8, 3, 3);
-        gc.setEffect(null);
         gc.setStroke(WHITE);
         gc.setLineWidth(1.5);
         gc.strokeLine(ex - 3, ey - 9, ex + 3, ey - 9);
