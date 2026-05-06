@@ -5,6 +5,17 @@
     -fx-spacing: 0;
 }
 
+/* divider del splitpane */
+
+.tm-root > .split-pane-divider {
+    -fx-background-color: -cc-border;
+    -fx-padding: 0 2 0 2;
+}
+
+.tm-root > .split-pane-divider:hover {
+    -fx-background-color: -cc-blue;
+}
+
 /* area del mapa */
 
 .tm-map-pane {

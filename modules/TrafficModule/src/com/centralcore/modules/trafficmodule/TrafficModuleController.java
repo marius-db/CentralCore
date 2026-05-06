@@ -21,7 +21,9 @@ import java.util.Set;
 public class TrafficModuleController {
 
     //region fxml
+    @FXML private SplitPane splitPane;
     @FXML private StackPane mapPane;
+    @FXML private VBox sidePanel;
     @FXML private Label lblConStatus;
     @FXML private Circle dotConStatus;
     @FXML private Button btnConectar;
@@ -63,7 +65,6 @@ public class TrafficModuleController {
     private final Gson gson = new Gson();
     private MapCanvas mapCanvas;
 
-    //true solo cuando onConnected ha disparado; no cuando se esta intentando conectar
     private boolean connected = false;
 
     private final ObservableList<TrafficLight> lightItems = FXCollections.observableArrayList();
@@ -71,20 +72,22 @@ public class TrafficModuleController {
     private final ObservableList<Incident> incidentItems = FXCollections.observableArrayList();
     private final ObservableList<Incident> historialItems = FXCollections.observableArrayList();
 
-    //distancia en unidades sim para activar override de semaforo ante el VE
     private static final double EV_LIGHT_TRIGGER_DIST = 80.0;
 
-    //evita enviar el mismo override multiples veces al mismo semaforo por tick
     private final Set<String> overriddenLights = new HashSet<>();
 
-    //lookup rapido arista por id para el parseState
     private final java.util.Map<String, TrafficEdge> edgeById = new java.util.HashMap<>();
-    //lookup rapido semaforo por id
     private final java.util.Map<String, TrafficLight> lightById = new java.util.HashMap<>();
+
+    //contador de ticks para throttling de las listas: se actualizan cada 5 ticks (~400ms)
+    //los estados de semaforo cambian en ciclos de varios segundos, no hace falta refrescar a 12fps
+    private int stateTick = 0;
+    private static final int LIST_REFRESH_INTERVAL = 5;
 
     @FXML
     public void initialize() {
         setupMapCanvas();
+        setupSplitPane();
         setupListCells();
         setupCombos();
         setupConnectionCallbacks();
@@ -101,7 +104,6 @@ public class TrafficModuleController {
         mapCanvas.heightProperty().bind(mapPane.heightProperty());
         mapPane.getChildren().add(0, mapCanvas);
 
-        //clic derecho en nodo: menu contextual
         mapCanvas.setOnNodeRightClicked(node -> {
             ContextMenu ctx = buildNodeContextMenu(node);
             javafx.geometry.Point2D screen = mapCanvas.localToScreen(
@@ -110,7 +112,6 @@ public class TrafficModuleController {
             if (screen != null) ctx.show(mapCanvas, screen.getX(), screen.getY());
         });
 
-        //clic derecho en calle (no sobre un nodo): mismo menu con coordenadas sim
         mapCanvas.setOnRoadRightClicked(coords -> {
             ContextMenu ctx = buildRoadContextMenu(coords[0], coords[1]);
             javafx.geometry.Point2D screen = mapCanvas.localToScreen(
@@ -119,13 +120,11 @@ public class TrafficModuleController {
             if (screen != null) ctx.show(mapCanvas, screen.getX(), screen.getY());
         });
 
-        //colocar incidente al hacer clic mientras se esta en modo colocacion
         mapCanvas.setOnIncidentPlaced((simX, simY) -> {
             btnMarcarMapa.setText("Marcar en mapa");
             createIncidentAt(simX, simY);
         });
 
-        //punto A colocado (por clic en calle o nodo)
         mapCanvas.setOnPointAPlaced(coords -> {
             btnMarcarA.setText("Marcar A");
             String nodeId = mapCanvas.getPointAId();
@@ -133,7 +132,6 @@ public class TrafficModuleController {
             refreshEnviarBtn();
         });
 
-        //punto B colocado
         mapCanvas.setOnPointBPlaced(coords -> {
             btnMarcarB.setText("Marcar B");
             String nodeId = mapCanvas.getPointBId();
@@ -141,7 +139,6 @@ public class TrafficModuleController {
             refreshEnviarBtn();
         });
 
-        //al seleccionar un pin de incidente en el mapa
         mapCanvas.setOnIncidentSelected(inc -> listIncidentes.getSelectionModel().select(inc));
     }
 
@@ -169,7 +166,6 @@ public class TrafficModuleController {
         return ctx;
     }
 
-    //menu contextual para clic derecho en una calle (sin nodo exacto)
     private ContextMenu buildRoadContextMenu(double simX, double simY) {
         ContextMenu ctx = new ContextMenu();
         MenuItem itemA = new MenuItem("Marcar como Punto A");
@@ -184,10 +180,34 @@ public class TrafficModuleController {
             lblPuntoB.setText(String.format("(%.0f, %.0f)", simX, simY));
             refreshEnviarBtn();
         });
-        MenuItem itemInc = new MenuItem("\u00c1\u00f1adir incidente aqu\u00ed");
+        MenuItem itemInc = new MenuItem("Añadir incidente aquí");
         itemInc.setOnAction(e -> createIncidentAt(simX, simY));
         ctx.getItems().addAll(itemA, itemB, new SeparatorMenuItem(), itemInc);
         return ctx;
+    }
+
+    private void setupSplitPane() {
+        final double[] dividerPos = {0.70};
+
+        splitPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene == null) return;
+            newScene.windowProperty().addListener((o2, oldWin, win) -> {
+                if (win == null) return;
+                win.showingProperty().addListener((o3, wasShowing, showing) -> {
+                    if (showing) Platform.runLater(() -> splitPane.setDividerPositions(dividerPos[0]));
+                });
+            });
+        });
+
+        splitPane.getDividers().get(0).positionProperty().addListener((obs, oldPos, newPos) -> {
+            dividerPos[0] = newPos.doubleValue();
+        });
+
+        splitPane.widthProperty().addListener((obs, oldW, newW) -> {
+            if (newW.doubleValue() > 0) {
+                Platform.runLater(() -> splitPane.setDividerPositions(dividerPos[0]));
+            }
+        });
     }
 
     private void setupListCells() {
@@ -198,6 +218,8 @@ public class TrafficModuleController {
             private final Label lblDir = new Label();
             private final Button btnOvr = new Button("Override");
             private final HBox row = new HBox(8, dot, lblId, lblDir, new Pane(), btnOvr);
+            //dropshadow creado una sola vez y reutilizado; solo se muta el color
+            private final javafx.scene.effect.DropShadow shadow = new javafx.scene.effect.DropShadow(6, Color.RED);
 
             {
                 HBox.setHgrow(row.getChildren().get(3), Priority.ALWAYS);
@@ -208,18 +230,16 @@ public class TrafficModuleController {
                     TrafficLight l = getItem();
                     if (l != null) showOverrideDialog(l);
                 });
+                dot.setEffect(shadow);
             }
 
             @Override
             protected void updateItem(TrafficLight l, boolean empty) {
                 super.updateItem(l, empty);
-                if (empty || l == null) {
-                    setGraphic(null);
-                    return;
-                }
+                if (empty || l == null) { setGraphic(null); return; }
                 Color c = lightStateColor(l.getState());
                 dot.setFill(c);
-                dot.setEffect(new javafx.scene.effect.DropShadow(6, c));
+                shadow.setColor(c);
                 String stateName = stateDisplayName(l.getState());
                 lblId.setText(l.getId() + "  " + stateName + "  " + l.getTimer() + "s");
                 lblId.getStyleClass().setAll("tm-list-label");
@@ -247,10 +267,7 @@ public class TrafficModuleController {
             @Override
             protected void updateItem(TrafficEdge e, boolean empty) {
                 super.updateItem(e, empty);
-                if (empty || e == null) {
-                    setGraphic(null);
-                    return;
-                }
+                if (empty || e == null) { setGraphic(null); return; }
                 double d = e.getDensity();
                 densBar.setWidth(Math.max(4, d * 80));
                 Color barColor = d < 0.4 ? Color.web("#22c55e")
@@ -270,16 +287,13 @@ public class TrafficModuleController {
             @Override
             protected void updateItem(Incident i, boolean empty) {
                 super.updateItem(i, empty);
-                if (empty || i == null) {
-                    setText(null);
-                    return;
-                }
+                if (empty || i == null) { setText(null); return; }
                 setText(i.toString());
                 getStyleClass().removeAll("inc-abierto", "inc-critico", "inc-resuelto");
                 switch (i.getEstado().toLowerCase()) {
                     case "crítico", "critico" -> getStyleClass().add("inc-critico");
-                    case "resuelto" -> getStyleClass().add("inc-resuelto");
-                    default -> getStyleClass().add("inc-abierto");
+                    case "resuelto"           -> getStyleClass().add("inc-resuelto");
+                    default                   -> getStyleClass().add("inc-abierto");
                 }
             }
         });
@@ -289,10 +303,7 @@ public class TrafficModuleController {
             @Override
             protected void updateItem(Incident i, boolean empty) {
                 super.updateItem(i, empty);
-                if (empty || i == null) {
-                    setText(null);
-                    return;
-                }
+                if (empty || i == null) { setText(null); return; }
                 String closed = i.getClosedAt() != null
                         ? i.getClosedAt().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM HH:mm"))
                         : "—";
@@ -332,29 +343,32 @@ public class TrafficModuleController {
 
         connection.setOnMapReceived(json -> {
             parseMap(json);
+            //setState reconstruye los caches de aristas y marca dirty
             mapCanvas.setState(simState);
         });
 
         connection.setOnStateReceived(json -> {
             parseState(json);
-            mapCanvas.setState(simState);
-            updateLightList();
-            updateEdgeDensities();
+            //markDirty en vez de setState: el mapa no cambia entre ticks de estado
+            mapCanvas.markDirty();
             handleEvLightOverride();
             if (simState.isRouteDone()) onRouteDone();
+            //listas: throttle a cada LIST_REFRESH_INTERVAL ticks para evitar setAll continuo
+            stateTick++;
+            if (stateTick % LIST_REFRESH_INTERVAL == 0) {
+                updateLightList();
+                updateEdgeDensities();
+            }
         });
 
-        //ev_done separado del estado (protocolo legacy) — evitar doble llamada
         connection.setOnEvDone(() -> {
             if (!simState.isRouteDone()) onRouteDone();
         });
     }
 
     private void setupEmergencyActions() {
-        //boton marcar punto A: activa modo colocacion en el canvas
         btnMarcarA.setOnAction(e -> {
             if (mapCanvas.isPlacingPointA()) {
-                // cancelar
                 mapCanvas.setPlacingPointA(false);
                 btnMarcarA.setText("Marcar A");
             } else {
@@ -422,10 +436,7 @@ public class TrafficModuleController {
 
     private void setupHistorialSelection() {
         listHistorial.getSelectionModel().selectedItemProperty().addListener((o, prev, curr) -> {
-            if (curr == null) {
-                listUpdates.setItems(FXCollections.emptyObservableList());
-                return;
-            }
+            if (curr == null) { listUpdates.setItems(FXCollections.emptyObservableList()); return; }
             List<IncidentUpdate> updates = dao.getUpdates(curr.getId());
             listUpdates.setItems(FXCollections.observableArrayList(updates));
         });
@@ -436,10 +447,8 @@ public class TrafficModuleController {
     private void onToggleConexion() {
         if (connected) {
             connection.disconnect();
-            // setConnectionStatus lo llama onDisconnected; no tocar el boton aqui
         } else {
-            // deshabilitar boton mientras se intenta conectar para evitar doble pulsacion
-            btnConectar.setText("Conectando…");
+            btnConectar.setText("Conectando...");
             btnConectar.setDisable(true);
             String url = fieldWsUrl.getText().trim();
             connection.connect(url.isBlank() ? "ws://localhost:8765" : url);
@@ -463,7 +472,6 @@ public class TrafficModuleController {
         String aId = mapCanvas.getPointAId();
         String bId = mapCanvas.getPointBId();
 
-        // si ambos puntos son nodos exactos usar ids; sino enviar coordenadas
         if (aId != null && bId != null) {
             connection.sendRoute(aId, bId);
         } else {
@@ -472,7 +480,7 @@ public class TrafficModuleController {
 
         String aLabel = aId != null ? aId : String.format("(%.0f,%.0f)", ax, ay);
         String bLabel = bId != null ? bId : String.format("(%.0f,%.0f)", bx, by);
-        lblEstadoRuta.setText("Ruta activa: " + aLabel + " → " + bLabel);
+        lblEstadoRuta.setText("Ruta activa: " + aLabel + " -> " + bLabel);
         btnCancelarRuta.setDisable(false);
         btnEnviarRuta.setDisable(true);
         overriddenLights.clear();
@@ -493,12 +501,12 @@ public class TrafficModuleController {
     }
 
     private void onRouteDone() {
-        lblEstadoRuta.setText("Ruta completada ✓");
+        lblEstadoRuta.setText("Ruta completada");
         btnCancelarRuta.setDisable(true);
         btnEnviarRuta.setDisable(false);
         simState.setEvActive(false);
         simState.setEvRoute(new ArrayList<>());
-        mapCanvas.setState(simState);
+        mapCanvas.markDirty();
         overriddenLights.clear();
     }
 
@@ -507,9 +515,6 @@ public class TrafficModuleController {
         boolean bOk = !Double.isNaN(mapCanvas.getPointBX());
         btnEnviarRuta.setDisable(!aOk || !bOk);
     }
-
-    //override automatico de semaforos para el VE
-    //se rastrea que semaforos ya han sido overrideados para no repetir el envio cada tick
 
     private void handleEvLightOverride() {
         if (!simState.isEvActive()) return;
@@ -523,22 +528,17 @@ public class TrafficModuleController {
                 simState.getEvY() - nextNode.getY());
         if (dist >= EV_LIGHT_TRIGGER_DIST) return;
 
-        // calcular la direccion de aproximacion del VE
         String approachDir = inferEvApproachDir(nextNodeId);
 
-        //poner en verde el semaforo de la direccion del VE y en rojo los perpendiculares
-        //solo si no lo hemos hecho ya para este nodo en esta ruta
         List<TrafficLight> lts = simState.findLightsAtNode(nextNodeId);
         for (TrafficLight lt : lts) {
             if (overriddenLights.contains(lt.getId())) continue;
             boolean sameAxis = isSameAxis(lt.getDir(), approachDir);
-            String state = sameAxis ? "green" : "red";
-            connection.overrideLight(lt.getId(), state, 35);
+            connection.overrideLight(lt.getId(), sameAxis ? "green" : "red", 35);
             overriddenLights.add(lt.getId());
         }
     }
 
-    //devuelve la direccion cardinal desde la que el VE llega al nodo destino
     private String inferEvApproachDir(String targetNodeId) {
         List<String> route = simState.getEvRoute();
         int idx = route.indexOf(targetNodeId);
@@ -552,7 +552,6 @@ public class TrafficModuleController {
         return dy > 0 ? "S" : "N";
     }
 
-    //N y S son el mismo eje; E y W son el mismo eje
     private boolean isSameAxis(String dirA, String dirB) {
         boolean nsA = dirA.equals("N") || dirA.equals("S");
         boolean nsB = dirB.equals("N") || dirB.equals("S");
@@ -653,7 +652,6 @@ public class TrafficModuleController {
         try {
             JsonObject root = gson.fromJson(json, JsonObject.class);
 
-            //coches
             List<SimCar> cars = new ArrayList<>();
             if (root.has("cars")) {
                 for (JsonElement el : root.getAsJsonArray("cars")) {
@@ -671,7 +669,7 @@ public class TrafficModuleController {
             }
             simState.setCars(cars);
 
-            //semaforos: O(1) por lookup en vez de O(n^2)
+            //lookup O(1) por id en vez de busqueda lineal
             if (root.has("lights")) {
                 for (JsonElement el : root.getAsJsonArray("lights")) {
                     JsonObject o = el.getAsJsonObject();
@@ -684,18 +682,14 @@ public class TrafficModuleController {
                 }
             }
 
-            //densidad por arista: O(1) por lookup
             if (root.has("traffic")) {
                 for (JsonElement el : root.getAsJsonArray("traffic")) {
                     JsonObject o = el.getAsJsonObject();
-                    String eid = o.get("id").getAsString();
-                    double dens = o.get("density").getAsDouble();
-                    TrafficEdge edge = edgeById.get(eid);
-                    if (edge != null) edge.setDensity(dens);
+                    TrafficEdge edge = edgeById.get(o.get("id").getAsString());
+                    if (edge != null) edge.setDensity(o.get("density").getAsDouble());
                 }
             }
 
-            //vehiculo de emergencia
             if (root.has("ev") && !root.get("ev").isJsonNull()) {
                 JsonObject ev = root.getAsJsonObject("ev");
                 simState.setEvActive(true);
@@ -732,51 +726,47 @@ public class TrafficModuleController {
     private Color lightStateColor(String state) {
         if (state == null) return Color.web("#ef4444");
         return switch (state) {
-            case "green" -> Color.web("#22c55e");
+            case "green"  -> Color.web("#22c55e");
             case "yellow" -> Color.web("#f59e0b");
-            default -> Color.web("#ef4444");
+            default       -> Color.web("#ef4444");
         };
     }
 
-    //nombre en espanol del estado del semaforo para mostrar en la lista
     private String stateDisplayName(String state) {
         if (state == null) return "Rojo";
         return switch (state) {
-            case "green" -> "Verde";
-            case "yellow" -> "Ámbar";
-            default -> "Rojo";
+            case "green"  -> "Verde";
+            case "yellow" -> "Ambar";
+            default       -> "Rojo";
         };
     }
 
-    //nombre en espanol de la direccion del semaforo
     private String dirDisplayName(String dir) {
         if (dir == null) return "";
         return switch (dir) {
-            case "N" -> "↑ Norte";
-            case "S" -> "↓ Sur";
-            case "E" -> "→ Este";
-            case "W" -> "← Oeste";
-            default -> dir;
+            case "N" -> "^ Norte";
+            case "S" -> "v Sur";
+            case "E" -> "> Este";
+            case "W" -> "< Oeste";
+            default  -> dir;
         };
     }
 
     private void showOverrideDialog(TrafficLight light) {
         Dialog<ButtonType> dlg = new Dialog<>();
-        dlg.setTitle("Override de semáforo — " + light.getId()
+        dlg.setTitle("Override de semaforo — " + light.getId()
                 + " (" + dirDisplayName(light.getDir()) + ")");
         dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        //opciones en espanol mapeadas a los estados internos
         ComboBox<String> comboState = new ComboBox<>(FXCollections.observableArrayList(
-                "Verde", "Ámbar", "Rojo"
+                "Verde", "Ambar", "Rojo"
         ));
-        //preseleccionar el estado actual traducido
         comboState.getSelectionModel().select(stateDisplayName(light.getState()));
 
         Spinner<Integer> spinnerDur = new Spinner<>(5, 120, 30, 5);
 
         Label lblInfo = new Label("Nodo: " + light.getNodeId()
-                + "   Dirección: " + dirDisplayName(light.getDir())
+                + "   Direccion: " + dirDisplayName(light.getDir())
                 + "   Estado actual: " + stateDisplayName(light.getState())
                 + "   Contador: " + light.getTimer() + "s");
         lblInfo.setStyle("-fx-text-fill: -cc-text-secondary; -fx-font-size: 11px;");
@@ -784,19 +774,18 @@ public class TrafficModuleController {
         VBox content = new VBox(10,
                 lblInfo,
                 new Label("Forzar estado:"), comboState,
-                new Label("Duración (segundos):"), spinnerDur
+                new Label("Duracion (segundos):"), spinnerDur
         );
         content.setPadding(new Insets(16));
         dlg.getDialogPane().setContent(content);
 
         dlg.showAndWait().ifPresent(bt -> {
             if (bt == ButtonType.OK) {
-                // traducir nombre en espanol al estado interno
                 String selected = comboState.getValue();
                 String internalState = switch (selected) {
                     case "Verde" -> "green";
-                    case "Ámbar" -> "yellow";
-                    default -> "red";
+                    case "Ambar" -> "yellow";
+                    default      -> "red";
                 };
                 connection.overrideLight(light.getId(), internalState, spinnerDur.getValue());
             }
