@@ -804,7 +804,19 @@ public class TrafficModuleController {
 
     //region listas
     private void updateLightList() {
+        //conservar seleccion antes del setAll — el replace de items dispara selectedItemProperty
+        //con null brevemente, lo que llamaria a mapCanvas.setSelectedLight(null) y mataría el highlight
+        TrafficLight sel = listSemaforos.getSelectionModel().getSelectedItem();
         lightItems.setAll(simState.getLights());
+        if (sel != null) {
+            //re-seleccionar por id porque setAll recrea los items aunque sean los mismos objetos
+            for (TrafficLight lt : lightItems) {
+                if (lt.getId().equals(sel.getId())) {
+                    listSemaforos.getSelectionModel().select(lt);
+                    break;
+                }
+            }
+        }
     }
 
     private void updateEdgeDensities() {

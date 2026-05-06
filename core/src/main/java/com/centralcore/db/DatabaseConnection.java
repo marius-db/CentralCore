@@ -22,8 +22,7 @@ public class DatabaseConnection {
 
     private static Connection connection = null;
 
-    private DatabaseConnection() {
-    }
+    private DatabaseConnection() {}
 
     public static Connection getConnection() {
         try {
@@ -52,7 +51,17 @@ public class DatabaseConnection {
         }
     }
 
+    //reabre o devuelve la conexion existente
     public static boolean testConnection() {
         return getConnection() != null;
+    }
+
+    //solo comprueba si la conexion activa responde, sin reabrir si esta cerrada
+    public static boolean pingConnection() {
+        try {
+            return connection != null && !connection.isClosed() && connection.isValid(2);
+        } catch (SQLException e) {
+            return false;
+        }
     }
 }

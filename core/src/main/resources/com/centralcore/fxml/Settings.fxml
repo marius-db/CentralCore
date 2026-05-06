@@ -3,16 +3,12 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<!--
-    settings view - app appearance and profile settings
-    vista de configuracion - ajustes de apariencia y perfil de la app
--->
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.centralcore.controller.SettingsController"
       style="-fx-background-color: #2c3e50; -fx-spacing: 0; -fx-padding: 0;">
 
-    <!-- page header / cabecera de la pagina -->
+    <!--cabecera-->
     <HBox style="-fx-padding: 15 20; -fx-background-color: #34495e; -fx-border-color: #2c3e50; -fx-border-width: 0 0 1 0; -fx-spacing: 10; -fx-alignment: center-left;">
         <Label fx:id="lblTitle" text="Settings" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
     </HBox>
@@ -20,56 +16,17 @@
     <ScrollPane VBox.vgrow="ALWAYS" style="-fx-background-color: #2c3e50; -fx-border-color: #34495e; -fx-padding: 0;" fitToWidth="true" fitToHeight="true">
         <VBox style="-fx-padding: 25; -fx-spacing: 25; -fx-background-color: #2c3e50;">
 
-            <!--seccion de apariencia-->
-            <VBox style="-fx-spacing: 12;">
-                <Label fx:id="lblAppearance" text="Appearance" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
-                <Separator style="-fx-border-color: #34495e; -fx-padding: 0;"/>
-
-                <!--toggle de modo oscuro-->
-                <HBox style="-fx-padding: 12; -fx-background-color: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-border-radius: 3; -fx-spacing: 10; -fx-alignment: center-left;">
-                    <VBox HBox.hgrow="ALWAYS" style="-fx-spacing: 4;">
-                        <Label fx:id="lblDarkMode" text="Dark Mode" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
-                        <Label fx:id="lblDarkModeDesc" text="Use dark theme for reduced eye strain" style="-fx-font-size: 10; -fx-text-fill: #bdc3c7;"/>
-                    </VBox>
-                    <CheckBox fx:id="chkDarkMode" selected="true" style="-fx-padding: 5;"/>
-                </HBox>
-            </VBox>
-
             <!--seccion de idioma-->
             <VBox style="-fx-spacing: 12;">
                 <Label fx:id="lblLanguageSection" text="Language" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
                 <Separator style="-fx-border-color: #34495e; -fx-padding: 0;"/>
 
-                <!--selector de idioma-->
                 <HBox style="-fx-padding: 12; -fx-background-color: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-border-radius: 3; -fx-spacing: 10; -fx-alignment: center-left;">
                     <VBox HBox.hgrow="ALWAYS" style="-fx-spacing: 4;">
                         <Label fx:id="lblInterfaceLanguage" text="Interface Language" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
                         <Label fx:id="lblLanguageDesc" text="Choose your preferred language" style="-fx-font-size: 10; -fx-text-fill: #bdc3c7;"/>
                     </VBox>
-                    <ComboBox fx:id="cmbLanguage" style="-fx-background-color: #2c3e50; -fx-control-inner-background: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-padding: 5 10; -fx-font-size: 11;" />                </HBox>
-            </VBox>
-
-            <!--seccion de notificaciones -->
-            <VBox style="-fx-spacing: 12;">
-                <Label fx:id="lblNotifications" text="Notifications" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
-                <Separator style="-fx-border-color: #34495e; -fx-padding: 0;"/>
-
-                <!--actualizaciones de modulos-->
-                <HBox style="-fx-padding: 12; -fx-background-color: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-border-radius: 3; -fx-spacing: 10; -fx-alignment: center-left;">
-                    <VBox HBox.hgrow="ALWAYS" style="-fx-spacing: 4;">
-                        <Label fx:id="lblModuleUpdates" text="Module Updates" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
-                        <Label fx:id="lblModuleUpdatesDesc" text="Notify when module updates are available" style="-fx-font-size: 10; -fx-text-fill: #bdc3c7;"/>
-                    </VBox>
-                    <CheckBox fx:id="chkModuleUpdates" selected="true" style="-fx-padding: 5;"/>
-                </HBox>
-
-                <!--notificaciones del sistema-->
-                <HBox style="-fx-padding: 12; -fx-background-color: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-border-radius: 3; -fx-spacing: 10; -fx-alignment: center-left;">
-                    <VBox HBox.hgrow="ALWAYS" style="-fx-spacing: 4;">
-                        <Label fx:id="lblSystemAlerts" text="System Alerts" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
-                        <Label fx:id="lblSystemAlertsDesc" text="Show system and error alerts" style="-fx-font-size: 10; -fx-text-fill: #bdc3c7;"/>
-                    </VBox>
-                    <CheckBox fx:id="chkSystemAlerts" selected="true" style="-fx-padding: 5;"/>
+                    <ComboBox fx:id="cmbLanguage" style="-fx-background-color: #2c3e50; -fx-control-inner-background: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-padding: 5 10; -fx-font-size: 11;"/>
                 </HBox>
             </VBox>
 
@@ -78,7 +35,7 @@
                 <Label fx:id="lblDatabase" text="Database" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
                 <Separator style="-fx-border-color: #34495e; -fx-padding: 0;"/>
 
-                <!--prueba de conexion-->
+                <!--estado de conexion-->
                 <HBox style="-fx-padding: 12; -fx-background-color: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-border-radius: 3; -fx-spacing: 10; -fx-alignment: center-left;">
                     <VBox HBox.hgrow="ALWAYS" style="-fx-spacing: 4;">
                         <Label fx:id="lblConnectionStatus" text="Connection Status" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
@@ -86,6 +43,35 @@
                     </VBox>
                     <Button fx:id="btnTestConn" text="Test Connection" onAction="#onTestConnectionClicked"
                             style="-fx-padding: 8 15; -fx-font-size: 11; -fx-background-color: #3498db; -fx-text-fill: #ecf0f1; -fx-cursor: hand; -fx-border-color: #2980b9; -fx-border-width: 1; -fx-border-radius: 2;"/>
+                </HBox>
+
+                <!--controles del motor-->
+                <HBox style="-fx-padding: 12; -fx-background-color: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-border-radius: 3; -fx-spacing: 10; -fx-alignment: center-left;">
+                    <VBox HBox.hgrow="ALWAYS" style="-fx-spacing: 4;">
+                        <Label fx:id="lblDbControls" text="DB Engine" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
+                    </VBox>
+                    <Button fx:id="btnDbStop" text="Stop" onAction="#onDbStopClicked"
+                            style="-fx-padding: 8 15; -fx-font-size: 11; -fx-background-color: #2c3e50; -fx-text-fill: #ecf0f1; -fx-cursor: hand; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-border-radius: 2;"/>
+                    <Button fx:id="btnDbStart" text="Start" onAction="#onDbStartClicked"
+                            style="-fx-padding: 8 15; -fx-font-size: 11; -fx-background-color: #2c3e50; -fx-text-fill: #ecf0f1; -fx-cursor: hand; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-border-radius: 2;"/>
+                    <Button fx:id="btnDbRestart" text="Restart" onAction="#onDbRestartClicked"
+                            style="-fx-padding: 8 15; -fx-font-size: 11; -fx-background-color: #3498db; -fx-text-fill: #ecf0f1; -fx-cursor: hand; -fx-border-color: #2980b9; -fx-border-width: 1; -fx-border-radius: 2;"/>
+                </HBox>
+            </VBox>
+
+            <!--zona peligrosa-->
+            <VBox style="-fx-spacing: 12;">
+                <Label fx:id="lblDangerZone" text="Danger Zone" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #e74c3c;"/>
+                <Separator style="-fx-border-color: #34495e; -fx-padding: 0;"/>
+
+                <HBox style="-fx-padding: 12; -fx-background-color: #34495e; -fx-border-color: #e74c3c; -fx-border-width: 1; -fx-border-radius: 3; -fx-spacing: 10; -fx-alignment: center-left;">
+                    <VBox HBox.hgrow="ALWAYS" style="-fx-spacing: 4;">
+                        <Label style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;" text="Delete Database"/>
+                        <Label fx:id="lblDeleteDbDesc" text="Permanently removes all data. App will close after deletion."
+                               style="-fx-font-size: 10; -fx-text-fill: #bdc3c7;" wrapText="true"/>
+                    </VBox>
+                    <Button fx:id="btnDeleteDb" text="Delete Database" onAction="#onDeleteDbClicked"
+                            style="-fx-padding: 8 15; -fx-font-size: 11; -fx-background-color: #e74c3c; -fx-text-fill: #ecf0f1; -fx-cursor: hand; -fx-border-color: #c0392b; -fx-border-width: 1; -fx-border-radius: 2;"/>
                 </HBox>
             </VBox>
 

@@ -54,10 +54,6 @@ public class CitizenDocument {
         this.rutaArchivo = rutaArchivo;
     }
 
-    public LocalDateTime getSubidoEn() {
-        return subidoEn;
-    }
-
     public void setSubidoEn(LocalDateTime subidoEn) {
         this.subidoEn = subidoEn;
     }
