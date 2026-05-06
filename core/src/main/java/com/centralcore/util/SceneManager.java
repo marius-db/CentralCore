@@ -69,6 +69,16 @@ public class SceneManager {
 
             VBox moduleWrapper = new VBox();
             moduleWrapper.setStyle("-fx-spacing: 0; -fx-padding: 0;");
+            //el wrapper debe ocupar exactamente el espacio del contentPane
+            //sin esto al maximizar y restaurar el modulo puede desbordar y tapar la barra de titulo
+            moduleWrapper.setMaxWidth(Double.MAX_VALUE);
+            moduleWrapper.setMaxHeight(Double.MAX_VALUE);
+            StackPane.setAlignment(moduleWrapper, javafx.geometry.Pos.TOP_LEFT);
+
+            //el wrapper se ancla al tamano del contentPane para no desbordarlo
+            moduleWrapper.prefWidthProperty().bind(mainShellContentPane.widthProperty());
+            moduleWrapper.prefHeightProperty().bind(mainShellContentPane.heightProperty());
+
             moduleWrapper.getChildren().add(headerBar);
             moduleWrapper.getChildren().add(moduleUI);
 

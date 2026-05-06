@@ -1,11 +1,27 @@
-/* traffic module styles, usa la misma paleta de variables del shell */
+/*variables globales del modulo traffic*/
+.root {
+    -cc-bg-dark: #0b0d12;
+    -cc-bg-mid: #12151c;
+    -cc-bg-card: #171b24;
+
+    -cc-border: #2a2f3a;
+
+    -cc-text-primary: #e5e7eb;
+    -cc-text-secondary: #9ca3af;
+    -cc-text-muted: #6b7280;
+
+    -cc-blue: #3b82f6;
+    -cc-bg-hover: #1f2430;
+}
+
+/*traffic module styles, usa la misma paleta de variables del shell */
 
 .tm-root {
     -fx-background-color: -cc-bg-dark;
     -fx-spacing: 0;
 }
 
-/* divider del splitpane */
+/*divider del splitpane */
 
 .tm-root > .split-pane-divider {
     -fx-background-color: -cc-border;
@@ -16,13 +32,13 @@
     -fx-background-color: -cc-blue;
 }
 
-/* area del mapa */
+/*area del mapa */
 
 .tm-map-pane {
     -fx-background-color: #0b0d12;
 }
 
-/* panel lateral */
+/*panel lateral */
 
 .tm-side-panel {
     -fx-background-color: -cc-bg-mid;
@@ -30,7 +46,7 @@
     -fx-border-width: 0 0 0 1;
 }
 
-/* barra de conexion */
+/*barra de conexion */
 
 .tm-con-bar {
     -fx-padding: 10 12 6 12;
@@ -65,7 +81,7 @@
     -fx-border-color: -cc-blue;
 }
 
-/* tabs */
+/*tabs */
 
 .tm-tabpane {
     -fx-background-color: -cc-bg-mid;
@@ -106,7 +122,7 @@
     -fx-padding: 0;
 }
 
-/* contenido de tabs */
+/*contenido de tabs */
 
 .tm-tab-content {
     -fx-padding: 12;
@@ -124,7 +140,7 @@
     -fx-background-color: -cc-bg-dark;
 }
 
-/* titulos de seccion */
+/*titulos de seccion */
 
 .tm-section-title {
     -fx-text-fill: -cc-text-muted;
@@ -134,7 +150,7 @@
     -fx-letter-spacing: 0.8px;
 }
 
-/* card */
+/*card */
 
 .tm-card {
     -fx-background-color: -cc-bg-card;
@@ -145,7 +161,7 @@
     -fx-padding: 12;
 }
 
-/* listas */
+/*listas */
 
 .tm-list {
     -fx-background-color: -cc-bg-mid;
@@ -184,7 +200,7 @@
     -fx-border-color: #22c55e30;
 }
 
-/* labels de emergencia */
+/*labels de emergencia */
 
 .tm-hint {
     -fx-text-fill: -cc-text-muted;
@@ -214,7 +230,7 @@
     -fx-padding: 4 0 0 0;
 }
 
-/* labels dentro de celdas de lista */
+/*labels dentro de celdas de lista */
 
 .tm-list-label {
     -fx-text-fill: -cc-text-primary;
@@ -250,4 +266,211 @@
 .tm-combo .combo-box-popup > .list-view {
     -fx-background-color: -cc-bg-card;
     -fx-border-color: -cc-border;
+}
+
+/*dialogo de incidente (popup)*/
+
+.dialog-pane {
+    -fx-background-color: -cc-bg-dark;
+    -fx-border-color: -cc-border;
+    -fx-border-width: 1px;
+}
+
+/*contenido interno del dialogo*/
+
+.dialog-pane .content {
+    -fx-padding: 16;
+}
+
+/*labels dentro del dialogo*/
+
+.dialog-pane .label {
+    -fx-text-fill: -cc-text-primary;
+}
+
+/*text field dentro del dialogo*/
+
+.dialog-pane .text-field {
+    -fx-background-color: -cc-bg-card;
+    -fx-text-fill: -cc-text-primary;
+    -fx-prompt-text-fill: -cc-text-muted;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.dialog-pane .text-field:focused {
+    -fx-border-color: -cc-blue;
+}
+
+/*combo dentro del dialogo (usa tu estilo base tm-combo pero reforzado)*/
+
+.dialog-pane .combo-box {
+    -fx-background-color: -cc-bg-card;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.dialog-pane .combo-box:focused {
+    -fx-border-color: -cc-blue;
+}
+
+.dialog-pane .combo-box .list-cell {
+    -fx-text-fill: -cc-text-primary;
+}
+
+/*popup desplegable del combo (fix del problema de texto sobre texto)*/
+
+.combo-box-popup .list-view {
+    -fx-background-color: -cc-bg-card;
+    -fx-border-color: -cc-border;
+}
+
+.combo-box-popup .list-cell {
+    -fx-text-fill: -cc-text-primary;
+    -fx-background-color: transparent;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: -cc-bg-hover;
+}
+
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: -cc-blue;
+    -fx-text-fill: white;
+}
+
+/*botones del dialogo*/
+
+.dialog-pane .button {
+    -fx-background-color: -cc-bg-card;
+    -fx-text-fill: -cc-text-primary;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.dialog-pane .button:hover {
+    -fx-background-color: -cc-bg-hover;
+}
+
+/*variables locales para dialog (fix para errores de javafx)*/
+
+.dialog-pane {
+    -cc-bg-dark: #0b0d12;
+    -cc-bg-mid: #12151c;
+    -cc-bg-card: #181c24;
+    -cc-border: #2a2f3a;
+    -cc-blue: #3b82f6;
+    -cc-text-primary: #e5e7eb;
+    -cc-text-secondary: #9ca3af;
+    -cc-text-muted: #6b7280;
+    -cc-bg-hover: #1f2430;
+}
+
+/*dialogo de incidente (popup)*/
+
+.dialog-pane {
+    -fx-background-color: -cc-bg-dark;
+    -fx-border-color: -cc-border;
+    -fx-border-width: 1px;
+}
+
+/*header del dialogo*/
+
+.dialog-pane .header-panel {
+    -fx-background-color: -cc-bg-mid;
+}
+
+.dialog-pane .header-panel .label {
+    -fx-text-fill: -cc-text-primary;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+/*contenido interno del dialogo*/
+
+.dialog-pane .content {
+    -fx-padding: 16;
+}
+
+/*labels dentro del dialogo*/
+
+.dialog-pane .label {
+    -fx-text-fill: -cc-text-primary;
+}
+
+/*text field dentro del dialogo*/
+
+.dialog-pane .text-field {
+    -fx-background-color: -cc-bg-card;
+    -fx-text-fill: -cc-text-primary;
+    -fx-prompt-text-fill: -cc-text-muted;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.dialog-pane .text-field:focused {
+    -fx-border-color: -cc-blue;
+}
+
+/*combo dentro del dialogo*/
+
+.dialog-pane .combo-box {
+    -fx-background-color: -cc-bg-card;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.dialog-pane .combo-box:focused {
+    -fx-border-color: -cc-blue;
+}
+
+.dialog-pane .combo-box .list-cell {
+    -fx-text-fill: -cc-text-primary;
+}
+
+/*popup del combo (fix superposicion y estilo)*/
+
+.combo-box-popup {
+    -fx-background-color: transparent;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: -cc-bg-card;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 4;
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: -cc-bg-card;
+    -fx-text-fill: -cc-text-primary;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: -cc-bg-hover;
+}
+
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: derive(-cc-blue, -65%);
+    -fx-text-fill: white;
+}
+
+/*botones del dialogo*/
+
+.dialog-pane .button {
+    -fx-background-color: -cc-bg-card;
+    -fx-text-fill: -cc-text-primary;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.dialog-pane .button:hover {
+    -fx-background-color: -cc-bg-hover;
 }

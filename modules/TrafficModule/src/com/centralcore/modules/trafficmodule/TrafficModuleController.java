@@ -45,9 +45,6 @@ public class TrafficModuleController {
     @FXML private Button btnMarcarB;
 
     //tab incidentes
-    @FXML private ComboBox<String> comboTipoIncidente;
-    @FXML private TextField fieldDescIncidente;
-    @FXML private ComboBox<String> comboEstadoIncidente;
     @FXML private Button btnMarcarMapa;
     @FXML private ListView<Incident> listIncidentes;
     @FXML private Button btnActualizarInc;
@@ -84,6 +81,9 @@ public class TrafficModuleController {
     private int stateTick = 0;
     private static final int LIST_REFRESH_INTERVAL = 5;
 
+    //menu de contexto activo — solo puede existir uno a la vez
+    private ContextMenu activeContextMenu = null;
+
     @FXML
     public void initialize() {
         setupMapCanvas();
@@ -104,21 +104,8 @@ public class TrafficModuleController {
         mapCanvas.heightProperty().bind(mapPane.heightProperty());
         mapPane.getChildren().add(0, mapCanvas);
 
-        mapCanvas.setOnNodeRightClicked(node -> {
-            ContextMenu ctx = buildNodeContextMenu(node);
-            javafx.geometry.Point2D screen = mapCanvas.localToScreen(
-                    node.getX() * mapCanvas.getScaleValue() + mapCanvas.getOffsetX(),
-                    node.getY() * mapCanvas.getScaleValue() + mapCanvas.getOffsetY());
-            if (screen != null) ctx.show(mapCanvas, screen.getX(), screen.getY());
-        });
-
-        mapCanvas.setOnRoadRightClicked(coords -> {
-            ContextMenu ctx = buildRoadContextMenu(coords[0], coords[1]);
-            javafx.geometry.Point2D screen = mapCanvas.localToScreen(
-                    coords[0] * mapCanvas.getScaleValue() + mapCanvas.getOffsetX(),
-                    coords[1] * mapCanvas.getScaleValue() + mapCanvas.getOffsetY());
-            if (screen != null) ctx.show(mapCanvas, screen.getX(), screen.getY());
-        });
+        mapCanvas.setOnNodeRightClicked(node -> showContextMenu(buildNodeContextMenu(node), node.getX(), node.getY()));
+        mapCanvas.setOnRoadRightClicked(coords -> showContextMenu(buildRoadContextMenu(coords[0], coords[1]), coords[0], coords[1]));
 
         mapCanvas.setOnIncidentPlaced((simX, simY) -> {
             btnMarcarMapa.setText("Marcar en mapa");
@@ -140,6 +127,36 @@ public class TrafficModuleController {
         });
 
         mapCanvas.setOnIncidentSelected(inc -> listIncidentes.getSelectionModel().select(inc));
+
+        //seleccion de semaforo desde el mapa: resalta en lista y en el mapa
+        mapCanvas.setOnLightClicked(lt -> {
+            listSemaforos.getSelectionModel().select(lt);
+            listSemaforos.scrollTo(lt);
+        });
+
+        //clic en el mapa fuera de semaforos/incidentes limpia la seleccion
+        mapPane.setOnMousePressed(e -> hideActiveContextMenu());
+    }
+
+    //muestra un ContextMenu convirtiendo coordenadas sim a screen
+    //cierra cualquier menu anterior antes de mostrar el nuevo
+    private void showContextMenu(ContextMenu ctx, double simX, double simY) {
+        hideActiveContextMenu();
+        javafx.geometry.Point2D screen = mapCanvas.localToScreen(
+                simX * mapCanvas.getScaleValue() + mapCanvas.getOffsetX(),
+                simY * mapCanvas.getScaleValue() + mapCanvas.getOffsetY());
+        if (screen == null) return;
+        activeContextMenu = ctx;
+        //al ocultarse por cualquier motivo limpia la referencia
+        ctx.setOnHidden(e -> { if (activeContextMenu == ctx) activeContextMenu = null; });
+        ctx.show(mapCanvas, screen.getX(), screen.getY());
+    }
+
+    private void hideActiveContextMenu() {
+        if (activeContextMenu != null) {
+            activeContextMenu.hide();
+            activeContextMenu = null;
+        }
     }
 
     private ContextMenu buildNodeContextMenu(TrafficNode node) {
@@ -160,7 +177,7 @@ public class TrafficModuleController {
         });
 
         MenuItem itemInc = new MenuItem("Añadir incidente aquí");
-        itemInc.setOnAction(e -> createIncidentAt(node.getX(), node.getY()));
+        itemInc.setOnAction(e -> showIncidentDialog(node.getX(), node.getY()));
 
         ctx.getItems().addAll(itemA, itemB, new SeparatorMenuItem(), itemInc);
         return ctx;
@@ -181,18 +198,30 @@ public class TrafficModuleController {
             refreshEnviarBtn();
         });
         MenuItem itemInc = new MenuItem("Añadir incidente aquí");
-        itemInc.setOnAction(e -> createIncidentAt(simX, simY));
+        itemInc.setOnAction(e -> showIncidentDialog(simX, simY));
         ctx.getItems().addAll(itemA, itemB, new SeparatorMenuItem(), itemInc);
         return ctx;
     }
 
     private void setupSplitPane() {
         final double[] dividerPos = {0.70};
+        //flag para ignorar cambios de ancho causados por maximize/restore
+        //sin esto el divider se resetea cada vez que se redimensiona la ventana
+        final boolean[] ignoreNext = {false};
 
         splitPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene == null) return;
             newScene.windowProperty().addListener((o2, oldWin, win) -> {
                 if (win == null) return;
+                javafx.stage.Stage stage = (javafx.stage.Stage) win;
+                //cuando cambia maximized restauramos el divider despues de que el layout se asiente
+                stage.maximizedProperty().addListener((o3, wasMax, isMax) -> {
+                    ignoreNext[0] = true;
+                    Platform.runLater(() -> {
+                        splitPane.setDividerPositions(dividerPos[0]);
+                        ignoreNext[0] = false;
+                    });
+                });
                 win.showingProperty().addListener((o3, wasShowing, showing) -> {
                     if (showing) Platform.runLater(() -> splitPane.setDividerPositions(dividerPos[0]));
                 });
@@ -200,13 +229,7 @@ public class TrafficModuleController {
         });
 
         splitPane.getDividers().get(0).positionProperty().addListener((obs, oldPos, newPos) -> {
-            dividerPos[0] = newPos.doubleValue();
-        });
-
-        splitPane.widthProperty().addListener((obs, oldW, newW) -> {
-            if (newW.doubleValue() > 0) {
-                Platform.runLater(() -> splitPane.setDividerPositions(dividerPos[0]));
-            }
+            if (!ignoreNext[0]) dividerPos[0] = newPos.doubleValue();
         });
     }
 
@@ -247,6 +270,11 @@ public class TrafficModuleController {
                 lblDir.getStyleClass().setAll("tm-hint");
                 setGraphic(row);
             }
+        });
+
+        //seleccion en lista de semaforos -> resaltar en mapa
+        listSemaforos.getSelectionModel().selectedItemProperty().addListener((o, prev, curr) -> {
+            mapCanvas.setSelectedLight(curr);
         });
 
         listTrafico.setItems(edgeItems);
@@ -313,17 +341,6 @@ public class TrafficModuleController {
     }
 
     private void setupCombos() {
-        comboTipoIncidente.setItems(FXCollections.observableArrayList(
-                "Accidente", "Corte de vía", "Obras", "Semáforo averiado",
-                "Vehículo abandonado", "Desbordamiento", "Incendio", "Otro"
-        ));
-        comboTipoIncidente.getSelectionModel().selectFirst();
-
-        comboEstadoIncidente.setItems(FXCollections.observableArrayList(
-                "Abierto", "En curso", "Crítico", "Resuelto"
-        ));
-        comboEstadoIncidente.getSelectionModel().selectFirst();
-
         comboEstadoUpdate.setItems(FXCollections.observableArrayList(
                 "Abierto", "En curso", "Crítico", "Resuelto"
         ));
@@ -343,17 +360,14 @@ public class TrafficModuleController {
 
         connection.setOnMapReceived(json -> {
             parseMap(json);
-            //setState reconstruye los caches de aristas y marca dirty
             mapCanvas.setState(simState);
         });
 
         connection.setOnStateReceived(json -> {
             parseState(json);
-            //markDirty en vez de setState: el mapa no cambia entre ticks de estado
             mapCanvas.markDirty();
             handleEvLightOverride();
             if (simState.isRouteDone()) onRouteDone();
-            //listas: throttle a cada LIST_REFRESH_INTERVAL ticks para evitar setAll continuo
             stateTick++;
             if (stateTick % LIST_REFRESH_INTERVAL == 0) {
                 updateLightList();
@@ -397,17 +411,23 @@ public class TrafficModuleController {
     }
 
     private void setupIncidentActions() {
+        //al pulsar "Marcar en mapa" abre el dialogo de creacion para rellenar datos
+        //y luego activa el modo de colocacion en el canvas
         btnMarcarMapa.setOnAction(e -> {
             if (mapCanvas.isPlacingIncident()) {
                 mapCanvas.setPlacingIncident(false);
                 btnMarcarMapa.setText("Marcar en mapa");
             } else {
-                mapCanvas.setPlacingIncident(true);
-                mapCanvas.setPlacingPointA(false);
-                mapCanvas.setPlacingPointB(false);
-                btnMarcarMapa.setText("Cancelar colocación");
-                btnMarcarA.setText("Marcar A");
-                btnMarcarB.setText("Marcar B");
+                //muestra el dialogo — si el usuario confirma, activa el modo de colocacion
+                boolean confirmed = showIncidentFormDialog();
+                if (confirmed) {
+                    mapCanvas.setPlacingIncident(true);
+                    mapCanvas.setPlacingPointA(false);
+                    mapCanvas.setPlacingPointB(false);
+                    btnMarcarMapa.setText("Cancelar colocación");
+                    btnMarcarA.setText("Marcar A");
+                    btnMarcarB.setText("Marcar B");
+                }
             }
         });
 
@@ -559,22 +579,91 @@ public class TrafficModuleController {
     }
 
     //region incidentes
+
+    //datos del incidente pendiente de colocacion — rellenados por el dialogo
+    private String pendingTipo = null;
+    private String pendingDesc = null;
+    private String pendingEstado = null;
+
+    //muestra el dialogo de creacion de incidente y guarda los datos en pendingXxx
+    //devuelve true si el usuario confirmo, false si cancelo
+    private boolean showIncidentFormDialog() {
+        Dialog<ButtonType> dlg = new Dialog<>();
+        dlg.setTitle("Nuevo incidente");
+        dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dlg.getDialogPane().getStylesheets().add(
+                getClass().getResource("/trafficmodule/css/traffic.css").toExternalForm());
+
+        ComboBox<String> comboTipo = new ComboBox<>(FXCollections.observableArrayList(
+                "Accidente", "Corte de vía", "Obras", "Semáforo averiado",
+                "Vehículo abandonado", "Desbordamiento", "Incendio", "Otro"
+        ));
+        comboTipo.getStyleClass().add("tm-combo");
+        comboTipo.setMaxWidth(Double.MAX_VALUE);
+        comboTipo.getSelectionModel().selectFirst();
+
+        ComboBox<String> comboEstado = new ComboBox<>(FXCollections.observableArrayList(
+                "Abierto", "En curso", "Crítico", "Resuelto"
+        ));
+        comboEstado.getStyleClass().add("tm-combo");
+        comboEstado.setMaxWidth(Double.MAX_VALUE);
+        comboEstado.getSelectionModel().selectFirst();
+
+        TextField fieldDesc = new TextField();
+        fieldDesc.getStyleClass().add("tm-url-field");
+        fieldDesc.setPromptText("Descripción breve…");
+
+        Label hint = new Label("Después de confirmar haz clic en el mapa para colocar el incidente.");
+        hint.getStyleClass().add("tm-hint");
+        hint.setWrapText(true);
+
+        VBox content = new VBox(10,
+                new Label("Tipo") {{ getStyleClass().add("tm-field-label"); }},
+                comboTipo,
+                new Label("Estado inicial") {{ getStyleClass().add("tm-field-label"); }},
+                comboEstado,
+                new Label("Descripción") {{ getStyleClass().add("tm-field-label"); }},
+                fieldDesc,
+                hint
+        );
+        content.setPadding(new Insets(16));
+        content.setPrefWidth(320);
+
+        //estilo del panel del dialogo para que encaje con el tema oscuro
+        dlg.getDialogPane().setContent(content);
+
+        java.util.Optional<ButtonType> result = dlg.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) return false;
+
+        pendingTipo = comboTipo.getValue();
+        pendingDesc = fieldDesc.getText().trim();
+        pendingEstado = comboEstado.getValue();
+        return true;
+    }
+
+    //abre el dialogo de incidente y lo crea directamente en las coordenadas dadas
+    //usado desde el menu de contexto del mapa (clic derecho -> añadir incidente aqui)
+    private void showIncidentDialog(double simX, double simY) {
+        boolean confirmed = showIncidentFormDialog();
+        if (confirmed) createIncidentAt(simX, simY);
+    }
+
     private void createIncidentAt(double simX, double simY) {
-        String tipo = comboTipoIncidente.getValue();
-        String desc = fieldDescIncidente.getText().trim();
-        String estado = comboEstadoIncidente.getValue();
-        if (tipo == null) {
+        if (pendingTipo == null) {
             showAlert("Selecciona el tipo de incidente antes de colocarlo.");
             return;
         }
         Incident i = new Incident();
-        i.setTipo(tipo);
-        i.setDescripcion(desc.isBlank() ? null : desc);
+        i.setTipo(pendingTipo);
+        i.setDescripcion(pendingDesc == null || pendingDesc.isBlank() ? null : pendingDesc);
         i.setMapX(simX);
         i.setMapY(simY);
-        i.setEstado(estado != null ? estado : "Abierto");
+        i.setEstado(pendingEstado != null ? pendingEstado : "Abierto");
         dao.insertIncident(i);
-        fieldDescIncidente.clear();
+        pendingTipo = null;
+        pendingDesc = null;
+        pendingEstado = null;
         refreshIncidents();
     }
 
