@@ -58,7 +58,7 @@ public class IncidentUpdate {
 
     @Override
     public String toString() {
-        String ts = createdAt != null ? createdAt.format(FMT) : "—";
+        String ts = createdAt != null ? createdAt.format(FMT) : "-";
         return ts + "  [" + estado + "]" + (nota != null && !nota.isBlank() ? "  " + nota : "");
     }
 }

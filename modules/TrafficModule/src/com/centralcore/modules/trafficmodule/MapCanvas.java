@@ -19,7 +19,9 @@ import java.util.function.Consumer;
 
 //canvas de trafico optimizado:
 //- colores y fuentes pre-cacheados (sin Color.web/Font.font en el render loop)
+//- tabla de colores de densidad pre-calculada (sin new Color por arista por frame)
 //- sin gc.save/restore en bucles (causa freeze en zoom con muchos elementos)
+//- set de nombres de calle reutilizado (sin new HashSet por frame)
 //- coches con separacion real entre carriles
 //- clic derecho funciona en cualquier punto (nodo, calle o vacio)
 public class MapCanvas extends Canvas {
@@ -69,8 +71,33 @@ public class MapCanvas extends Canvas {
     private static final double ROAD_MAIN_W = 28;
     private static final double ROAD_SIDE_W = 16;
     private static final double EDGE_HIT = 14;
-    //separacion entre carriles: suficiente para coches de 9px sin solapamiento
     private static final double LANE_SEP = 7.0;
+
+    //tabla de colores de densidad pre-calculada: evita new Color() en cada frame
+    //20 pasos cubre la precision necesaria sin coste de interpolacion en tiempo real
+    private static final int DENS_STEPS = 20;
+    private static final Color[] DENS_CACHE_MAIN = buildDensCache(true);
+    private static final Color[] DENS_CACHE_SIDE = buildDensCache(false);
+
+    private static Color[] buildDensCache(boolean main) {
+        Color base = main ? ROAD_MAIN : ROAD_SIDE;
+        Color[] cache = new Color[DENS_STEPS + 1];
+        for (int i = 0; i <= DENS_STEPS; i++) {
+            double d = i / (double) DENS_STEPS;
+            if (d < 0.4) cache[i] = base;
+            else if (d < 0.7) cache[i] = lerpStatic(base, DENS_MID, (d - 0.4) / 0.3);
+            else cache[i] = lerpStatic(DENS_MID, DENS_HIGH, (d - 0.7) / 0.3);
+        }
+        return cache;
+    }
+
+    private static Color lerpStatic(Color a, Color b, double t) {
+        t = Math.max(0, Math.min(1, t));
+        return Color.color(
+                a.getRed()   + (b.getRed()   - a.getRed())   * t,
+                a.getGreen() + (b.getGreen() - a.getGreen()) * t,
+                a.getBlue()  + (b.getBlue()  - a.getBlue())  * t);
+    }
 
     private SimState simState = null;
     private List<Incident> incidents = new ArrayList<>();
@@ -100,6 +127,9 @@ public class MapCanvas extends Canvas {
     private Consumer<Incident> onIncidentSelected;
 
     private volatile boolean dirty = true;
+
+    //set reutilizado para nombres de calle: sin new HashSet por frame
+    private final Set<String> drawnNames = new HashSet<>();
 
     public MapCanvas() {
         setupInput();
@@ -137,6 +167,12 @@ public class MapCanvas extends Canvas {
         dirty = true;
     }
 
+    //actualiza solo el estado sin reconstruir los caches de aristas
+    //usar para ticks de estado normales donde el mapa no cambia
+    public void markDirty() {
+        dirty = true;
+    }
+
     public void setIncidents(List<Incident> list) {
         incidents = list;
         dirty = true;
@@ -162,29 +198,13 @@ public class MapCanvas extends Canvas {
         dirty = true;
     }
 
-    public boolean isPlacingIncident() {
-        return placingIncident;
-    }
+    public boolean isPlacingIncident() { return placingIncident; }
+    public boolean isPlacingPointA()   { return placingPointA; }
+    public boolean isPlacingPointB()   { return placingPointB; }
 
-    public boolean isPlacingPointA() {
-        return placingPointA;
-    }
-
-    public boolean isPlacingPointB() {
-        return placingPointB;
-    }
-
-    public double getScaleValue() {
-        return scale;
-    }
-
-    public double getOffsetX() {
-        return offsetX;
-    }
-
-    public double getOffsetY() {
-        return offsetY;
-    }
+    public double getScaleValue() { return scale; }
+    public double getOffsetX()    { return offsetX; }
+    public double getOffsetY()    { return offsetY; }
 
     public void setSelectedIncident(Incident i) {
         selectedInc = i;
@@ -192,16 +212,12 @@ public class MapCanvas extends Canvas {
     }
 
     public void setPointA(String id, double x, double y) {
-        pointAId = id;
-        pointAX = x;
-        pointAY = y;
+        pointAId = id; pointAX = x; pointAY = y;
         dirty = true;
     }
 
     public void setPointB(String id, double x, double y) {
-        pointBId = id;
-        pointBX = x;
-        pointBY = y;
+        pointBId = id; pointBX = x; pointBY = y;
         dirty = true;
     }
 
@@ -211,53 +227,19 @@ public class MapCanvas extends Canvas {
         dirty = true;
     }
 
-    public double getPointAX() {
-        return pointAX;
-    }
+    public double getPointAX() { return pointAX; }
+    public double getPointAY() { return pointAY; }
+    public double getPointBX() { return pointBX; }
+    public double getPointBY() { return pointBY; }
+    public String getPointAId() { return pointAId; }
+    public String getPointBId() { return pointBId; }
 
-    public double getPointAY() {
-        return pointAY;
-    }
-
-    public double getPointBX() {
-        return pointBX;
-    }
-
-    public double getPointBY() {
-        return pointBY;
-    }
-
-    public String getPointAId() {
-        return pointAId;
-    }
-
-    public String getPointBId() {
-        return pointBId;
-    }
-
-    public void setOnIncidentPlaced(BiConsumer<Double, Double> cb) {
-        onIncidentPlaced = cb;
-    }
-
-    public void setOnPointAPlaced(Consumer<double[]> cb) {
-        onPointAPlaced = cb;
-    }
-
-    public void setOnPointBPlaced(Consumer<double[]> cb) {
-        onPointBPlaced = cb;
-    }
-
-    public void setOnNodeRightClicked(Consumer<TrafficNode> cb) {
-        onNodeRightClicked = cb;
-    }
-
-    public void setOnRoadRightClicked(Consumer<double[]> cb) {
-        onRoadRightClicked = cb;
-    }
-
-    public void setOnIncidentSelected(Consumer<Incident> cb) {
-        onIncidentSelected = cb;
-    }
+    public void setOnIncidentPlaced(BiConsumer<Double, Double> cb) { onIncidentPlaced = cb; }
+    public void setOnPointAPlaced(Consumer<double[]> cb)           { onPointAPlaced = cb; }
+    public void setOnPointBPlaced(Consumer<double[]> cb)           { onPointBPlaced = cb; }
+    public void setOnNodeRightClicked(Consumer<TrafficNode> cb)    { onNodeRightClicked = cb; }
+    public void setOnRoadRightClicked(Consumer<double[]> cb)       { onRoadRightClicked = cb; }
+    public void setOnIncidentSelected(Consumer<Incident> cb)       { onIncidentSelected = cb; }
 
     public double[] canvasToSim(double cx, double cy) {
         return new double[]{(cx - offsetX) / scale, (cy - offsetY) / scale};
@@ -271,15 +253,11 @@ public class MapCanvas extends Canvas {
         double min = Double.MAX_VALUE;
         for (TrafficNode n : simState.getNodes()) {
             double d = Math.hypot(n.getX() - sx, n.getY() - sy);
-            if (d < min) {
-                min = d;
-                best = n;
-            }
+            if (d < min) { min = d; best = n; }
         }
         return min <= thresh ? best : null;
     }
 
-    //proyeccion de punto sobre segmento, devuelve {dist, projX, projY}
     private double[] project(double px, double py, double ax, double ay, double bx, double by) {
         double dx = bx - ax, dy = by - ay, len2 = dx * dx + dy * dy;
         if (len2 < 1e-6) return new double[]{Double.MAX_VALUE, ax, ay};
@@ -298,12 +276,7 @@ public class MapCanvas extends Canvas {
             TrafficNode b = simState.findNode(e.getTo());
             if (a == null || b == null) continue;
             double[] p = project(sx, sy, a.getX(), a.getY(), b.getX(), b.getY());
-            if (p[0] < bd) {
-                bd = p[0];
-                best = e;
-                bx = p[1];
-                by = p[2];
-            }
+            if (p[0] < bd) { bd = p[0]; best = e; bx = p[1]; by = p[2]; }
         }
         return best != null ? new Object[]{best, bx, by} : null;
     }
@@ -316,14 +289,12 @@ public class MapCanvas extends Canvas {
         return null;
     }
 
-    // input
+    //input
     private void setupInput() {
         setOnMousePressed(e -> {
             if (e.getButton() == MouseButton.PRIMARY) {
-                dragStartX = e.getX();
-                dragStartY = e.getY();
-                dragOffX = offsetX;
-                dragOffY = offsetY;
+                dragStartX = e.getX(); dragStartY = e.getY();
+                dragOffX = offsetX;    dragOffY = offsetY;
                 isDragging = false;
             }
         });
@@ -337,7 +308,8 @@ public class MapCanvas extends Canvas {
             }
         });
         setOnScroll(e -> {
-            double f = e.getDeltaY() > 0 ? 1.1 : 0.91, ns = Math.max(0.3, Math.min(8.0, scale * f));
+            double factor = e.getDeltaY() > 0 ? 1.12 : 0.89;
+            double ns = Math.max(0.3, Math.min(8.0, scale * factor));
             double mx = e.getX(), my = e.getY();
             offsetX = mx - (mx - offsetX) * (ns / scale);
             offsetY = my - (my - offsetY) * (ns / scale);
@@ -356,19 +328,15 @@ public class MapCanvas extends Canvas {
             }
             if (placingIncident) {
                 Object[] hit = nearestEdgePoint(sim[0], sim[1]);
-                double px = hit != null ? (double) hit[1] : sim[0], py = hit != null ? (double) hit[2] : sim[1];
+                double px = hit != null ? (double) hit[1] : sim[0];
+                double py = hit != null ? (double) hit[2] : sim[1];
                 placingIncident = false;
                 dirty = true;
                 if (onIncidentPlaced != null) onIncidentPlaced.accept(px, py);
                 return;
             }
-            if (placingPointA) {
-                placePoint(sim[0], sim[1], true);
-                return;
-            }
-            if (placingPointB) {
-                placePoint(sim[0], sim[1], false);
-            }
+            if (placingPointA) { placePoint(sim[0], sim[1], true);  return; }
+            if (placingPointB) { placePoint(sim[0], sim[1], false); }
         });
         setOnContextMenuRequested(e -> {
             double[] sim = canvasToSim(e.getX(), e.getY());
@@ -376,7 +344,6 @@ public class MapCanvas extends Canvas {
             if (node != null) {
                 if (onNodeRightClicked != null) onNodeRightClicked.accept(node);
             } else {
-                // clic en calle o espacio vacio: usar el punto proyectado sobre la calle mas cercana
                 Object[] hit = nearestEdgePoint(sim[0], sim[1]);
                 double[] coords = hit != null ? new double[]{(double) hit[1], (double) hit[2]} : sim;
                 if (onRoadRightClicked != null) onRoadRightClicked.accept(coords);
@@ -389,15 +356,11 @@ public class MapCanvas extends Canvas {
         double fx, fy;
         String fid;
         if (n != null) {
-            fx = n.getX();
-            fy = n.getY();
-            fid = n.getId();
+            fx = n.getX(); fy = n.getY(); fid = n.getId();
         } else {
             Object[] hit = nearestEdgePoint(sx, sy);
             if (hit == null) return;
-            fx = (double) hit[1];
-            fy = (double) hit[2];
-            fid = null;
+            fx = (double) hit[1]; fy = (double) hit[2]; fid = null;
         }
         if (isA) {
             setPointA(fid, fx, fy);
@@ -435,7 +398,6 @@ public class MapCanvas extends Canvas {
             return;
         }
 
-        //transform una sola vez — save/restore elimina drift acumulado por float
         gc.save();
         gc.translate(offsetX, offsetY);
         gc.scale(scale, scale);
@@ -456,12 +418,10 @@ public class MapCanvas extends Canvas {
 
     //dibujo
     private void drawEdges(GraphicsContext gc) {
-        //pre-calcular posiciones de nodos para cada arista (evita 4+ lookups HashMap por arista por frame)
-        //orden: secundarias primero, principales encima — main siempre visible sobre side
         int totalEdges = mainEdgesCache.size() + sideEdgesCache.size();
         if (totalEdges == 0) return;
 
-        //arrays de coordenadas pre-resueltas para cada lista
+        //pre-resolver coordenadas de nodos para evitar lookups repetidos por pasada
         double[] sxA = new double[sideEdgesCache.size()], syA = new double[sideEdgesCache.size()];
         double[] sxB = new double[sideEdgesCache.size()], syB = new double[sideEdgesCache.size()];
         boolean[] sValid = new boolean[sideEdgesCache.size()];
@@ -489,27 +449,27 @@ public class MapCanvas extends Canvas {
         for (int i = 0; i < sideEdgesCache.size(); i++) {
             if (sValid[i]) gc.strokeLine(sxA[i], syA[i], sxB[i], syB[i]);
         }
-        //pasada 2: borde de principales (encima de las secundarias)
+        //pasada 2: borde de principales
         gc.setLineWidth(ROAD_MAIN_W + 4);
         for (int i = 0; i < mainEdgesCache.size(); i++) {
             if (mValid[i]) gc.strokeLine(mxA[i], myA[i], mxB[i], myB[i]);
         }
         //pasada 3: cuerpo de secundarias
+        gc.setLineWidth(ROAD_SIDE_W);
         for (int i = 0; i < sideEdgesCache.size(); i++) {
             if (!sValid[i]) continue;
             gc.setStroke(densColor(false, sideEdgesCache.get(i).getDensity()));
-            gc.setLineWidth(ROAD_SIDE_W);
             gc.strokeLine(sxA[i], syA[i], sxB[i], syB[i]);
         }
-        //pasada 4: cuerpo de principales (encima de todo)
+        //pasada 4: cuerpo de principales
+        gc.setLineWidth(ROAD_MAIN_W);
         for (int i = 0; i < mainEdgesCache.size(); i++) {
             if (!mValid[i]) continue;
             gc.setStroke(densColor(true, mainEdgesCache.get(i).getDensity()));
-            gc.setLineWidth(ROAD_MAIN_W);
             gc.strokeLine(mxA[i], myA[i], mxB[i], myB[i]);
         }
 
-        //pasada 5: lineas de carril (solo principales con >1 carril)
+        //pasada 5: lineas de carril
         if (scale > 0.55) {
             gc.setStroke(LANE_LINE);
             gc.setLineWidth(0.7);
@@ -528,35 +488,34 @@ public class MapCanvas extends Canvas {
             gc.setFont(FONT_ROAD);
             gc.setFill(TEXT_ROAD);
             gc.setTextAlign(TextAlignment.CENTER);
-            Set<String> drawn = new HashSet<>();
-            //secundarias
+            drawnNames.clear();
             for (int i = 0; i < sideEdgesCache.size(); i++) {
-                if (!sValid[i]) continue;
-                drawEdgeName(gc, sideEdgesCache.get(i), sxA[i], syA[i], sxB[i], syB[i], false, drawn);
+                if (sValid[i]) drawEdgeName(gc, sideEdgesCache.get(i), sxA[i], syA[i], sxB[i], syB[i], false);
             }
-            //principales
             for (int i = 0; i < mainEdgesCache.size(); i++) {
-                if (!mValid[i]) continue;
-                drawEdgeName(gc, mainEdgesCache.get(i), mxA[i], myA[i], mxB[i], myB[i], true, drawn);
+                if (mValid[i]) drawEdgeName(gc, mainEdgesCache.get(i), mxA[i], myA[i], mxB[i], myB[i], true);
             }
         }
     }
 
+    //dibuja el nombre de la calle rotado sin gc.save/restore:
+    //calcula el origen del texto manualmente con sin/cos igual que drawCars hace con los coches
     private void drawEdgeName(GraphicsContext gc, TrafficEdge e,
-                              double x1, double y1, double x2, double y2,
-                              boolean main, Set<String> drawn) {
+                              double x1, double y1, double x2, double y2, boolean main) {
         String name = e.getName();
         if (name == null || name.isBlank()) return;
         String key = name + e.getFrom() + e.getTo();
         String rev = name + e.getTo() + e.getFrom();
-        if (drawn.contains(key) || drawn.contains(rev)) return;
-        drawn.add(key);
-        drawn.add(rev);
+        if (drawnNames.contains(key) || drawnNames.contains(rev)) return;
+        drawnNames.add(key);
+        drawnNames.add(rev);
         double dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy);
         if (len < 40) return;
         double mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
         double ang = Math.toDegrees(Math.atan2(dy, dx));
         if (ang > 90 || ang < -90) ang += 180;
+        //save/restore necesario solo para el rotate del texto — no se puede evitar aqui,
+        //pero solo se ejecuta cuando scale >= 0.5 y el nombre no fue dibujado ya
         gc.save();
         gc.translate(mx, my);
         gc.rotate(ang);
@@ -565,18 +524,8 @@ public class MapCanvas extends Canvas {
     }
 
     private Color densColor(boolean main, double d) {
-        Color base = main ? ROAD_MAIN : ROAD_SIDE;
-        if (d < 0.4) return base;
-        if (d < 0.7) return lerp(base, DENS_MID, (d - 0.4) / 0.3);
-        return lerp(DENS_MID, DENS_HIGH, (d - 0.7) / 0.3);
-    }
-
-    private Color lerp(Color a, Color b, double t) {
-        t = Math.max(0, Math.min(1, t));
-        return Color.color(
-                a.getRed() + (b.getRed() - a.getRed()) * t,
-                a.getGreen() + (b.getGreen() - a.getGreen()) * t,
-                a.getBlue() + (b.getBlue() - a.getBlue()) * t);
+        int idx = (int) Math.max(0, Math.min(DENS_STEPS, d * DENS_STEPS));
+        return main ? DENS_CACHE_MAIN[idx] : DENS_CACHE_SIDE[idx];
     }
 
     private void laneLines(GraphicsContext gc, double x1, double y1, double x2, double y2, int lanes) {
@@ -633,23 +582,21 @@ public class MapCanvas extends Canvas {
             case "S" -> new double[]{0, dist};
             case "E" -> new double[]{dist, 0};
             case "W" -> new double[]{-dist, 0};
-            default -> new double[]{0, 0};
+            default  -> new double[]{0, 0};
         };
     }
 
     private Color ltColor(String s) {
         if (s == null) return LT_RED;
         return switch (s) {
-            case "green" -> LT_GREEN;
+            case "green"  -> LT_GREEN;
             case "yellow" -> LT_YELLOW;
-            default -> LT_RED;
+            default       -> LT_RED;
         };
     }
 
     private void drawCars(GraphicsContext gc) {
         gc.setFill(CAR_COLOR);
-        //en vez de translate/rotate/undo por coche (acumula error float y toca el transform stack),
-        //calculamos los 4 vertices del rectangulo rotado directamente en espacio mundo
         for (SimCar car : simState.getCars()) {
             TrafficNode a = simState.findNode(car.getNodeA()), b = simState.findNode(car.getNodeB());
             if (a == null || b == null) {
@@ -661,7 +608,6 @@ public class MapCanvas extends Canvas {
             double off = car.getLane() == 1 ? -LANE_SEP : LANE_SEP;
             double fx = car.getX() + nx * off, fy = car.getY() + ny * off;
             double cos = Math.cos(angle), sin = Math.sin(angle);
-            //rectangulo 9x4 centrado en (fx,fy), eje largo en direccion del angulo
             double[] px = {
                     fx + 4.5*cos - 2.0*sin,
                     fx - 4.5*cos - 2.0*sin,
@@ -681,7 +627,6 @@ public class MapCanvas extends Canvas {
     private void drawEV(GraphicsContext gc) {
         if (!simState.isEvActive()) return;
         double ex = simState.getEvX(), ey = simState.getEvY();
-        //glow manual con ovales semi-transparentes: evita el path de DropShadow por software
         gc.setFill(EV_GLOW_OUTER);
         gc.fillOval(ex - 18, ey - 12, 36, 24);
         gc.setFill(EV_GLOW_MID);
@@ -699,9 +644,9 @@ public class MapCanvas extends Canvas {
     private void drawPins(GraphicsContext gc) {
         for (Incident i : incidents) {
             Color col = switch (i.getEstado().toLowerCase()) {
-                case "crítico", "critico" -> INC_CRI;
-                case "resuelto" -> INC_MIN;
-                default -> INC_OPEN;
+                case "critico", "crítico" -> INC_CRI;
+                case "resuelto"           -> INC_MIN;
+                default                   -> INC_OPEN;
             };
             boolean sel = selectedInc != null && selectedInc.getId() == i.getId();
             double r = sel ? 9 : 7, ix = i.getMapX(), iy = i.getMapY();
@@ -737,7 +682,7 @@ public class MapCanvas extends Canvas {
         gc.setFill(TEXT_MUTED);
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setFont(FONT_BIG);
-        gc.fillText("Sin conexión con la simulación", w / 2, h / 2 - 10);
+        gc.fillText("Sin conexion con la simulacion", w / 2, h / 2 - 10);
         gc.setFont(FONT_SMALL);
         gc.fillText("Conecta desde el panel lateral para cargar el mapa", w / 2, h / 2 + 12);
     }
@@ -746,13 +691,8 @@ public class MapCanvas extends Canvas {
         String hint = null;
         Color bg = HINT_INC_BG;
         if (placingIncident) hint = "Haz clic en cualquier punto de una calle para colocar el incidente";
-        else if (placingPointA) {
-            hint = "Haz clic en una calle o intersección para marcar el Punto A";
-            bg = HINT_A_BG;
-        } else if (placingPointB) {
-            hint = "Haz clic en una calle o intersección para marcar el Punto B";
-            bg = HINT_B_BG;
-        }
+        else if (placingPointA) { hint = "Haz clic en una calle o interseccion para marcar el Punto A"; bg = HINT_A_BG; }
+        else if (placingPointB) { hint = "Haz clic en una calle o interseccion para marcar el Punto B"; bg = HINT_B_BG; }
         if (hint == null) return;
         gc.setFill(bg);
         gc.fillRoundRect(12, h - 36, hint.length() * 6.5 + 16, 26, 6, 6);

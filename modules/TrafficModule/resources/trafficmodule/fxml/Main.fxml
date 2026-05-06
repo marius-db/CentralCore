@@ -4,18 +4,19 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.geometry.Insets?>
 
-<HBox xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.centralcore.modules.trafficmodule.TrafficModuleController"
-      styleClass="tm-root"
-      stylesheets="@../css/traffic.css"
-      VBox.vgrow="ALWAYS">
+<SplitPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:id="splitPane"
+           fx:controller="com.centralcore.modules.trafficmodule.TrafficModuleController"
+           styleClass="tm-root"
+           stylesheets="@../css/traffic.css"
+           VBox.vgrow="ALWAYS">
 
     <!--area principal del mapa-->
-    <StackPane fx:id="mapPane" HBox.hgrow="ALWAYS" styleClass="tm-map-pane"/>
+    <StackPane fx:id="mapPane" styleClass="tm-map-pane" minWidth="200"/>
 
     <!--panel lateral derecho-->
-    <VBox styleClass="tm-side-panel" minWidth="290" maxWidth="290" spacing="0">
+    <VBox fx:id="sidePanel" styleClass="tm-side-panel" spacing="0" minWidth="60">
 
         <!--fila de conexion-->
         <HBox styleClass="tm-con-bar" alignment="CENTER_LEFT" spacing="8">
@@ -159,4 +160,4 @@
 
     </VBox>
 
-</HBox>
+</SplitPane>
