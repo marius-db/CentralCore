@@ -56,15 +56,10 @@ public class CitizenModuleController implements Initializable {
     @FXML private Label detailEmail;
     @FXML private Label detailMaritalStatus;
     @FXML private Label detailStatus;
-    @FXML private Button btnEdit;
-    @FXML private Button btnDelete;
 
     //documentos
     @FXML private ListView<CitizenDocument> docList;
     @FXML private ComboBox<String> docTypeCombo;
-    @FXML private Button btnAddDoc;
-    @FXML private Button btnOpenDoc;
-    @FXML private Button btnDeleteDoc;
 
     //formulario editar/crear
     @FXML private Label editTitle;
@@ -83,8 +78,6 @@ public class CitizenModuleController implements Initializable {
     @FXML private ComboBox<String> editMaritalStatus;
     @FXML private CheckBox editActive;
     @FXML private Label editError;
-    @FXML private Button btnSave;
-    @FXML private Button btnCancel;
 
     private final CitizenDAO dao = new CitizenDAO();
     private final ObservableList<Citizen> citizenData = FXCollections.observableArrayList();
@@ -118,7 +111,6 @@ public class CitizenModuleController implements Initializable {
     }
 
     //configuración
-
     private void setupTable() {
         colDni.setCellValueFactory(new PropertyValueFactory<>("dni"));
         colName.setCellValueFactory(cd ->
@@ -170,7 +162,6 @@ public class CitizenModuleController implements Initializable {
     }
 
     //cargar datos
-
     private void loadAllCitizens() {
         citizenData.setAll(dao.getAll());
     }
@@ -180,7 +171,6 @@ public class CitizenModuleController implements Initializable {
     }
 
     //visibilidad del panel
-
     private void showEmptyState() {
         emptyState.setVisible(true);
         emptyState.setManaged(true);

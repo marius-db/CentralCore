@@ -126,6 +126,7 @@ public class CitizenDAO {
                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 """;
         Connection conn = DatabaseConnection.getConnection();
+        assert conn != null;
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             bind(ps, c);
             ps.executeUpdate();
