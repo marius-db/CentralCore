@@ -50,6 +50,8 @@ public class MapCanvas extends Canvas {
     private static final Color LT_YELLOW = Color.web("#f59e0b");
     private static final Color LT_RED = Color.web("#ef4444");
     private static final Color LT_BG = Color.web("#0d0f14");
+    private static final Color LT_SELECTED_RING = Color.web("#ffffff");
+    private static final Color LT_SELECTED_GLOW = Color.web("#ffffff40");
     private static final Color WHITE = Color.WHITE;
     private static final Color DENS_MID = Color.web("#503510");
     private static final Color DENS_HIGH = Color.web("#5a1414");
@@ -118,6 +120,7 @@ public class MapCanvas extends Canvas {
     private boolean placingPointA = false;
     private boolean placingPointB = false;
     private Incident selectedInc = null;
+    private TrafficLight selectedLight = null;
 
     private BiConsumer<Double, Double> onIncidentPlaced;
     private Consumer<double[]> onPointAPlaced;
@@ -125,6 +128,7 @@ public class MapCanvas extends Canvas {
     private Consumer<TrafficNode> onNodeRightClicked;
     private Consumer<double[]> onRoadRightClicked;
     private Consumer<Incident> onIncidentSelected;
+    private Consumer<TrafficLight> onLightClicked;
 
     private volatile boolean dirty = true;
 
@@ -211,6 +215,11 @@ public class MapCanvas extends Canvas {
         dirty = true;
     }
 
+    public void setSelectedLight(TrafficLight lt) {
+        selectedLight = lt;
+        dirty = true;
+    }
+
     public void setPointA(String id, double x, double y) {
         pointAId = id; pointAX = x; pointAY = y;
         dirty = true;
@@ -240,6 +249,7 @@ public class MapCanvas extends Canvas {
     public void setOnNodeRightClicked(Consumer<TrafficNode> cb)    { onNodeRightClicked = cb; }
     public void setOnRoadRightClicked(Consumer<double[]> cb)       { onRoadRightClicked = cb; }
     public void setOnIncidentSelected(Consumer<Incident> cb)       { onIncidentSelected = cb; }
+    public void setOnLightClicked(Consumer<TrafficLight> cb)       { onLightClicked = cb; }
 
     public double[] canvasToSim(double cx, double cy) {
         return new double[]{(cx - offsetX) / scale, (cy - offsetY) / scale};
@@ -247,6 +257,19 @@ public class MapCanvas extends Canvas {
 
     //hit testing
 
+    //siempre devuelve el nodo mas cercano, sin umbral — para snapping de puntos A/B
+    public TrafficNode findNearestNode(double sx, double sy) {
+        if (simState == null) return null;
+        TrafficNode best = null;
+        double min = Double.MAX_VALUE;
+        for (TrafficNode n : simState.getNodes()) {
+            double d = Math.hypot(n.getX() - sx, n.getY() - sy);
+            if (d < min) { min = d; best = n; }
+        }
+        return best;
+    }
+
+    //con umbral: para deteccion de clic en nodo (no snap)
     public TrafficNode findNearestNode(double sx, double sy, double thresh) {
         if (simState == null) return null;
         TrafficNode best = null;
@@ -256,6 +279,30 @@ public class MapCanvas extends Canvas {
             if (d < min) { min = d; best = n; }
         }
         return min <= thresh ? best : null;
+    }
+
+    //busca el semaforo mas cercano al punto de canvas dado (coordenadas de canvas, no sim)
+    //radio de deteccion en pixels de canvas para que funcione bien a cualquier zoom
+    private TrafficLight findNearestLight(double cx, double cy) {
+        if (simState == null) return null;
+        final double dist = 15 * scale;
+        final double hitRadius = 10 * scale;
+        TrafficLight best = null;
+        double minDist = hitRadius;
+        for (TrafficNode n : simState.getNodes()) {
+            List<TrafficLight> lts = simState.findLightsAtNode(n.getId());
+            if (lts == null) continue;
+            double nx = n.getX() * scale + offsetX;
+            double ny = n.getY() * scale + offsetY;
+            for (TrafficLight lt : lts) {
+                double[] off = dirOff(lt.getDir(), dist);
+                double lx = nx + off[0];
+                double ly = ny + off[1];
+                double d = Math.hypot(cx - lx, cy - ly);
+                if (d < minDist) { minDist = d; best = lt; }
+            }
+        }
+        return best;
     }
 
     private double[] project(double px, double py, double ax, double ay, double bx, double by) {
@@ -319,13 +366,24 @@ public class MapCanvas extends Canvas {
         setOnMouseClicked(e -> {
             if (e.getButton() != MouseButton.PRIMARY || isDragging) return;
             double[] sim = canvasToSim(e.getX(), e.getY());
-            Incident near = nearestIncident(e.getX(), e.getY());
-            if (near != null) {
-                selectedInc = near;
+
+            Incident nearInc = nearestIncident(e.getX(), e.getY());
+            if (nearInc != null) {
+                selectedInc = nearInc;
                 dirty = true;
-                if (onIncidentSelected != null) onIncidentSelected.accept(near);
+                if (onIncidentSelected != null) onIncidentSelected.accept(nearInc);
                 return;
             }
+
+            //deteccion de semaforo: antes de modos de colocacion
+            TrafficLight nearLight = findNearestLight(e.getX(), e.getY());
+            if (nearLight != null && !placingIncident && !placingPointA && !placingPointB) {
+                selectedLight = nearLight;
+                dirty = true;
+                if (onLightClicked != null) onLightClicked.accept(nearLight);
+                return;
+            }
+
             if (placingIncident) {
                 Object[] hit = nearestEdgePoint(sim[0], sim[1]);
                 double px = hit != null ? (double) hit[1] : sim[0];
@@ -351,25 +409,18 @@ public class MapCanvas extends Canvas {
         });
     }
 
+    //puntos A/B siempre snapean al nodo mas cercano — sin colocacion libre
     private void placePoint(double sx, double sy, boolean isA) {
-        TrafficNode n = findNearestNode(sx, sy, 30);
-        double fx, fy;
-        String fid;
-        if (n != null) {
-            fx = n.getX(); fy = n.getY(); fid = n.getId();
-        } else {
-            Object[] hit = nearestEdgePoint(sx, sy);
-            if (hit == null) return;
-            fx = (double) hit[1]; fy = (double) hit[2]; fid = null;
-        }
+        TrafficNode n = findNearestNode(sx, sy);
+        if (n == null) return;
         if (isA) {
-            setPointA(fid, fx, fy);
+            setPointA(n.getId(), n.getX(), n.getY());
             placingPointA = false;
-            if (onPointAPlaced != null) onPointAPlaced.accept(new double[]{fx, fy});
+            if (onPointAPlaced != null) onPointAPlaced.accept(new double[]{n.getX(), n.getY()});
         } else {
-            setPointB(fid, fx, fy);
+            setPointB(n.getId(), n.getX(), n.getY());
             placingPointB = false;
-            if (onPointBPlaced != null) onPointBPlaced.accept(new double[]{fx, fy});
+            if (onPointBPlaced != null) onPointBPlaced.accept(new double[]{n.getX(), n.getY()});
         }
         dirty = true;
     }
@@ -572,6 +623,16 @@ public class MapCanvas extends Canvas {
                 gc.fillOval(lx - r - 1, ly - r - 1, (r + 1) * 2, (r + 1) * 2);
                 gc.setFill(ltColor(lt.getState()));
                 gc.fillOval(lx - r, ly - r, r * 2, r * 2);
+
+                //anillo de seleccion si este semaforo esta seleccionado
+                if (selectedLight != null && selectedLight.getId().equals(lt.getId())) {
+                    gc.setStroke(LT_SELECTED_GLOW);
+                    gc.setLineWidth(4);
+                    gc.strokeOval(lx - r - 4, ly - r - 4, (r + 4) * 2, (r + 4) * 2);
+                    gc.setStroke(LT_SELECTED_RING);
+                    gc.setLineWidth(1.5);
+                    gc.strokeOval(lx - r - 3, ly - r - 3, (r + 3) * 2, (r + 3) * 2);
+                }
             }
         }
     }
@@ -691,8 +752,8 @@ public class MapCanvas extends Canvas {
         String hint = null;
         Color bg = HINT_INC_BG;
         if (placingIncident) hint = "Haz clic en cualquier punto de una calle para colocar el incidente";
-        else if (placingPointA) { hint = "Haz clic en una calle o interseccion para marcar el Punto A"; bg = HINT_A_BG; }
-        else if (placingPointB) { hint = "Haz clic en una calle o interseccion para marcar el Punto B"; bg = HINT_B_BG; }
+        else if (placingPointA) { hint = "Haz clic en una interseccion para marcar el Punto A (snapping automatico)"; bg = HINT_A_BG; }
+        else if (placingPointB) { hint = "Haz clic en una interseccion para marcar el Punto B (snapping automatico)"; bg = HINT_B_BG; }
         if (hint == null) return;
         gc.setFill(bg);
         gc.fillRoundRect(12, h - 36, hint.length() * 6.5 + 16, 26, 6, 6);

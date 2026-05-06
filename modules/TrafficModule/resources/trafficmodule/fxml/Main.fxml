@@ -38,6 +38,8 @@
             <Tab text="Semáforos">
                 <VBox styleClass="tm-tab-content" spacing="0">
                     <Label text="ESTADO DE SEMÁFOROS" styleClass="tm-section-title"/>
+                    <Label text="Haz clic en un semáforo del mapa para seleccionarlo." styleClass="tm-hint"
+                           style="-fx-padding: 0 0 6 0;"/>
                     <ListView fx:id="listSemaforos" styleClass="tm-list" VBox.vgrow="ALWAYS"/>
                 </VBox>
             </Tab>
@@ -58,7 +60,7 @@
                         <Label text="RUTA DE VEHÍCULO DE EMERGENCIA" styleClass="tm-section-title"/>
 
                         <VBox styleClass="tm-card" spacing="8">
-                            <Label text="Haz clic en 'Marcar A/B' y luego en cualquier punto del mapa (calle o intersección)."
+                            <Label text="Haz clic en 'Marcar A/B' y luego en cualquier intersección del mapa. El punto se ajusta automáticamente al nodo más cercano."
                                    styleClass="tm-hint" wrapText="true"/>
 
                             <HBox spacing="8" alignment="CENTER_LEFT">
@@ -99,21 +101,8 @@
                         <Label text="NUEVO INCIDENTE" styleClass="tm-section-title"/>
 
                         <VBox styleClass="tm-card" spacing="8">
-                            <VBox spacing="4">
-                                <Label text="Tipo" styleClass="tm-field-label"/>
-                                <ComboBox fx:id="comboTipoIncidente" styleClass="tm-combo"
-                                          maxWidth="Infinity"/>
-                            </VBox>
-                            <VBox spacing="4">
-                                <Label text="Estado inicial" styleClass="tm-field-label"/>
-                                <ComboBox fx:id="comboEstadoIncidente" styleClass="tm-combo"
-                                          maxWidth="Infinity"/>
-                            </VBox>
-                            <VBox spacing="4">
-                                <Label text="Descripción" styleClass="tm-field-label"/>
-                                <TextField fx:id="fieldDescIncidente" styleClass="tm-url-field"
-                                           promptText="Descripción breve…"/>
-                            </VBox>
+                            <Label text="Al pulsar el botón se abrirá un formulario para rellenar los datos del incidente. Luego haz clic en el mapa para colocarlo."
+                                   styleClass="tm-hint" wrapText="true"/>
                             <Button fx:id="btnMarcarMapa" styleClass="btn-ghost-blue"
                                     text="Marcar en mapa" maxWidth="Infinity"/>
                         </VBox>
