@@ -1,6 +1,7 @@
 package com.centralcore.util;
 
 import com.centralcore.modules.Module;
+import com.centralcore.modules.ModuleManager;
 
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -62,6 +63,12 @@ public class ModuleDetailsDialog {
         );
         lblDescription.setWrapText(true);
 
+        //label de estado para mostrar resultado del reload
+        Label lblStatus = new Label();
+        lblStatus.setStyle("-fx-font-size: 11; -fx-text-fill: #2ecc71;");
+        lblStatus.setManaged(false);
+        lblStatus.setVisible(false);
+
         HBox buttonsBox = new HBox();
         buttonsBox.setStyle("-fx-spacing: 10; -fx-alignment: center-right;");
         buttonsBox.setPadding(new Insets(15, 0, 0, 0));
@@ -75,8 +82,22 @@ public class ModuleDetailsDialog {
                         "-fx-text-fill: white;"
         );
         btnUpdate.setOnAction(e -> {
-            System.out.println("actualizar modulo: " + module.getName());
-            dialogStage.close();
+            //recarga el módulo en caliente sin reiniciar la app
+            String moduleId = module.getModuleId();
+            Module reloaded = ModuleManager.getInstance().reloadModule(moduleId);
+
+            if (reloaded != null) {
+                System.out.println("modulo recargado: " + moduleId);
+                lblStatus.setText("✔ Módulo recargado correctamente");
+                lblStatus.setStyle("-fx-font-size: 11; -fx-text-fill: #2ecc71;");
+            } else {
+                System.err.println("fallo al recargar modulo: " + moduleId);
+                lblStatus.setText("✘ Error al recargar el módulo");
+                lblStatus.setStyle("-fx-font-size: 11; -fx-text-fill: #e74c3c;");
+            }
+
+            lblStatus.setManaged(true);
+            lblStatus.setVisible(true);
         });
 
         Button btnDelete = new Button("Delete");
@@ -112,6 +133,7 @@ public class ModuleDetailsDialog {
                 lblVersion,
                 lblDescLabel,
                 lblDescription,
+                lblStatus,
                 buttonsBox
         );
 

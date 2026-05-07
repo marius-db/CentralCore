@@ -1,5 +1,6 @@
 package com.centralcore.controller;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -11,6 +12,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -51,10 +55,11 @@ public class ModulesViewController implements Initializable {
                         " -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 4, 0, 0, 2);"
         );
 
-        Rectangle logo = new Rectangle(150, 100);
-        logo.setFill(Color.web("#3498db"));
-        logo.setArcWidth(8);
-        logo.setArcHeight(8);
+        //intentar cargar imagen del modulo, fallback a rectangulo coloreado si no existe
+        //envuelto en StackPane para centrar el logo dentro del tile
+        StackPane logoContainer = new StackPane(buildLogoNode(module, 150, 100));
+        logoContainer.setAlignment(javafx.geometry.Pos.CENTER);
+        logoContainer.setPrefWidth(Double.MAX_VALUE);
 
         Label nameLabel = new Label(module.getName());
         nameLabel.setStyle(
@@ -65,11 +70,11 @@ public class ModulesViewController implements Initializable {
                         "-fx-text-fill: #ecf0f1;"
         );
 
-        tile.getChildren().addAll(logo, nameLabel);
+        tile.getChildren().addAll(logoContainer, nameLabel);
 
         tile.setOnMouseClicked(e -> openModule(module));
 
-        //el hover manipula el string de estilo porque javafx no soporta :hover en css inline
+        //el hover manipula el string de estilo porque javafx no soporta ":hover" en css inline
         tile.setOnMouseEntered(e -> tile.setStyle(
                 tile.getStyle().replace("-fx-background-color: #34495e;", "-fx-background-color: #2c3e50;")
         ));
@@ -78,6 +83,44 @@ public class ModulesViewController implements Initializable {
         ));
 
         return tile;
+    }
+
+    //carga la imagen del módulo o devuelve un rectangulo de fallback
+    static javafx.scene.Node buildLogoNode(Module module, double width, double height) {
+        try {
+            File logoFile = resolveLogoFile(module);
+            if (logoFile != null && logoFile.exists()) {
+                ImageView iv = new ImageView(new Image(logoFile.toURI().toString()));
+                iv.setFitWidth(width);
+                iv.setFitHeight(height);
+                iv.setPreserveRatio(true);
+                return iv;
+            }
+        } catch (Exception e) {
+            System.err.println("error al cargar logo de " + module.getName() + ": " + e.getMessage());
+        }
+
+        //fallback: rectangulo azul si la imagen no esta disponible
+        Rectangle fallback = new Rectangle(width, height);
+        fallback.setFill(Color.web("#3498db"));
+        fallback.setArcWidth(8);
+        fallback.setArcHeight(8);
+        return fallback;
+    }
+
+    //resuelve la ruta del logo del modulo en disco
+    private static File resolveLogoFile(Module module) {
+        String logoPath = module.getLogoPath();
+        if (logoPath == null || logoPath.isBlank()) return null;
+
+        //el modulo ya esta en la carpeta modules/<NombreModulo>/resources/<logoPath>
+        //se busca via reflection en el classloader del modulo
+        try {
+            URL resource = module.getClass().getResource("/" + logoPath);
+            if (resource != null) return new File(resource.toURI());
+        } catch (Exception ignored) {}
+
+        return null;
     }
 
     private void openModule(Module module) {

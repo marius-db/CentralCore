@@ -16,6 +16,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.GaussianBlur;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 
 public class LoginController implements Initializable, TranslationManager.LanguageChangeListener {
 
@@ -33,6 +37,7 @@ public class LoginController implements Initializable, TranslationManager.Langua
     @FXML private Button btnLogin;
     @FXML private Button btnBack;
     @FXML private ComboBox<String> cmbLanguage;
+    @FXML private StackPane loginRoot;
 
     //false = modo login, true = modo registro
     private boolean isRegisterMode = false;
@@ -45,7 +50,33 @@ public class LoginController implements Initializable, TranslationManager.Langua
         cmbLanguage.setValue(TranslationManager.getCurrentLanguage().equals("en") ? "English" : "Español");
         cmbLanguage.setOnAction(e -> onLanguageComboChanged());
 
+        loadBackground();
         updateLabels();
+    }
+
+    private void loadBackground() {
+        try {
+            URL imageUrl = getClass().getResource("/com/centralcore/image/city.png");
+            if (imageUrl == null) return;
+
+            ImageView bg = new ImageView(new Image(imageUrl.toExternalForm(), true));
+            bg.setPreserveRatio(false);
+            bg.setEffect(new GaussianBlur(20));
+
+            //vincular al tamaño de la escena igual que en el welcome
+            bg.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    bg.fitWidthProperty().bind(newScene.widthProperty());
+                    bg.fitHeightProperty().bind(newScene.heightProperty());
+                }
+            });
+
+            //insertar como primera capa, por debajo de todo el contenido existente
+            loginRoot.getChildren().add(0, bg);
+
+        } catch (Exception e) {
+            System.err.println("error al cargar fondo del login: " + e.getMessage());
+        }
     }
 
     private void onLanguageComboChanged() {

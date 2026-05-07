@@ -65,6 +65,37 @@ public class ModuleManager {
         return modules.containsKey(moduleId);
     }
 
+    //recarga un módulo en caliente: shutdown, nueva instancia desde disco y después initialize
+    //devuelve el módulo nuevo si tuvo exito, null si fallo
+    public Module reloadModule(String moduleId) {
+        Module old = modules.get(moduleId);
+        if (old != null) {
+            try {
+                old.shutdown();
+            } catch (Exception e) {
+                System.err.println("error en shutdown antes de recargar " + moduleId + ": " + e.getMessage());
+            }
+            modules.remove(moduleId);
+        }
+
+        Module fresh = ModuleLoader.reloadModule(moduleId);
+        if (fresh == null) {
+            System.err.println("fallo al recargar modulo: " + moduleId);
+            return null;
+        }
+
+        try {
+            fresh.initialize();
+            modules.put(fresh.getModuleId(), fresh);
+            System.out.println("modulo recargado: " + fresh.getModuleId());
+            return fresh;
+        } catch (Exception e) {
+            System.err.println("error al inicializar modulo recargado " + moduleId + ": " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public int getModuleCount() {
         return modules.size();
     }

@@ -593,7 +593,7 @@ public class TrafficModuleController {
         dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         dlg.getDialogPane().getStylesheets().add(
-                getClass().getResource("/trafficmodule/css/traffic.css").toExternalForm());
+                getClass().getResource("/css/traffic.css").toExternalForm());
 
         ComboBox<String> comboTipo = new ComboBox<>(FXCollections.observableArrayList(
                 "Accidente", "Corte de vía", "Obras", "Semáforo averiado",
