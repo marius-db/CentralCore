@@ -17,17 +17,17 @@ import javafx.scene.layout.VBox;
 
 public class LicencesController implements Initializable, TranslationManager.LanguageChangeListener {
 
-    @FXML private TableView<Licence>            tableLicences;
-    @FXML private TableColumn<Licence, String>  colKey;
-    @FXML private TableColumn<Licence, String>  colExpiry;
+    @FXML private TableView<Licence> tableLicences;
+    @FXML private TableColumn<Licence, String> colKey;
+    @FXML private TableColumn<Licence, String> colExpiry;
     @FXML private TableColumn<Licence, Boolean> colActive;
-    @FXML private VBox                          emptyState;
-    @FXML private Label                         lblTitle;
-    @FXML private Label                         lblEmptyTitle;
-    @FXML private Label                         lblEmptyDesc;
-    @FXML private Button                        btnRemove;
-    @FXML private Button                        btnAdd;
-    @FXML private Button                        btnAddFirst;
+    @FXML private VBox emptyState;
+    @FXML private Label lblTitle;
+    @FXML private Label lblEmptyTitle;
+    @FXML private Label lblEmptyDesc;
+    @FXML private Button btnRemove;
+    @FXML private Button btnAdd;
+    @FXML private Button btnAddFirst;
 
     private final ObservableList<Licence> licences = FXCollections.observableArrayList();
 

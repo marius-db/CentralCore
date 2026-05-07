@@ -3,9 +3,9 @@ package com.centralcore.model;
 import javafx.beans.property.*;
 
 public class Licence {
-    private final StringProperty module  = new SimpleStringProperty();
-    private final StringProperty key     = new SimpleStringProperty();
-    private final StringProperty expiry  = new SimpleStringProperty();
+    private final StringProperty module = new SimpleStringProperty();
+    private final StringProperty key = new SimpleStringProperty();
+    private final StringProperty expiry = new SimpleStringProperty();
     private final BooleanProperty active = new SimpleBooleanProperty();
 
     public Licence(String module, String key, String expiry, boolean active) {
