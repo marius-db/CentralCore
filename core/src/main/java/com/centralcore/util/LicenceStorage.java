@@ -7,7 +7,7 @@ public class LicenceStorage {
 
     private static final Preferences prefs = Preferences.userRoot().node("centralcore/licences");
     private static final String KEY_LICENCE = "app_licence";
-    private static final String KEY_EXPIRY  = "app_expiry";
+    private static final String KEY_EXPIRY = "app_expiry";
 
     public static void saveAppLicence(String key, String expiry) {
         prefs.put(KEY_LICENCE, key);

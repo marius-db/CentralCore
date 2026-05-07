@@ -5,36 +5,46 @@
 <?import javafx.scene.image.*?>
 
 <!--pantalla de bienvenida
-    layout dividido: lado izquierdo = logo + texto + boton login / lado derecho = imagen sci-fi-->
-<HBox xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.centralcore.controller.WelcomeController"
-      styleClass="welcome-root">
+    layout dividido: lado izquierdo = logo + texto + boton login / lado derecho = imagen sci-fi
+    el StackPane raiz permite superponer el selector de idioma encima de todo el contenido-->
+<StackPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.centralcore.controller.WelcomeController" styleClass="welcome-root">
 
-    <!--panel izquierdo: marca + llamada a la accion-->
-    <VBox styleClass="welcome-left" HBox.hgrow="NEVER">
-        <VBox styleClass="welcome-brand">
-            <!--placeholder del logo - reemplazar con ImageView real cuando el logo este listo-->
-            <Label text="CENTRAL" styleClass="logo-central"/>
-            <Label text="CORE" styleClass="logo-core"/>
+    <!--contenido principal - sin cambios-->
+    <HBox>
+
+        <!--panel izquierdo: marca + llamada a la accion-->
+        <VBox styleClass="welcome-left" HBox.hgrow="NEVER">
+            <VBox styleClass="welcome-brand">
+                <!--placeholder del logo - reemplazar con ImageView real cuando el logo este listo-->
+                <Label text="CENTRAL" styleClass="logo-central"/>
+                <Label text="CORE" styleClass="logo-core"/>
+            </VBox>
+
+            <VBox styleClass="welcome-tagline">
+                <Label fx:id="lblTaglineTitle" styleClass="tagline-title" wrapText="true"/>
+                <Label fx:id="lblTaglineSubtitle" styleClass="tagline-subtitle" wrapText="true"/>
+            </VBox>
+
+            <Button fx:id="btnLogin"
+                    text="Log In"
+                    styleClass="btn-primary"
+                    onAction="#onLoginClicked"/>
         </VBox>
 
-        <VBox styleClass="welcome-tagline">
-            <Label text="Welcome to CentralCore" styleClass="tagline-title" wrapText="true"/>
-            <Label text="Have control of the whole city in the palms of your hand."
-                   styleClass="tagline-subtitle" wrapText="true"/>
-        </VBox>
+        <!--panel derecho: imagen decorativa sci-fi-->
+        <StackPane styleClass="welcome-right" HBox.hgrow="ALWAYS">
+            <!--label placeholder hasta que se agregue la imagen real-->
+            <Label text="[City Image]" styleClass="image-placeholder"/>
+        </StackPane>
 
-        <Button fx:id="btnLogin"
-                text="Log In"
-                styleClass="btn-primary"
-                onAction="#onLoginClicked"/>
-    </VBox>
+    </HBox>
 
-    <!--panel derecho: imagen decorativa sci-fi-->
-    <StackPane styleClass="welcome-right" HBox.hgrow="ALWAYS">
-        <!--label placeholder hasta que se agregue la imagen real-->
-        <Label text="[City Image]" styleClass="image-placeholder"/>
-    </StackPane>
+    <!--selector de idioma en la esquina superior derecha - encima de todo incluida la imagen-->
+    <HBox StackPane.alignment="TOP_RIGHT" style="-fx-padding: 15;">
+        <ComboBox fx:id="cmbLanguage"
+                  style="-fx-background-color: #2c3e50; -fx-text-fill: #ecf0f1; -fx-control-inner-background: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-padding: 5 10; -fx-font-size: 11; -fx-font-fill: #ecf0f1; -fx-focus-color: #3498db; -fx-cell-text-fill: #ecf0f1;"
+                  promptText="Language"/>
+    </HBox>
 
-</HBox>
+</StackPane>
