@@ -12,7 +12,7 @@
 
     <!--cabecera de la pagina-->
     <HBox style="-fx-padding: 15 20; -fx-background-color: #34495e; -fx-border-color: #2c3e50; -fx-border-width: 0 0 1 0;">
-        <Label text="Installed Modules" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
+        <Label fx:id="lblTitle" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
     </HBox>
 
     <!--lista de modulos-->

@@ -7,6 +7,7 @@ import com.centralcore.modules.Module;
 import com.centralcore.modules.ModuleManager;
 import com.centralcore.util.ModuleDetailsDialog;
 import com.centralcore.util.SceneManager;
+import com.centralcore.util.TranslationManager;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -19,16 +20,18 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
-public class InstallsController implements Initializable {
+public class InstallsController implements Initializable, TranslationManager.LanguageChangeListener {
 
     @FXML private ListView<Module> moduleListView;
+    @FXML private Label lblTitle;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        TranslationManager.addLanguageChangeListener(this);
+        updateLabels();
         setupModuleList();
     }
 
@@ -38,6 +41,17 @@ public class InstallsController implements Initializable {
         moduleListView.setCellFactory(param -> new ModuleListCell());
     }
 
+    private void updateLabels() {
+        if (lblTitle != null) lblTitle.setText(TranslationManager.get("installs.title"));
+    }
+
+    @Override
+    public void onLanguageChanged(String newLanguageCode) {
+        updateLabels();
+        //refrescar la lista para que las celdas regeneren sus menus con el idioma nuevo
+        moduleListView.refresh();
+    }
+
     //celda personalizada para renderizar cada modulo en la lista
     private class ModuleListCell extends ListCell<Module> {
 
@@ -45,6 +59,7 @@ public class InstallsController implements Initializable {
         private Label lblName;
         private Label lblDescription;
         private Button btnMenu;
+        private StackPane logoPlaceholder;
 
         public ModuleListCell() {
             setupCell();
@@ -61,10 +76,11 @@ public class InstallsController implements Initializable {
             );
             container.setMinHeight(70);
 
-            Rectangle logo = new Rectangle(50, 50);
-            logo.setFill(Color.web("#3498db"));
-            logo.setArcWidth(4);
-            logo.setArcHeight(4);
+            //logo placeholder, se sobreescribe en updateItem con la imagen real
+            logoPlaceholder = new StackPane();
+            logoPlaceholder.setPrefSize(50, 50);
+            logoPlaceholder.setMinSize(50, 50);
+            logoPlaceholder.setMaxSize(50, 50);
 
             VBox infoBox = new VBox();
             infoBox.setStyle("-fx-spacing: 5;");
@@ -98,7 +114,7 @@ public class InstallsController implements Initializable {
                             "-fx-border-width: 1;"
             );
 
-            container.getChildren().addAll(logo, infoBox, btnMenu);
+            container.getChildren().addAll(logoPlaceholder, infoBox, btnMenu);
         }
 
         @Override
@@ -111,7 +127,12 @@ public class InstallsController implements Initializable {
                 lblName.setText(module.getName());
                 lblDescription.setText(module.getDescription());
 
-                //se recrea el menu en cada update para reflejar el modulo actual
+                //actualizar el logo con la imagen del modulo
+                logoPlaceholder.getChildren().setAll(
+                        ModulesViewController.buildLogoNode(module, 50, 50)
+                );
+
+                //se recrea el menu en cada update para reflejar el modulo actual y el idioma actual
                 ContextMenu contextMenu = createContextMenu(module);
                 btnMenu.setOnAction(e -> contextMenu.show(btnMenu, Side.BOTTOM, -60, 0));
 
@@ -122,16 +143,11 @@ public class InstallsController implements Initializable {
         private ContextMenu createContextMenu(Module module) {
             ContextMenu menu = new ContextMenu();
 
+            MenuItem itemViewDetails = new MenuItem(TranslationManager.get("installs.menu.viewDetails"));
+            itemViewDetails.setOnAction(e -> ModuleDetailsDialog.show(SceneManager.getStage(), module));
 
-            MenuItem itemViewDetails = new MenuItem("View Details");
-            itemViewDetails.setOnAction(e -> {
-                ModuleDetailsDialog.show(SceneManager.getStage(), module);
-            });
-
-            MenuItem itemDelete = new MenuItem("Delete");
-            itemDelete.setOnAction(e -> {
-                System.out.println("eliminar modulo: " + module.getName());
-            });
+            MenuItem itemDelete = new MenuItem(TranslationManager.get("installs.menu.delete"));
+            itemDelete.setOnAction(e -> System.out.println("eliminar modulo: " + module.getName()));
 
             menu.getItems().addAll(itemViewDetails, itemDelete);
             return menu;

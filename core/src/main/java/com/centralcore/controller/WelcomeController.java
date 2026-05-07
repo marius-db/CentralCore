@@ -11,6 +11,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class WelcomeController implements Initializable, TranslationManager.LanguageChangeListener {
 
@@ -18,6 +20,7 @@ public class WelcomeController implements Initializable, TranslationManager.Lang
     @FXML private ComboBox<String> cmbLanguage;
     @FXML private Label lblTaglineTitle;
     @FXML private Label lblTaglineSubtitle;
+    @FXML private ImageView imgCity;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -27,7 +30,31 @@ public class WelcomeController implements Initializable, TranslationManager.Lang
         cmbLanguage.setValue(TranslationManager.getCurrentLanguage().equals("en") ? "English" : "Español");
         cmbLanguage.setOnAction(e -> onLanguageComboChanged());
 
+        loadCityImage();
         updateLabels();
+    }
+
+    private void loadCityImage() {
+        try {
+            URL imageUrl = getClass().getResource("/com/centralcore/image/city.png");
+            if (imageUrl != null) {
+                //cargar sin esperar el tamaño completo, el binding lo ajusta
+                imgCity.setImage(new Image(imageUrl.toExternalForm(), true));
+
+                //vincular al scene una vez disponible: scene siempre refleja el tamaño real de la ventana
+                //usar la escena en vez del parent evita que la imagen empuje el layout
+                imgCity.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                    if (newScene != null) {
+                        imgCity.fitWidthProperty().bind(newScene.widthProperty());
+                        imgCity.fitHeightProperty().bind(newScene.heightProperty());
+                    }
+                });
+            } else {
+                System.err.println("imagen city.png no encontrada");
+            }
+        } catch (Exception e) {
+            System.err.println("error al cargar city.png: " + e.getMessage());
+        }
     }
 
     private void onLanguageComboChanged() {

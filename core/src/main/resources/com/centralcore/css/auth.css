@@ -1,7 +1,7 @@
 /*estilos para la pantalla de login*/
 
 .login-root {
-    -fx-background-color: -cc-bg-dark;
+    -fx-background-color: transparent;
 }
 
 /*tarjeta de login centrada*/
@@ -78,4 +78,25 @@
     -fx-font-size: 12px;
     -fx-wrap-text: true;
     -fx-alignment: center;
+}
+
+/* fondo desenfocado con efecto cristal para el login */
+
+.login-card {
+    -fx-background-color: rgba(15, 20, 30, 0.72);
+    -fx-background-radius: 22;
+
+    -fx-border-color: rgba(255,255,255,0.08);
+    -fx-border-radius: 22;
+
+    -fx-padding: 40;
+
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(0,0,0,0.45),
+            30,
+            0.2,
+            0,
+            8
+    );
 }

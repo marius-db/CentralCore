@@ -1,7 +1,7 @@
 {
   "id": "traffic_module",
   "name": "Gestión del tráfico",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Seguimiento de vehículos e incidentes de tráfico en la ciudad",
   "logoPath": "images/logo.png",
   "mainClass": "com.centralcore.modules.trafficmodule.TrafficModule",

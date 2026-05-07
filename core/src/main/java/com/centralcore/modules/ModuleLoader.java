@@ -23,6 +23,30 @@ public class ModuleLoader {
     private ModuleLoader() {
     }
 
+    //recarga un modulo ya cargado: shutdown, nuevo classloader, nueva instancia, initialize
+    public static Module reloadModule(String moduleId) {
+        try {
+            Path modulesPath = Paths.get(MODULES_FOLDER);
+            File modulesDir = modulesPath.toFile();
+            File[] subdirs = modulesDir.listFiles(File::isDirectory);
+            if (subdirs == null) return null;
+
+            for (File moduleDir : subdirs) {
+                File configFile = new File(moduleDir, "module.json");
+                if (!configFile.exists()) continue;
+
+                ModuleConfig config = gson.fromJson(new FileReader(configFile), ModuleConfig.class);
+                if (!moduleId.equals(config.id)) continue;
+
+                return loadModule(moduleDir);
+            }
+        } catch (Exception e) {
+            System.err.println("error al recargar modulo " + moduleId + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static List<Module> loadAllModules() {
         List<Module> loadedModules = new ArrayList<>();
 
@@ -107,6 +131,9 @@ public class ModuleLoader {
             Constructor<?> constructor = moduleClass.getDeclaredConstructor();
             constructor.setAccessible(true);
             Module module = (Module) constructor.newInstance();
+
+            //inyectar el directorio del modulo para que pueda leer module.json e imagenes
+            module.setModuleDir(moduleDir);
 
             return module;
 

@@ -100,6 +100,19 @@ public class LicencesController implements Initializable, TranslationManager.Lan
             return;
         }
 
+        //verificar que el email de la licencia coincide con el usuario en sesion
+        String tokenEmail = LicenseValidator.extractEmail(key);
+        String userEmail  = com.centralcore.util.SessionManager.getCurrentUser() != null
+                ? com.centralcore.util.SessionManager.getCurrentUser().getEmail()
+                : "";
+        if (!tokenEmail.equals(userEmail)) {
+            Alert err = new Alert(Alert.AlertType.ERROR,
+                    TranslationManager.get("licences.error.emailMismatch"), ButtonType.OK);
+            applyDialogTheme(err.getDialogPane());
+            err.showAndWait();
+            return;
+        }
+
         String expiry = LicenseValidator.extractExpiry(key);
         boolean active = LicenseValidator.isActive(key);
 

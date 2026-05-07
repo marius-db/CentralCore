@@ -5,7 +5,8 @@
 
 <!--pantalla de inicio de sesion / registro
     cambia entre modo login y modo crear cuenta sin cambiar de escena-->
-<StackPane xmlns="http://javafx.com/javafx/21"
+<StackPane fx:id="loginRoot"
+           xmlns="http://javafx.com/javafx/21"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.centralcore.controller.LoginController"
            styleClass="login-root">

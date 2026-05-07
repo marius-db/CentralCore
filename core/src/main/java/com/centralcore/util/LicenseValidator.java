@@ -41,6 +41,15 @@ public class LicenseValidator {
         }
     }
 
+    public static String extractEmail(String licenseKey) {
+        try {
+            String decoded = new String(Base64.getDecoder().decode(licenseKey));
+            return decoded.split("\\|")[0];
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
     public static boolean isActive(String licenseKey) {
         try {
             String decoded = new String(Base64.getDecoder().decode(licenseKey));
