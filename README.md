@@ -1,35 +1,130 @@
 # CentralCore
 
-Desktop application for city administration and management.
-Aplicación de escritorio para la administración y gestión de ciudades.
+> 🇪🇸 [Versión en español](README.es.md)
 
-## Requirements / Requisitos
+Desktop application for city administration built on a plugin architecture. The core shell handles auth, module loading, and licence management; actual functionality lives in independently compiled modules that get discovered and loaded at runtime via `URLClassLoader`.
+
+Two modules are included: a citizen records database and a traffic management interface that connects to a simulation server over WebSocket.
+
+## Requirements
 
 - Java 21 JDK
 - Gradle 8+
 
-No external database required. CentralCore uses an embedded H2 database that is created automatically on first run.
-No se necesita base de datos externa. CentralCore usa una base de datos H2 embebida que se crea automáticamente en el primer arranque.
+No external database needed. CentralCore uses an embedded H2 database that gets created automatically on first run at `~/centralcore_db.mv.db`.
 
-## Setup / Configuración
-
-### 1. Run / Ejecutar
+## Running it
 
 ```bash
 ./gradlew run
 ```
 
-That's it. The database file is created at `~/centralcore_db.mv.db` on first launch and the schema is initialized automatically.
-Eso es todo. El archivo de base de datos se crea en `~/centralcore_db.mv.db` en el primer arranque y el esquema se inicializa automáticamente.
+That's it. Schema is initialized automatically on first launch.
 
-### 2. Default credentials / Credenciales por defecto
-
+Default credentials:
 - Email: `admin@centralcore.local`
 - Password: `Admin1234`
 
-### 3. Modules / Módulos
+## Project structure
 
-Place module folders inside the `modules/` directory next to the JAR. Each module folder must contain a `module.json` descriptor:
+This is a multi-project Gradle build with three subprojects:
+
+```
+CentralCore/
+├── build.gradle                  - root config, shared settings
+├── core/                         - the shell application
+│   └── src/main/java/com/centralcore/
+│       ├── Main.java
+│       ├── App.java
+│       ├── controller/           - FXML controllers for all shell views
+│       │   ├── WelcomeController.java
+│       │   ├── LoginController.java
+│       │   ├── MainShellController.java
+│       │   ├── ModulesViewController.java
+│       │   ├── InstallsController.java
+│       │   ├── LicencesController.java
+│       │   └── SettingsController.java
+│       ├── dao/
+│       │   └── UserDAO.java
+│       ├── db/
+│       │   ├── DatabaseConnection.java   - H2 singleton
+│       │   └── SchemaInitializer.java    - creates tables and seeds defaults
+│       ├── model/
+│       │   ├── User.java
+│       │   └── Licence.java
+│       ├── modules/
+│       │   ├── Module.java               - interface all modules must implement
+│       │   ├── ModuleConfig.java         - module.json POJO
+│       │   ├── ModuleLoader.java         - discovers and loads from ./modules/
+│       │   └── ModuleManager.java        - lifecycle manager
+│       └── util/
+│           ├── CustomTitleBar.java       - draggable custom window chrome
+│           ├── ModuleDetailsDialog.java
+│           ├── SceneManager.java         - centralized scene/navigation
+│           ├── SessionManager.java       - current user holder
+│           ├── LicenceStorage.java       - persists licence keys via Java Prefs
+│           ├── LicenseValidator.java     - HMAC-SHA256 validation
+│           └── TranslationManager.java   - i18n with observer pattern
+└── modules/
+    ├── CitizenModule/            - citizen records module
+    │   ├── module.json
+    │   ├── build.gradle
+    │   └── src/com/centralcore/modules/citizenmodule/
+    │       ├── CitizenModule.java
+    │       ├── CitizenModuleController.java
+    │       ├── CitizenDAO.java
+    │       ├── Citizen.java
+    │       ├── CitizenDocument.java
+    │       └── ...
+    └── TrafficModule/            - traffic management module
+        ├── module.json
+        ├── build.gradle
+        └── src/com/centralcore/modules/trafficmodule/
+            ├── TrafficModule.java
+            ├── TrafficModuleController.java
+            ├── MapCanvas.java            - JavaFX Canvas renderer
+            ├── SimConnection.java        - WebSocket client
+            ├── TrafficDAO.java           - incident persistence
+            └── model/
+                ├── SimState.java
+                ├── SimCar.java
+                ├── TrafficLight.java
+                ├── TrafficNode.java
+                ├── TrafficEdge.java
+                ├── Incident.java
+                └── IncidentUpdate.java
+```
+
+## Database schema
+
+Tables created automatically on first run:
+
+| Table | Description |
+|---|---|
+| `users` | App users, BCrypt-hashed passwords, roles |
+| `licences` | Module licence keys with expiry dates |
+| `ciudadanos` | Citizen records (CitizenModule) |
+| `vehiculos` | Registered vehicles linked to citizens |
+| `incidentes_trafico` | Traffic incidents with severity, state, and coordinates |
+
+CitizenModule also creates two additional tables on its own init:
+- `ciudadano_documentos`: file attachments linked to citizen records
+
+## Navigation flow
+
+```
+Welcome -> Login -> MainShell
+                     ├── Modules (default view)
+                     │     ├── CitizenModule
+                     │     └── TrafficModule
+                     ├── Installs   - lists loaded modules with details
+                     ├── Licences   - add/remove licence keys
+                     └── Settings   - language, DB controls, danger zone
+```
+
+## Module system
+
+Modules are loaded from a `modules/` folder next to the running app. Each module needs a `module.json` and its compiled classes in `build/classes/java/main/`.
 
 ```json
 {
@@ -42,79 +137,20 @@ Place module folders inside the `modules/` directory next to the JAR. Each modul
 }
 ```
 
-The main class must implement `com.centralcore.modules.Module` and have a no-args constructor.
+The main class must implement `com.centralcore.modules.Module` and have a no-args constructor. Each module gets its own isolated `URLClassLoader` so there are no class conflicts between modules.
 
-## Project Structure / Estructura del Proyecto
+To build a module:
 
-```
-src/main/java/
-├── com/centralcore/
-│   ├── Main.java                    - entry point
-│   ├── App.java                     - JavaFX application
-│   ├── controller/                  - FXML controllers
-│   │   ├── WelcomeController.java
-│   │   ├── LoginController.java
-│   │   ├── MainShellController.java
-│   │   ├── ModulesViewController.java
-│   │   ├── InstallsController.java
-│   │   ├── LicencesController.java
-│   │   └── SettingsController.java
-│   ├── model/                       - data models
-│   │   └── User.java
-│   ├── dao/                         - database access objects
-│   │   └── UserDAO.java
-│   ├── db/                          - database
-│   │   ├── DatabaseConnection.java  - H2 embedded connection singleton
-│   │   └── SchemaInitializer.java   - creates tables and seeds default data
-│   ├── modules/                     - module system
-│   │   ├── Module.java              - interface all modules must implement
-│   │   ├── ModuleConfig.java        - module.json POJO
-│   │   ├── ModuleLoader.java        - discovers and loads modules from ./modules/
-│   │   └── ModuleManager.java       - lifecycle manager (singleton)
-│   └── util/
-│       ├── CustomTitleBar.java      - draggable custom window chrome
-│       ├── ModuleDetailsDialog.java - modal dialog for module info
-│       ├── SceneManager.java        - centralized scene/navigation manager
-│       ├── SessionManager.java      - current logged-in user holder
-│       └── TranslationManager.java  - i18n with observer pattern
-├── citizenmodule/
-│   └── CitizenModule.java           - built-in citizen records module
-└── trafficmodule/
-    └── TrafficModule.java           - built-in traffic management module
-
-src/main/resources/com/centralcore/
-├── fxml/                            - UI layouts
-├── css/                             - stylesheets (global, auth, main, views, welcome)
-└── fonts/                           - Orbitron variable font
-
-modules/
-├── CitizenModule/module.json
-└── TrafficModule/module.json
+```bash
+cd modules/CitizenModule
+./gradlew jar
 ```
 
-## Database Schema / Esquema de Base de Datos
+## Licence system
 
-Tables created automatically on first run:
+Licences are HMAC-SHA256 signed keys encoded in Base64 with the format `email|expiry_date|hmac`. The app validates signature and expiry on import, and stores the result locally via Java Preferences API. Demo licence keys for both modules are seeded into the database automatically.
 
-- `users` — application users with BCrypt-hashed passwords
-- `licences` — module licence keys
-- `ciudadanos` — citizen records (used by CitizenModule)
-- `vehiculos` — registered vehicles linked to citizens
-- `incidentes_trafico` — traffic incidents (used by TrafficModule)
-
-## Navigation Flow / Flujo de Navegación
-
-```
-Welcome → Login → MainShell
-                    ├── Modules (default view)
-                    │     ├── → CitizenModule (loads into content pane)
-                    │     └── → TrafficModule (loads into content pane)
-                    ├── Installs  - lists loaded modules
-                    ├── Licences  - manage licence keys
-                    └── Settings  - language, appearance, DB status
-```
-
-## Dependencies / Dependencias
+## Dependencies
 
 | Library | Version | Purpose |
 |---|---|---|
