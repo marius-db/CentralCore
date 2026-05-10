@@ -6,9 +6,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import com.centralcore.util.PreferencesStorage;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
+import javafx.application.Platform;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -27,6 +29,9 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class CitizenModuleController implements Initializable {
+
+    //splitpane raiz del modulo
+    @FXML private SplitPane citizenSplitPane;
 
     //tabla
     @FXML private TextField searchField;
@@ -78,6 +83,12 @@ public class CitizenModuleController implements Initializable {
     @FXML private ComboBox<String> editMaritalStatus;
     @FXML private CheckBox editActive;
     @FXML private Label editError;
+    @FXML private Label errDni;
+    @FXML private Label errFirstName;
+    @FXML private Label errLastName;
+    @FXML private Label errBirthDate;
+    @FXML private Label errPhone;
+    @FXML private Label errEmail;
 
     private final CitizenDAO dao = new CitizenDAO();
     private final ObservableList<Citizen> citizenData = FXCollections.observableArrayList();
@@ -108,6 +119,59 @@ public class CitizenModuleController implements Initializable {
             if (val == null || val.isBlank()) loadAllCitizens();
             else filterCitizens(val.trim());
         });
+
+        setupSplitPane();
+    }
+
+    //configura el divisor del splitpane con posicion guardada y persistencia
+    private void setupSplitPane() {
+        if (citizenSplitPane == null) return;
+        //cargar posicion guardada, por defecto 1/3 de la pantalla
+        final double savedPos = PreferencesStorage.getDouble("citizen.splitpane.divider", 0.33);
+        final double[] dividerPos = {savedPos};
+        //bandera para suprimir guardado mientras se restaura la posicion
+        final boolean[] settling = {true};
+
+        //esperar al primer layout real antes de restaurar, igual que el modulo de trafico
+        //layoutBoundsProperty cambia cuando el nodo tiene tamano asignado por javafx
+        citizenSplitPane.layoutBoundsProperty().addListener(new javafx.beans.value.ChangeListener<javafx.geometry.Bounds>() {
+            @Override
+            public void changed(javafx.beans.value.ObservableValue<? extends javafx.geometry.Bounds> obs,
+                                javafx.geometry.Bounds oldB, javafx.geometry.Bounds newB) {
+                if (newB.getWidth() > 0) {
+                    citizenSplitPane.layoutBoundsProperty().removeListener(this);
+                    Platform.runLater(() -> Platform.runLater(() -> {
+                        citizenSplitPane.setDividerPositions(dividerPos[0]);
+                        settling[0] = false;
+                    }));
+                }
+            }
+        });
+
+        //cuando se maximiza o restaura la ventana, replicar la posicion guardada sin guardarla
+        citizenSplitPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene == null) return;
+            newScene.windowProperty().addListener((o2, oldWin, win) -> {
+                if (win == null) return;
+                javafx.stage.Stage stage = (javafx.stage.Stage) win;
+                stage.maximizedProperty().addListener((o3, wasMax, isMax) -> {
+                    boolean prev = settling[0];
+                    settling[0] = true;
+                    Platform.runLater(() -> {
+                        citizenSplitPane.setDividerPositions(dividerPos[0]);
+                        settling[0] = prev;
+                    });
+                });
+            });
+        });
+
+        //guardar posicion solo cuando el usuario mueve el divider, no durante el layout
+        citizenSplitPane.getDividers().get(0).positionProperty().addListener((obs, oldPos, newPos) -> {
+            if (!settling[0]) {
+                dividerPos[0] = newPos.doubleValue();
+                PreferencesStorage.putDouble("citizen.splitpane.divider", dividerPos[0]);
+            }
+        });
     }
 
     //configuración
@@ -134,6 +198,13 @@ public class CitizenModuleController implements Initializable {
         editMaritalStatus.setItems(FXCollections.observableArrayList(
                 "Soltero/a", "Casado/a", "Divorciado/a", "Viudo/a", "Pareja de hecho"
         ));
+
+        //restringir el campo telefono para que solo acepte numeros, espacios y signo +
+        editPhone.textProperty().addListener((obs, old, val) -> {
+            if (val != null && !val.matches("[0-9 +]*")) {
+                editPhone.setText(val.replaceAll("[^0-9 +]", ""));
+            }
+        });
     }
 
     private void setupDocumentPanel() {
@@ -202,6 +273,8 @@ public class CitizenModuleController implements Initializable {
 
         editTitle.setText(isNew ? "Nuevo Ciudadano" : "Editar Ciudadano");
         editError.setVisible(false);
+        editError.setManaged(false);
+        clearFieldErrors();
 
         if (isNew) {
             clearForm();
@@ -357,33 +430,80 @@ public class CitizenModuleController implements Initializable {
 
     private boolean validateForm() {
         editError.setVisible(false);
+        editError.setManaged(false);
 
+        //limpiar todos los errores inline antes de revalidar
+        clearFieldErrors();
+
+        boolean valid = true;
+
+        //dni obligatorio
         if (editDni.getText().isBlank()) {
-            editError.setText("El DNI/NIE es obligatorio");
-            editError.setVisible(true);
-            return false;
+            showFieldError(errDni, "El DNI/NIE es obligatorio");
+            valid = false;
         }
+        //nombre obligatorio
         if (editFirstName.getText().isBlank()) {
-            editError.setText("El nombre es obligatorio");
-            editError.setVisible(true);
-            return false;
+            showFieldError(errFirstName, "El nombre es obligatorio");
+            valid = false;
         }
+        //apellidos obligatorios
         if (editLastName.getText().isBlank()) {
-            editError.setText("Los apellidos son obligatorios");
-            editError.setVisible(true);
-            return false;
+            showFieldError(errLastName, "Los apellidos son obligatorios");
+            valid = false;
         }
+        //fecha obligatoria y valida
         if (editBirthDate.getValue() == null) {
-            editError.setText("La fecha de nacimiento es obligatoria");
-            editError.setVisible(true);
-            return false;
+            showFieldError(errBirthDate, "Obligatorio, formato: DD/MM/AAAA");
+            valid = false;
+        } else if (editBirthDate.getValue().isAfter(LocalDate.now())) {
+            showFieldError(errBirthDate, "La fecha no puede ser futura");
+            valid = false;
         }
-        if (editBirthDate.getValue().isAfter(LocalDate.now())) {
-            editError.setText("La fecha de nacimiento no puede ser futura");
-            editError.setVisible(true);
-            return false;
+        //telefono: solo numeros, espacios y signo +
+        String phone = editPhone.getText().trim();
+        if (!phone.isBlank() && !phone.matches("[0-9 +]+")) {
+            showFieldError(errPhone, "Solo se permiten numeros y el signo +");
+            valid = false;
         }
-        return true;
+        //email: formato basico si esta relleno
+        String email = editEmail.getText().trim();
+        if (!email.isBlank() && !isValidEmail(email)) {
+            showFieldError(errEmail, "Formato invalido, ej: correo@dominio.com");
+            valid = false;
+        }
+
+        return valid;
+    }
+
+    //muestra el label de error inline de un campo
+    private void showFieldError(Label errLabel, String message) {
+        if (errLabel == null) return;
+        errLabel.setText(message);
+        errLabel.setVisible(true);
+        errLabel.setManaged(true);
+    }
+
+    //oculta todos los labels de error inline
+    private void clearFieldErrors() {
+        hideFieldError(errDni);
+        hideFieldError(errFirstName);
+        hideFieldError(errLastName);
+        hideFieldError(errBirthDate);
+        hideFieldError(errPhone);
+        hideFieldError(errEmail);
+    }
+
+    private void hideFieldError(Label errLabel) {
+        if (errLabel == null) return;
+        errLabel.setVisible(false);
+        errLabel.setManaged(false);
+    }
+
+    //validacion de formato de email
+    private boolean isValidEmail(String email) {
+        return email.contains("@") && email.indexOf("@") > 0
+                && email.lastIndexOf(".") > email.indexOf("@") + 1;
     }
 
     private void readFormInto(Citizen c) {

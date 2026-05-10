@@ -71,6 +71,11 @@
                        visible="false"
                        managed="false"/>
 
+        <!--checkbox recuerdame, solo visible en modo login-->
+        <CheckBox fx:id="chkRememberMe"
+                  styleClass="login-remember-check"
+                  visible="false" managed="false"/>
+
         <!--boton principal (login o register segun modo)-->
         <Button fx:id="btnLogin"
                 styleClass="btn-primary"

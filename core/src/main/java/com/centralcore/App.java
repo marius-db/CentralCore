@@ -1,8 +1,8 @@
 package com.centralcore;
 
 import com.centralcore.modules.ModuleManager;
+import com.centralcore.util.DwmManager;
 import com.centralcore.util.SceneManager;
-
 import javafx.application.Application;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -17,8 +17,8 @@ public class App extends Application {
         Font.loadFont(getClass().getResourceAsStream("/com/centralcore/fonts/Orbitron-VariableFont_wght.ttf"), 14);
         primaryStage = stage;
 
-        //sin decoracion nativa, usamos CustomTitleBar
-        stage.initStyle(StageStyle.UNDECORATED);
+        //transparent permite que DWM dibuje el borde de acento y sombra nativa de Windows
+        stage.initStyle(StageStyle.TRANSPARENT);
 
         stage.setTitle("CentralCore");
         stage.setMinWidth(1100);
@@ -26,10 +26,13 @@ public class App extends Application {
         stage.setWidth(1280);
         stage.setHeight(720);
 
+        //initialize construye la escena compartida y la asigna al stage
         SceneManager.initialize(stage);
         SceneManager.showWelcome();
 
         stage.show();
+        //instalar integracion DWM despues de show() para que el HWND exista
+        DwmManager.install(stage);
     }
 
     public static Stage getPrimaryStage() {

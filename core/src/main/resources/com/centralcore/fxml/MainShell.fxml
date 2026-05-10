@@ -66,7 +66,7 @@
                minHeight="0">
 
         <VBox styleClass="content-placeholder">
-            <Label text="Select a module from the sidebar"
+            <Label fx:id="lblPlaceholder" text="Select a module from the sidebar"
                    styleClass="placeholder-text"/>
         </VBox>
 

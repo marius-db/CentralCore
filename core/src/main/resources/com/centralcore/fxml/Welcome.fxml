@@ -43,11 +43,12 @@
 
     </HBox>
 
-    <!--selector de idioma en la esquina superior derecha - encima de todo incluida la imagen-->
-    <HBox StackPane.alignment="TOP_RIGHT" style="-fx-padding: 15;" pickOnBounds="false">
-        <ComboBox fx:id="cmbLanguage"
-                  style="-fx-background-color: #2c3e50; -fx-text-fill: #ecf0f1; -fx-control-inner-background: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-padding: 5 10; -fx-font-size: 11; -fx-font-fill: #ecf0f1; -fx-focus-color: #3498db; -fx-cell-text-fill: #ecf0f1;"
-                  promptText="Language"/>
-    </HBox>
+    <!--selector de idioma en la esquina superior derecha - mismo estilo que la pantalla login-->
+    <ComboBox fx:id="cmbLanguage"
+              StackPane.alignment="TOP_RIGHT"
+              style="-fx-background-color: #2c3e50; -fx-text-fill: #ecf0f1; -fx-control-inner-background: #34495e; -fx-border-color: #7f8c8d; -fx-border-width: 1; -fx-padding: 5 10; -fx-font-size: 11; -fx-font-fill: #ecf0f1; -fx-focus-color: #3498db; -fx-cell-text-fill: #ecf0f1;"
+              promptText="Language">
+        <StackPane.margin><javafx.geometry.Insets top="15" right="15"/></StackPane.margin>
+    </ComboBox>
 
 </StackPane>

@@ -30,6 +30,7 @@ public class MainShellController implements Initializable, TranslationManager.La
     @FXML private Button btnLicences;
     @FXML private Button btnSettings;
     @FXML private Button btnLogout;
+    @FXML private Label lblPlaceholder;
 
     //velo semitransparente que bloquea el contenido cuando no hay licencia
     private StackPane licenceVeil;
@@ -198,6 +199,7 @@ public class MainShellController implements Initializable, TranslationManager.La
         btnLicences.setText(TranslationManager.get("nav.licences"));
         btnSettings.setText(TranslationManager.get("nav.settings"));
         btnLogout.setText(TranslationManager.get("btn.logout"));
+        if (lblPlaceholder != null) lblPlaceholder.setText(TranslationManager.get("shell.placeholder"));
     }
 
     @Override

@@ -3,9 +3,14 @@ package com.centralcore.controller;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import com.centralcore.dao.UserDAO;
+import com.centralcore.model.User;
+import com.centralcore.util.RememberMeStorage;
 import com.centralcore.util.SceneManager;
+import com.centralcore.util.SessionManager;
 import com.centralcore.util.TranslationManager;
 
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -22,6 +27,9 @@ public class WelcomeController implements Initializable, TranslationManager.Lang
     @FXML private Label lblTaglineSubtitle;
     @FXML private ImageView imgCity;
 
+    //si hay credenciales guardadas el boton entra en modo "continuar sesion"
+    private boolean hasSession = false;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         TranslationManager.addLanguageChangeListener(this);
@@ -31,27 +39,27 @@ public class WelcomeController implements Initializable, TranslationManager.Lang
         cmbLanguage.setOnAction(e -> onLanguageComboChanged());
 
         loadCityImage();
+
+        //detectar si hay sesion guardada para cambiar el texto del boton, sin autologin automatico
+        hasSession = RememberMeStorage.hasCredentials();
         updateLabels();
     }
 
     private void loadCityImage() {
         try {
             URL imageUrl = getClass().getResource("/com/centralcore/image/city.png");
-            if (imageUrl != null) {
-                //cargar sin esperar el tamaño completo, el binding lo ajusta
-                imgCity.setImage(new Image(imageUrl.toExternalForm(), true));
+            if (imageUrl == null) return;
 
-                //vincular al scene una vez disponible: scene siempre refleja el tamaño real de la ventana
-                //usar la escena en vez del parent evita que la imagen empuje el layout
-                imgCity.sceneProperty().addListener((obs, oldScene, newScene) -> {
-                    if (newScene != null) {
-                        imgCity.fitWidthProperty().bind(newScene.widthProperty());
-                        imgCity.fitHeightProperty().bind(newScene.heightProperty());
-                    }
-                });
-            } else {
-                System.err.println("imagen city.png no encontrada");
-            }
+            //cargar sin esperar el tamaño completo, el binding lo ajusta
+            imgCity.setImage(new Image(imageUrl.toExternalForm(), true));
+
+            //vincular al scene una vez disponible
+            imgCity.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    imgCity.fitWidthProperty().bind(newScene.widthProperty());
+                    imgCity.fitHeightProperty().bind(newScene.heightProperty());
+                }
+            });
         } catch (Exception e) {
             System.err.println("error al cargar city.png: " + e.getMessage());
         }
@@ -73,13 +81,64 @@ public class WelcomeController implements Initializable, TranslationManager.Lang
     }
 
     private void updateLabels() {
-        btnLogin.setText(TranslationManager.get("btn.login"));
+        //si hay sesion guardada mostrar "continuar sesion", si no el login normal
+        String btnKey = hasSession ? "welcome.continue" : "btn.login";
+        btnLogin.setText(TranslationManager.get(btnKey));
         lblTaglineTitle.setText(TranslationManager.get("welcome.title"));
         lblTaglineSubtitle.setText(TranslationManager.get("welcome.subtitle"));
     }
 
     @FXML
     private void onLoginClicked() {
-        SceneManager.showLogin();
+        if (hasSession) {
+            //verificar credenciales en segundo plano cuando el usuario pulsa el boton
+            runSessionAuth();
+        } else {
+            SceneManager.showLogin();
+        }
+    }
+
+    //autentica en segundo plano con las credenciales guardadas tras pulsar el boton
+    private void runSessionAuth() {
+        String[] creds = RememberMeStorage.load();
+        if (creds == null) {
+            //las credenciales desaparecieron entre el check y el click
+            hasSession = false;
+            updateLabels();
+            return;
+        }
+
+        btnLogin.setText(TranslationManager.get("welcome.loading"));
+        btnLogin.setDisable(true);
+
+        Task<User> authTask = new Task<>() {
+            @Override
+            protected User call() {
+                //bcrypt es lento intencionadamente, nunca llamar desde el hilo de la ui
+                return new UserDAO().authenticate(creds[0], creds[1]);
+            }
+        };
+
+        authTask.setOnSucceeded(ev -> {
+            User user = authTask.getValue();
+            if (user != null) {
+                SessionManager.setCurrentUser(user);
+                SceneManager.showMainShell();
+            } else {
+                //credenciales caducadas o cambiadas, limpiar y dejar al usuario hacer login manual
+                RememberMeStorage.clear();
+                hasSession = false;
+                btnLogin.setDisable(false);
+                updateLabels();
+            }
+        });
+
+        authTask.setOnFailed(ev -> {
+            System.err.println("error verificando sesion guardada: " + authTask.getException().getMessage());
+            btnLogin.setDisable(false);
+            updateLabels();
+        });
+
+        new Thread(authTask, "session-auth-thread").start();
     }
 }

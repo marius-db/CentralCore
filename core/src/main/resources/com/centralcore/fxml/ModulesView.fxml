@@ -14,7 +14,7 @@
 
     <!--cabecera-->
     <HBox spacing="10" style="-fx-alignment: center-left;">
-        <Label text="Modules" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
+        <Label fx:id="lblHeader" text="Modules" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #ecf0f1;"/>
     </HBox>
 
     <!--grilla de tiles-->

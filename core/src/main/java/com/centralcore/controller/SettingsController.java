@@ -37,6 +37,10 @@ public class SettingsController implements Initializable, TranslationManager.Lan
     @FXML private Button btnDeleteDb;
 
     @FXML private Label lblAbout;
+    @FXML private Label lblDeleteDbTitle;
+    @FXML private Label lblAboutApp;
+    @FXML private Label lblAboutDesc;
+    @FXML private Label lblAboutCopy;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -80,6 +84,10 @@ public class SettingsController implements Initializable, TranslationManager.Lan
         lblDeleteDbDesc.setText(TranslationManager.get("settings.deleteDbDesc"));
         btnDeleteDb.setText(TranslationManager.get("settings.deleteDb"));
         lblAbout.setText(TranslationManager.get("settings.about"));
+        if (lblDeleteDbTitle != null) lblDeleteDbTitle.setText(TranslationManager.get("settings.deleteDb"));
+        if (lblAboutApp     != null) lblAboutApp.setText(TranslationManager.get("settings.about.app"));
+        if (lblAboutDesc    != null) lblAboutDesc.setText(TranslationManager.get("settings.about.desc"));
+        if (lblAboutCopy    != null) lblAboutCopy.setText(TranslationManager.get("settings.about.copy"));
     }
 
     //solo comprueba si la conexion activa responde, no intenta reabrir
