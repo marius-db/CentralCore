@@ -7,6 +7,7 @@ import java.util.ResourceBundle;
 import com.centralcore.modules.Module;
 import com.centralcore.modules.ModuleManager;
 import com.centralcore.util.SceneManager;
+import com.centralcore.util.TranslationManager;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -20,12 +21,20 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-public class ModulesViewController implements Initializable {
+public class ModulesViewController implements Initializable, TranslationManager.LanguageChangeListener {
 
     @FXML private TilePane tilePane;
+    @FXML private javafx.scene.control.Label lblHeader;
 
     @Override public void initialize(URL url, ResourceBundle rb) {
+        TranslationManager.addLanguageChangeListener(this);
+        if (lblHeader != null) lblHeader.setText(TranslationManager.get("nav.modules"));
         setupTiles();
+    }
+
+    @Override
+    public void onLanguageChanged(String newLanguageCode) {
+        if (lblHeader != null) lblHeader.setText(TranslationManager.get("nav.modules"));
     }
 
     private void setupTiles() {

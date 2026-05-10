@@ -100,3 +100,20 @@
             8
     );
 }
+/*checkbox de recuerdame en el login*/
+
+.login-remember-check {
+    -fx-text-fill: -cc-text-secondary;
+    -fx-font-size: 12px;
+}
+
+.login-remember-check .box {
+    -fx-background-color: -cc-bg-mid;
+    -fx-border-color: -cc-border;
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+}
+
+.login-remember-check:selected .mark {
+    -fx-background-color: -cc-blue;
+}

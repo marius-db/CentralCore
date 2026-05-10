@@ -7,11 +7,15 @@ import com.centralcore.dao.UserDAO;
 import com.centralcore.model.User;
 import com.centralcore.util.SceneManager;
 import com.centralcore.util.SessionManager;
+import com.centralcore.util.RememberMeStorage;
 import com.centralcore.util.TranslationManager;
 
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -38,6 +42,7 @@ public class LoginController implements Initializable, TranslationManager.Langua
     @FXML private Button btnBack;
     @FXML private ComboBox<String> cmbLanguage;
     @FXML private StackPane loginRoot;
+    @FXML private CheckBox chkRememberMe;
 
     //false = modo login, true = modo registro
     private boolean isRegisterMode = false;
@@ -52,6 +57,7 @@ public class LoginController implements Initializable, TranslationManager.Langua
 
         loadBackground();
         updateLabels();
+        tryLoadRememberedCredentials();
     }
 
     private void loadBackground() {
@@ -63,13 +69,9 @@ public class LoginController implements Initializable, TranslationManager.Langua
             bg.setPreserveRatio(false);
             bg.setEffect(new GaussianBlur(20));
 
-            //vincular al tamaño de la escena igual que en el welcome
-            bg.sceneProperty().addListener((obs, oldScene, newScene) -> {
-                if (newScene != null) {
-                    bg.fitWidthProperty().bind(newScene.widthProperty());
-                    bg.fitHeightProperty().bind(newScene.heightProperty());
-                }
-            });
+            //vincular al loginRoot, no a la escena - el blur no debe llegar a la barra de titulo
+            bg.fitWidthProperty().bind(loginRoot.widthProperty());
+            bg.fitHeightProperty().bind(loginRoot.heightProperty());
 
             //insertar como primera capa, por debajo de todo el contenido existente
             loginRoot.getChildren().add(0, bg);
@@ -113,6 +115,30 @@ public class LoginController implements Initializable, TranslationManager.Langua
             btnLogin.setText(TranslationManager.get("btn.login"));
             lblSwitchLink.setText(TranslationManager.get("login.switchToRegister"));
         }
+        //checkbox solo en modo login
+        if (chkRememberMe != null) {
+            chkRememberMe.setVisible(!isRegisterMode);
+            chkRememberMe.setManaged(!isRegisterMode);
+            chkRememberMe.setText(TranslationManager.get("login.rememberMe"));
+        }
+    }
+
+
+
+    //si habia credenciales guardadas las rellena automaticamente
+    private void tryLoadRememberedCredentials() {
+        String[] creds = RememberMeStorage.load();
+        if (creds != null) {
+            txtEmail.setText(creds[0]);
+            txtPassword.setText(creds[1]);
+            chkRememberMe.setSelected(true);
+        }
+    }
+
+    //valida que el email tenga formato basico con @
+    private boolean isValidEmail(String email) {
+        return email.contains("@") && email.indexOf("@") > 0
+                && email.lastIndexOf(".") > email.indexOf("@") + 1;
     }
 
     //alterna entre modo login y modo registro
@@ -154,18 +180,51 @@ public class LoginController implements Initializable, TranslationManager.Langua
             return;
         }
 
-        UserDAO userDAO = new UserDAO();
-        User user = userDAO.authenticate(email, password);
-
-        if (user != null) {
-            //login exitoso - persiste sesion y navega al shell
-            SessionManager.setCurrentUser(user);
-            hideError();
-            SceneManager.showMainShell();
-        } else {
-            showError(TranslationManager.get("login.error.invalidCredentials"));
-            txtPassword.clear();
+        if (!isValidEmail(email)) {
+            showError(TranslationManager.get("login.error.invalidEmail"));
+            return;
         }
+
+        //deshabilitar el boton durante la autenticacion para evitar doble envio
+        btnLogin.setDisable(true);
+        btnLogin.setText("...");
+
+        //bcrypt es lento, moverlo a un hilo de fondo para no congelar la ui
+        Task<User> authTask = new Task<>() {
+            @Override
+            protected User call() {
+                return new UserDAO().authenticate(email, password);
+            }
+        };
+
+        authTask.setOnSucceeded(ev -> {
+            User user = authTask.getValue();
+            btnLogin.setDisable(false);
+            updateLabels();
+            if (user != null) {
+                //persistir o limpiar credenciales segun el checkbox
+                if (chkRememberMe != null && chkRememberMe.isSelected()) {
+                    RememberMeStorage.save(email, password);
+                } else {
+                    RememberMeStorage.clear();
+                }
+                SessionManager.setCurrentUser(user);
+                hideError();
+                SceneManager.showMainShell();
+            } else {
+                showError(TranslationManager.get("login.error.invalidCredentials"));
+                txtPassword.clear();
+            }
+        });
+
+        authTask.setOnFailed(ev -> {
+            btnLogin.setDisable(false);
+            updateLabels();
+            showError(TranslationManager.get("login.error.invalidCredentials"));
+            System.err.println("error en autenticacion: " + authTask.getException().getMessage());
+        });
+
+        new Thread(authTask, "login-auth-thread").start();
     }
 
     private void handleRegister() {
@@ -176,6 +235,11 @@ public class LoginController implements Initializable, TranslationManager.Langua
 
         if (username.isEmpty() || email.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
             showError(TranslationManager.get("login.error.emptyFields"));
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            showError(TranslationManager.get("login.error.invalidEmail"));
             return;
         }
 

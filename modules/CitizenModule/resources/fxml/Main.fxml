@@ -3,15 +3,16 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<HBox xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.centralcore.modules.citizenmodule.CitizenModuleController"
-      styleClass="cm-root"
-      stylesheets="@../css/Citizen.css"
-      VBox.vgrow="ALWAYS">
+<SplitPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:id="citizenSplitPane"
+           fx:controller="com.centralcore.modules.citizenmodule.CitizenModuleController"
+           styleClass="split-pane cm-root"
+           stylesheets="@../css/Citizen.css"
+           VBox.vgrow="ALWAYS">
 
     <!--panel izquierdo: lista de ciudadanos-->
-    <VBox styleClass="cm-list-panel" minWidth="340" maxWidth="340">
+    <VBox styleClass="cm-list-panel" minWidth="220">
 
         <HBox styleClass="cm-list-header" alignment="CENTER_LEFT" spacing="8">
             <TextField fx:id="searchField" styleClass="cm-search"
@@ -34,10 +35,8 @@
 
     </VBox>
 
-    <Separator orientation="VERTICAL" styleClass="cm-divider"/>
-
     <!--panel derecho-->
-    <StackPane fx:id="rightPanel" HBox.hgrow="ALWAYS">
+    <StackPane fx:id="rightPanel">
 
         <!--estado vacio-->
         <VBox fx:id="emptyState" styleClass="cm-empty-state" alignment="CENTER" spacing="12">
@@ -149,10 +148,12 @@
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label text="DNI / NIE *" styleClass="field-label"/>
                             <TextField fx:id="editDni" styleClass="field-input" promptText="12345678A"/>
+                            <Label fx:id="errDni" styleClass="cm-field-error" visible="false" managed="false"
+                                   text="Campo obligatorio"/>
                         </VBox>
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label text="Sexo" styleClass="field-label"/>
-                            <ComboBox fx:id="editGender" styleClass="cm-combo" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                            <ComboBox fx:id="editGender" styleClass="cm-combo cm-combo-gender"/>
                         </VBox>
                     </HBox>
 
@@ -160,11 +161,15 @@
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label text="Nombre *" styleClass="field-label"/>
                             <TextField fx:id="editFirstName" styleClass="field-input" promptText="Nombre"/>
+                            <Label fx:id="errFirstName" styleClass="cm-field-error" visible="false" managed="false"
+                                   text="Campo obligatorio"/>
                         </VBox>
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label text="Apellidos *" styleClass="field-label"/>
                             <TextField fx:id="editLastName" styleClass="field-input"
                                        promptText="Primer apellido Segundo apellido"/>
+                            <Label fx:id="errLastName" styleClass="cm-field-error" visible="false" managed="false"
+                                   text="Campo obligatorio"/>
                         </VBox>
                     </HBox>
 
@@ -172,6 +177,8 @@
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label text="Fecha de nacimiento *" styleClass="field-label"/>
                             <DatePicker fx:id="editBirthDate" styleClass="cm-datepicker" maxWidth="Infinity"/>
+                            <Label fx:id="errBirthDate" styleClass="cm-field-error" visible="false" managed="false"
+                                   text="Formato: DD/MM/AAAA"/>
                         </VBox>
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label text="Lugar de nacimiento" styleClass="field-label"/>
@@ -186,8 +193,7 @@
                         </VBox>
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label text="Estado civil" styleClass="field-label"/>
-                            <ComboBox fx:id="editMaritalStatus" styleClass="cm-combo" maxWidth="Infinity"
-                                      HBox.hgrow="ALWAYS"/>
+                            <ComboBox fx:id="editMaritalStatus" styleClass="cm-combo cm-combo-status"/>
                         </VBox>
                     </HBox>
                 </VBox>
@@ -215,10 +221,14 @@
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label text="Teléfono" styleClass="field-label"/>
                             <TextField fx:id="editPhone" styleClass="field-input" promptText="600 000 000"/>
+                            <Label fx:id="errPhone" styleClass="cm-field-error" visible="false" managed="false"
+                                   text="Solo números y + permitidos"/>
                         </VBox>
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label text="Email" styleClass="field-label"/>
                             <TextField fx:id="editEmail" styleClass="field-input" promptText="correo@ejemplo.com"/>
+                            <Label fx:id="errEmail" styleClass="cm-field-error" visible="false" managed="false"
+                                   text="Formato: correo@dominio.com"/>
                         </VBox>
                     </HBox>
                 </VBox>
@@ -237,4 +247,4 @@
 
     </StackPane>
 
-</HBox>
+</SplitPane>

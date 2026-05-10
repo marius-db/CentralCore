@@ -138,7 +138,7 @@
 
 /*combobox (estado cerrado - valor seleccionado) */
 .combo-box .list-cell {
-    -fx-text-fill: white;
+    -fx-text-fill: -cc-text-primary;
 }
 
 /*elementos del desplegable del combobox */

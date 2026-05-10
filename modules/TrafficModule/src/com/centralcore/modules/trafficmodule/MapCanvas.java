@@ -255,9 +255,9 @@ public class MapCanvas extends Canvas {
         return new double[]{(cx - offsetX) / scale, (cy - offsetY) / scale};
     }
 
-    //hit testing
+    //prueba de choque
 
-    //siempre devuelve el nodo mas cercano, sin umbral — para snapping de puntos A/B
+    //siempre devuelve el nodo mas cercano, sin umbral, para snapping de puntos A/B
     public TrafficNode findNearestNode(double sx, double sy) {
         if (simState == null) return null;
         TrafficNode best = null;
@@ -409,7 +409,7 @@ public class MapCanvas extends Canvas {
         });
     }
 
-    //puntos A/B siempre snapean al nodo mas cercano — sin colocacion libre
+    //puntos A/B siempre snapean al nodo mas cercano, sin colocacion libre
     private void placePoint(double sx, double sy, boolean isA) {
         TrafficNode n = findNearestNode(sx, sy);
         if (n == null) return;
@@ -565,7 +565,7 @@ public class MapCanvas extends Canvas {
         double mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
         double ang = Math.toDegrees(Math.atan2(dy, dx));
         if (ang > 90 || ang < -90) ang += 180;
-        //save/restore necesario solo para el rotate del texto — no se puede evitar aqui,
+        //save/restore necesario solo para el rotate del texto, no se puede evitar aqui,
         //pero solo se ejecuta cuando scale >= 0.5 y el nombre no fue dibujado ya
         gc.save();
         gc.translate(mx, my);

@@ -1,6 +1,7 @@
 package com.centralcore.modules.trafficmodule;
 
 import com.centralcore.modules.trafficmodule.model.*;
+import com.centralcore.util.PreferencesStorage;
 import com.google.gson.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -20,7 +21,7 @@ import java.util.Set;
 
 public class TrafficModuleController {
 
-    //region fxml
+    //región fxml
     @FXML private SplitPane splitPane;
     @FXML private StackPane mapPane;
     @FXML private VBox sidePanel;
@@ -29,13 +30,13 @@ public class TrafficModuleController {
     @FXML private Button btnConectar;
     @FXML private TextField fieldWsUrl;
 
-    //tab semaforos
+    //pestaña semaforos
     @FXML private ListView<TrafficLight> listSemaforos;
 
-    //tab trafico
+    //pestaña trafico
     @FXML private ListView<TrafficEdge> listTrafico;
 
-    //tab emergencia
+    //pestaña emergencia
     @FXML private Label lblPuntoA;
     @FXML private Label lblPuntoB;
     @FXML private Button btnEnviarRuta;
@@ -44,7 +45,7 @@ public class TrafficModuleController {
     @FXML private Button btnMarcarA;
     @FXML private Button btnMarcarB;
 
-    //tab incidentes
+    //pestaña incidentes
     @FXML private Button btnMarcarMapa;
     @FXML private ListView<Incident> listIncidentes;
     @FXML private Button btnActualizarInc;
@@ -52,7 +53,7 @@ public class TrafficModuleController {
     @FXML private TextField fieldNotaUpdate;
     @FXML private ComboBox<String> comboEstadoUpdate;
 
-    //tab historial
+    //pestaña historial
     @FXML private ListView<Incident> listHistorial;
     @FXML private ListView<IncidentUpdate> listUpdates;
 
@@ -81,7 +82,7 @@ public class TrafficModuleController {
     private int stateTick = 0;
     private static final int LIST_REFRESH_INTERVAL = 5;
 
-    //menu de contexto activo — solo puede existir uno a la vez
+    //menu de contexto activo , solo puede existir uno a la vez
     private ContextMenu activeContextMenu = null;
 
     @FXML
@@ -97,7 +98,7 @@ public class TrafficModuleController {
         refreshIncidents();
     }
 
-    //region setup
+    //región setup
     private void setupMapCanvas() {
         mapCanvas = new MapCanvas();
         mapCanvas.widthProperty().bind(mapPane.widthProperty());
@@ -204,32 +205,52 @@ public class TrafficModuleController {
     }
 
     private void setupSplitPane() {
-        final double[] dividerPos = {0.70};
-        //flag para ignorar cambios de ancho causados por maximize/restore
-        //sin esto el divider se resetea cada vez que se redimensiona la ventana
-        final boolean[] ignoreNext = {false};
+        //cargar posicion guardada, por defecto 2/3 mapa y 1/3 panel lateral
+        final double savedPos = PreferencesStorage.getDouble("traffic.splitpane.divider", 0.67);
+        final double[] dividerPos = {savedPos};
+        //bandera para suprimir guardado mientras se restaura la posicion
+        final boolean[] settling = {true};
 
+        //la forma más fiable de forzar la posicion es esperar al primer layout real del splitpane
+        //layoutBoundsProperty cambia cuando el nodo tiene tamano asignado
+        splitPane.layoutBoundsProperty().addListener(new javafx.beans.value.ChangeListener<javafx.geometry.Bounds>() {
+            @Override
+            public void changed(javafx.beans.value.ObservableValue<? extends javafx.geometry.Bounds> obs,
+                                javafx.geometry.Bounds oldB, javafx.geometry.Bounds newB) {
+                if (newB.getWidth() > 0) {
+                    splitPane.layoutBoundsProperty().removeListener(this);
+                    //dos runLater para dejar que javafx termine el primer layout completo
+                    Platform.runLater(() -> Platform.runLater(() -> {
+                        splitPane.setDividerPositions(dividerPos[0]);
+                        settling[0] = false;
+                    }));
+                }
+            }
+        });
+
+        //cuando se maximiza o restaura, replicar la posicion guardada sin guardar el cambio
         splitPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene == null) return;
             newScene.windowProperty().addListener((o2, oldWin, win) -> {
                 if (win == null) return;
                 javafx.stage.Stage stage = (javafx.stage.Stage) win;
-                //cuando cambia maximized restauramos el divider despues de que el layout se asiente
                 stage.maximizedProperty().addListener((o3, wasMax, isMax) -> {
-                    ignoreNext[0] = true;
+                    boolean prev = settling[0];
+                    settling[0] = true;
                     Platform.runLater(() -> {
                         splitPane.setDividerPositions(dividerPos[0]);
-                        ignoreNext[0] = false;
+                        settling[0] = prev;
                     });
-                });
-                win.showingProperty().addListener((o3, wasShowing, showing) -> {
-                    if (showing) Platform.runLater(() -> splitPane.setDividerPositions(dividerPos[0]));
                 });
             });
         });
 
+        //guardar posicion solo cuando el usuario mueve el divider, no durante el layout
         splitPane.getDividers().get(0).positionProperty().addListener((obs, oldPos, newPos) -> {
-            if (!ignoreNext[0]) dividerPos[0] = newPos.doubleValue();
+            if (!settling[0]) {
+                dividerPos[0] = newPos.doubleValue();
+                PreferencesStorage.putDouble("traffic.splitpane.divider", dividerPos[0]);
+            }
         });
     }
 
@@ -239,7 +260,7 @@ public class TrafficModuleController {
             private final Circle dot = new Circle(5);
             private final Label lblId = new Label();
             private final Label lblDir = new Label();
-            private final Button btnOvr = new Button("Override");
+            private final Button btnOvr = new Button("Sobreescribir");
             private final HBox row = new HBox(8, dot, lblId, lblDir, new Pane(), btnOvr);
             //dropshadow creado una sola vez y reutilizado; solo se muta el color
             private final javafx.scene.effect.DropShadow shadow = new javafx.scene.effect.DropShadow(6, Color.RED);
@@ -335,7 +356,7 @@ public class TrafficModuleController {
                 String closed = i.getClosedAt() != null
                         ? i.getClosedAt().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM HH:mm"))
                         : "—";
-                setText("[" + closed + "] " + i.getTipo() + " — " + i.getDescripcion());
+                setText("[" + closed + "] " + i.getTipo() + " - " + i.getDescripcion());
             }
         });
     }
@@ -411,14 +432,14 @@ public class TrafficModuleController {
     }
 
     private void setupIncidentActions() {
-        //al pulsar "Marcar en mapa" abre el dialogo de creacion para rellenar datos
+        //al pulsar "Marcar en mapa" abre el diálogo de creacion para rellenar datos
         //y luego activa el modo de colocacion en el canvas
         btnMarcarMapa.setOnAction(e -> {
             if (mapCanvas.isPlacingIncident()) {
                 mapCanvas.setPlacingIncident(false);
                 btnMarcarMapa.setText("Marcar en mapa");
             } else {
-                //muestra el dialogo — si el usuario confirma, activa el modo de colocacion
+                //muestra el dialogo, si el usuario confirma, activa el modo de colocacion
                 boolean confirmed = showIncidentFormDialog();
                 if (confirmed) {
                     mapCanvas.setPlacingIncident(true);
@@ -462,7 +483,7 @@ public class TrafficModuleController {
         });
     }
 
-    //region conexion
+    //región conexion
     @FXML
     private void onToggleConexion() {
         if (connected) {
@@ -482,7 +503,7 @@ public class TrafficModuleController {
         btnConectar.setDisable(false);
     }
 
-    //region emergencia
+    //región emergencia
     @FXML
     private void onEnviarRuta() {
         double ax = mapCanvas.getPointAX(), ay = mapCanvas.getPointAY();
@@ -578,14 +599,14 @@ public class TrafficModuleController {
         return nsA == nsB;
     }
 
-    //region incidentes
+    //región incidentes
 
-    //datos del incidente pendiente de colocacion — rellenados por el dialogo
+    //datos del incidente pendiente de colocacion, rellenados por el diálogo
     private String pendingTipo = null;
     private String pendingDesc = null;
     private String pendingEstado = null;
 
-    //muestra el dialogo de creacion de incidente y guarda los datos en pendingXxx
+    //muestra el diálogo de creacion de incidente y guarda los datos en pendingXxx
     //devuelve true si el usuario confirmo, false si cancelo
     private boolean showIncidentFormDialog() {
         Dialog<ButtonType> dlg = new Dialog<>();
@@ -642,8 +663,8 @@ public class TrafficModuleController {
         return true;
     }
 
-    //abre el dialogo de incidente y lo crea directamente en las coordenadas dadas
-    //usado desde el menu de contexto del mapa (clic derecho -> añadir incidente aqui)
+    //abre el diálogo de incidente y lo crea directamente en las coordenadas dadas
+    //usado desde el menu de contexto del mapa (clic derecho -> añadir incidente aquí)
     private void showIncidentDialog(double simX, double simY) {
         boolean confirmed = showIncidentFormDialog();
         if (confirmed) createIncidentAt(simX, simY);
@@ -675,7 +696,7 @@ public class TrafficModuleController {
         mapCanvas.setIncidents(activos);
     }
 
-    //region parsing json
+    //región parsing json
     private void parseMap(String json) {
         try {
             JsonObject root = gson.fromJson(json, JsonObject.class);
@@ -802,9 +823,9 @@ public class TrafficModuleController {
         }
     }
 
-    //region listas
+    //región listas
     private void updateLightList() {
-        //conservar seleccion antes del setAll — el replace de items dispara selectedItemProperty
+        //conservar seleccion antes del setAll , el replace de items dispara selectedItemProperty
         //con null brevemente, lo que llamaria a mapCanvas.setSelectedLight(null) y mataría el highlight
         TrafficLight sel = listSemaforos.getSelectionModel().getSelectedItem();
         lightItems.setAll(simState.getLights());
@@ -823,7 +844,7 @@ public class TrafficModuleController {
         edgeItems.setAll(simState.getEdges());
     }
 
-    //region helpers ui
+    //región helpers ui
     private Color lightStateColor(String state) {
         if (state == null) return Color.web("#ef4444");
         return switch (state) {
@@ -855,7 +876,7 @@ public class TrafficModuleController {
 
     private void showOverrideDialog(TrafficLight light) {
         Dialog<ButtonType> dlg = new Dialog<>();
-        dlg.setTitle("Override de semaforo — " + light.getId()
+        dlg.setTitle("Sobreescribir semaforo: " + light.getId()
                 + " (" + dirDisplayName(light.getDir()) + ")");
         dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
