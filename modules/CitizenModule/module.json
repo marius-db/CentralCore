@@ -1,7 +1,7 @@
 {
   "id": "citizen_module",
   "name": "Base de Datos Ciudadana",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Gestionar los registros y perfiles de los ciudadanos de la ciudad.",
   "logoPath": "images/logo.png",
   "mainClass": "com.centralcore.modules.citizenmodule.CitizenModule",

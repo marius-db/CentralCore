@@ -1,6 +1,5 @@
 package com.centralcore.controller;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -94,16 +93,20 @@ public class ModulesViewController implements Initializable, TranslationManager.
         return tile;
     }
 
-    //carga la imagen del módulo o devuelve un rectangulo de fallback
+    //carga la imagen del modulo o devuelve un rectangulo de fallback
     static javafx.scene.Node buildLogoNode(Module module, double width, double height) {
         try {
-            File logoFile = resolveLogoFile(module);
-            if (logoFile != null && logoFile.exists()) {
-                ImageView iv = new ImageView(new Image(logoFile.toURI().toString()));
-                iv.setFitWidth(width);
-                iv.setFitHeight(height);
-                iv.setPreserveRatio(true);
-                return iv;
+            //intenta cargar el logo desde el classloader del modulo (funciona tanto en JAR como en desarrollo)
+            String logoPath = module.getLogoPath();
+            if (logoPath != null && !logoPath.isBlank()) {
+                URL resource = module.getClass().getResource("/" + logoPath);
+                if (resource != null) {
+                    ImageView iv = new ImageView(new Image(resource.toExternalForm()));
+                    iv.setFitWidth(width);
+                    iv.setFitHeight(height);
+                    iv.setPreserveRatio(true);
+                    return iv;
+                }
             }
         } catch (Exception e) {
             System.err.println("error al cargar logo de " + module.getName() + ": " + e.getMessage());
@@ -115,21 +118,6 @@ public class ModulesViewController implements Initializable, TranslationManager.
         fallback.setArcWidth(8);
         fallback.setArcHeight(8);
         return fallback;
-    }
-
-    //resuelve la ruta del logo del modulo en disco
-    private static File resolveLogoFile(Module module) {
-        String logoPath = module.getLogoPath();
-        if (logoPath == null || logoPath.isBlank()) return null;
-
-        //el modulo ya esta en la carpeta modules/<NombreModulo>/resources/<logoPath>
-        //se busca via reflection en el classloader del modulo
-        try {
-            URL resource = module.getClass().getResource("/" + logoPath);
-            if (resource != null) return new File(resource.toURI());
-        } catch (Exception ignored) {}
-
-        return null;
     }
 
     private void openModule(Module module) {
