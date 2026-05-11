@@ -261,100 +261,6 @@
     -fx-padding: 0 0 4 0;
 }
 
-/* combo base - misma apariencia que field-input */
-/* combo base - misma apariencia que field-input */
-
-.cm-combo {
-    -fx-background-color: -cc-bg-mid;
-    -fx-border-color: -cc-border;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
-    -fx-border-width: 1px;
-    -fx-font-size: 13px;
-    -fx-padding: 2 0 2 0;
-}
-
-.cm-combo:focused {
-    -fx-border-color: -cc-blue;
-    -fx-background-color: -cc-bg-card;
-}
-
-/* celda cerrada: muestra el valor seleccionado */
-
-.cm-combo > .list-cell {
-    -fx-background-color: transparent;
-    -fx-text-fill: -cc-text-primary;
-    -fx-font-size: 13px;
-    -fx-padding: 7 10 7 10;
-}
-
-/* boton de flecha */
-
-.cm-combo .arrow-button {
-    -fx-background-color: transparent;
-    -fx-padding: 0 8 0 4;
-}
-
-.cm-combo .arrow-button .arrow {
-    -fx-background-color: -cc-text-secondary;
-    -fx-padding: 3.5 3 3.5 3;
-}
-
-.cm-combo:focused .arrow-button .arrow {
-    -fx-background-color: -cc-blue;
-}
-
-/*popup del combobox */
-/*importante: el popup vive fuera del nodo .cm-combo */
-/*por eso los selectores tienen que ser globales */
-
-.combo-box-popup > .list-view {
-    -fx-background-color: -cc-bg-mid;
-    -fx-border-color: -cc-border;
-    -fx-border-width: 1px;
-    -fx-background-radius: 4px;
-    -fx-border-radius: 4px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 8, 0, 0, 3);
-}
-
-/*items del dropdown */
-
-.combo-box-popup .list-cell {
-    -fx-background-color: -cc-bg-mid;
-    -fx-text-fill: -cc-text-primary;
-    -fx-font-size: 13px;
-    -fx-padding: 7 10 7 10;
-}
-
-/*hover del item */
-
-.combo-box-popup .list-cell:hover {
-    -fx-background-color: -cc-bg-hover;
-}
-
-/*item seleccionado */
-
-.combo-box-popup .list-cell:selected {
-    -fx-background-color: -cc-blue;
-    -fx-text-fill: white;
-}
-
-/*genero: ancho fijo compacto (M, F, Otro son opciones cortas) */
-
-.cm-combo-gender {
-    -fx-pref-width: 110px;
-    -fx-min-width: 110px;
-    -fx-max-width: 110px;
-}
-
-/*estado civil: ancho fijo mediano */
-
-.cm-combo-status {
-    -fx-pref-width: 200px;
-    -fx-min-width: 200px;
-    -fx-max-width: 200px;
-}
-
 .cm-datepicker {
     -fx-background-color: -cc-bg-mid;
     -fx-border-color: -cc-border;
@@ -430,6 +336,7 @@
 .btn-ghost-danger:hover {
     -fx-background-color: derive(-cc-error, 70%);
 }
+
 /* divisor del splitpane del modulo ciudadano */
 /* hex directo porque las variables del modulo no siempre resuelven bien en nodos hijo */
 

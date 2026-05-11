@@ -7,7 +7,6 @@ import com.centralcore.util.TranslationManager;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.scene.Node;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -52,7 +51,6 @@ public class LicencesController implements Initializable, TranslationManager.Lan
         keyDialog.setContentText(TranslationManager.get("licences.add.prompt"));
         //aplicar tema antes y despues de mostrar para cubrir todos los nodos del scene graph
         applyDialogTheme(keyDialog.getDialogPane());
-        keyDialog.setOnShown(ev -> applyDialogTheme(keyDialog.getDialogPane()));
 
         String key = keyDialog.showAndWait().orElse(null);
         if (key == null || key.isBlank()) return;
@@ -61,7 +59,6 @@ public class LicencesController implements Initializable, TranslationManager.Lan
             Alert err = new Alert(Alert.AlertType.ERROR,
                     TranslationManager.get("licences.error.invalid"), ButtonType.OK);
             applyDialogTheme(err.getDialogPane());
-            err.setOnShown(ev -> applyDialogTheme(err.getDialogPane()));
             err.showAndWait();
             return;
         }
@@ -75,7 +72,6 @@ public class LicencesController implements Initializable, TranslationManager.Lan
             Alert err = new Alert(Alert.AlertType.ERROR,
                     TranslationManager.get("licences.error.emailMismatch"), ButtonType.OK);
             applyDialogTheme(err.getDialogPane());
-            err.setOnShown(ev -> applyDialogTheme(err.getDialogPane()));
             err.showAndWait();
             return;
         }
@@ -101,7 +97,6 @@ public class LicencesController implements Initializable, TranslationManager.Lan
                 ButtonType.YES, ButtonType.NO);
         confirm.setTitle(TranslationManager.get("licences.remove.title"));
         applyDialogTheme(confirm.getDialogPane());
-        confirm.setOnShown(ev -> applyDialogTheme(confirm.getDialogPane()));
 
         confirm.showAndWait().ifPresent(btn -> {
             if (btn == ButtonType.YES) {
@@ -148,83 +143,30 @@ public class LicencesController implements Initializable, TranslationManager.Lan
         updateLabels();
     }
 
-    //aplica el tema oscuro a un dialogo de javafx, cubriendo todos sus paneles y nodos hijos
+    //inyecta dialog.css en el scene del dialogo cuando ya esta montado
+    //los estilos inline se ignoran porque modena los sobreescribe con mayor especificidad;
+    //un stylesheet propio en el scene del dialogo gana correctamente
     private void applyDialogTheme(DialogPane pane) {
-        //fondo y texto del panel raiz
-        pane.setStyle(
-                "-fx-background-color: #2c3e50;" +
-                        "-fx-border-color: #3d5270;" +
-                        "-fx-border-width: 1;"
-        );
-
-        //cabecera del dialogo (area gris clara por defecto)
-        Node header = pane.lookup(".header-panel");
-        if (header != null) {
-            header.setStyle(
-                    "-fx-background-color: #34495e;" +
-                            "-fx-padding: 14 18 14 18;"
-            );
+        //esperar a que el dialogo tenga scene antes de inyectar el css
+        if (pane.getScene() != null) {
+            injectDialogCss(pane);
+        } else {
+            pane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) injectDialogCss(pane);
+            });
         }
+    }
 
-        //label del header
-        Node headerLabel = pane.lookup(".header-panel .label");
-        if (headerLabel != null) {
-            headerLabel.setStyle(
-                    "-fx-text-fill: #ecf0f1;" +
-                            "-fx-font-size: 14;" +
-                            "-fx-font-weight: bold;"
-            );
+    private void injectDialogCss(DialogPane pane) {
+        URL cssUrl = getClass().getResource("/com/centralcore/css/dialog.css");
+        if (cssUrl == null) {
+            System.err.println("dialog.css no encontrado");
+            return;
         }
-
-        //todos los labels del contenido
-        pane.lookupAll(".label").forEach(n -> {
-            if (!n.getStyleClass().contains("header-panel")) {
-                n.setStyle("-fx-text-fill: #ecf0f1; -fx-font-size: 12;");
-            }
-        });
-
-        //campo de texto del TextInputDialog
-        pane.lookupAll(".text-field").forEach(n ->
-                n.setStyle(
-                        "-fx-background-color: #1e2738;" +
-                                "-fx-text-fill: #ecf0f1;" +
-                                "-fx-prompt-text-fill: #7f8c8d;" +
-                                "-fx-border-color: #4a6080;" +
-                                "-fx-border-width: 1;" +
-                                "-fx-border-radius: 4;" +
-                                "-fx-background-radius: 4;" +
-                                "-fx-padding: 6 10;" +
-                                "-fx-font-size: 12;"
-                )
-        );
-
-        //barra de botones
-        Node btnBar = pane.lookup(".button-bar");
-        if (btnBar != null) {
-            btnBar.setStyle("-fx-background-color: #2c3e50; -fx-padding: 10 14;");
+        String cssStr = cssUrl.toExternalForm();
+        if (!pane.getScene().getStylesheets().contains(cssStr)) {
+            pane.getScene().getStylesheets().add(cssStr);
         }
-
-        //botones del dialogo
-        pane.lookupAll(".button").forEach(n ->
-                n.setStyle(
-                        "-fx-background-color: #34495e;" +
-                                "-fx-text-fill: #ecf0f1;" +
-                                "-fx-border-color: #4a6080;" +
-                                "-fx-border-width: 1;" +
-                                "-fx-border-radius: 4;" +
-                                "-fx-background-radius: 4;" +
-                                "-fx-padding: 6 14;" +
-                                "-fx-font-size: 12;" +
-                                "-fx-cursor: hand;"
-                )
-        );
-
-        //area de contenido (scroll pane interior)
-        Node content = pane.lookup(".content");
-        if (content != null) {
-            content.setStyle("-fx-background-color: #2c3e50; -fx-padding: 14 18;");
-        }
-
     }
 
     //celda personalizada que imita el estilo de instalaciones
