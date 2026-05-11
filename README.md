@@ -42,13 +42,6 @@ From the project root, run:
 ```bash
 ./gradlew :core:run
 ```
-
-On Windows use `gradlew.bat` instead of `./gradlew`:
-
-```bat
-gradlew.bat :core:run
-```
-
 The first run will take a moment while Gradle downloads dependencies. After that it starts quickly.
 
 On first launch the app automatically creates the H2 database and initializes all tables. You can log in immediately with the default admin account:
