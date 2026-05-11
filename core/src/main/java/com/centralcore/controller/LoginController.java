@@ -73,6 +73,12 @@ public class LoginController implements Initializable, TranslationManager.Langua
             bg.fitWidthProperty().bind(loginRoot.widthProperty());
             bg.fitHeightProperty().bind(loginRoot.heightProperty());
 
+            //clip para que el imageview no desborde los limites del loginRoot y tape la barra de titulo
+            javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle();
+            clip.widthProperty().bind(loginRoot.widthProperty());
+            clip.heightProperty().bind(loginRoot.heightProperty());
+            bg.setClip(clip);
+
             //insertar como primera capa, por debajo de todo el contenido existente
             loginRoot.getChildren().add(0, bg);
 
