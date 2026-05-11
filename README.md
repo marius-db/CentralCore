@@ -12,9 +12,9 @@ Two modules are included out of the box: a citizen records database and a traffi
 
 Before anything, make sure you have the following installed:
 
-- **Java 21 JDK** — the app targets Java 21. Any JDK 21 distribution works (Eclipse Temurin, Oracle, Amazon Corretto, etc.). Make sure `java` and `javac` are on your PATH.
-- **Git** — to clone the repository.
-- **IntelliJ IDEA** (recommended) — the project is set up as a Gradle project and IntelliJ handles everything automatically. Community Edition is free and works fine.
+- **Java 21 JDK**: the app targets Java 21. Any JDK 21 distribution works (Eclipse Temurin, Oracle, Amazon Corretto, etc.). Make sure `java` and `javac` are on your PATH.
+- **Git**: to clone the repository.
+- **IntelliJ IDEA** (recommended): the project is set up as a Gradle project and IntelliJ handles everything automatically. Community Edition is free and works fine.
 
 You do **not** need to install Gradle separately. The project includes a Gradle wrapper (`gradlew`) that downloads the right version automatically on first use.
 
