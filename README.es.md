@@ -12,9 +12,9 @@ Se incluyen dos módulos de serie: una base de datos de registros ciudadanos y u
 
 Antes de nada, asegúrate de tener lo siguiente instalado:
 
-- **Java 21 JDK** — la aplicación está compilada para Java 21. Vale cualquier distribución de JDK 21 (Eclipse Temurin, Oracle, Amazon Corretto, etc.). Asegúrate de que `java` y `javac` están en el PATH.
-- **Git** — para clonar el repositorio.
-- **IntelliJ IDEA** (recomendado) — el proyecto está configurado como proyecto Gradle e IntelliJ lo importa todo automáticamente. La edición Community es gratuita y funciona perfectamente.
+- **Java 21 JDK**:  la aplicación está compilada para Java 21. Vale cualquier distribución de JDK 21 (Eclipse Temurin, Oracle, Amazon Corretto, etc.). Asegúrate de que `java` y `javac` están en el PATH.
+- **Git**: para clonar el repositorio.
+- **IntelliJ IDEA** (recomendado): el proyecto está configurado como proyecto Gradle e IntelliJ lo importa todo automáticamente. La edición Community es gratuita y funciona perfectamente.
 
 No necesitas instalar Gradle por separado. El proyecto incluye un wrapper de Gradle (`gradlew`) que descarga la versión correcta automáticamente la primera vez.
 
