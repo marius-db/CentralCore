@@ -28,20 +28,37 @@ public class TrafficModule implements Module {
     }
 
     private void loadConfig() {
-        try {
-            File configFile = new File(moduleDir, "module.json");
-            config = new Gson().fromJson(new FileReader(configFile), ModuleConfig.class);
-        } catch (Exception e) {
-            System.err.println("error al leer module.json de TrafficModule: " + e.getMessage());
-            //fallback por si el archivo no se puede leer
-            config = new ModuleConfig();
-            config.id          = "traffic_module";
-            config.name        = "Gestión del tráfico";
-            config.version     = "0.1.0";
-            config.description = "Seguimiento de vehículos e incidentes de tráfico en la ciudad";
-            config.logoPath    = "images/logo.png";
-            config.author      = "CentralCore Team";
+        File configFile = new File(moduleDir, "module.json");
+
+        if (configFile.exists()) {
+            //modo desarrollo: leer desde disco
+            try {
+                config = new Gson().fromJson(new FileReader(configFile), ModuleConfig.class);
+                return;
+            } catch (Exception e) {
+                System.err.println("error al leer module.json de TrafficModule: " + e.getMessage());
+            }
+        } else {
+            //modo JAR: leer desde dentro del JAR via classloader
+            try {
+                java.io.InputStream is = getClass().getResourceAsStream("/module.json");
+                if (is != null) {
+                    config = new Gson().fromJson(new java.io.InputStreamReader(is), ModuleConfig.class);
+                    return;
+                }
+            } catch (Exception e) {
+                System.err.println("error al leer module.json desde JAR: " + e.getMessage());
+            }
         }
+
+        //ultimo recurso: valores hardcodeados
+        config = new ModuleConfig();
+        config.id = "traffic_module";
+        config.name = "Gestión del tráfico";
+        config.version = "0.1.0";
+        config.description = "Seguimiento de vehículos e incidentes de tráfico en la ciudad";
+        config.logoPath = "images/logo.png";
+        config.author = "CentralCore Team";
     }
 
     @Override
@@ -69,10 +86,11 @@ public class TrafficModule implements Module {
         return config != null ? config.logoPath : "images/logo.png";
     }
 
-    //devuelve el archivo de imagen de logo resuelto desde el directorio del módulo
+    //devuelve el archivo de imagen de logo resuelto desde el directorio del modulo
     public File getLogoFile() {
         if (moduleDir == null || config == null) return null;
-        return new File(moduleDir, "resources/" + config.logoPath);
+        File f = new File(moduleDir, "resources/" + config.logoPath);
+        return f.exists() ? f : null;
     }
 
     @Override
