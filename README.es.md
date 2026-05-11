@@ -42,13 +42,6 @@ Desde la raíz del proyecto, ejecuta:
 ```bash
 ./gradlew :core:run
 ```
-
-En Windows usa `gradlew.bat` en lugar de `./gradlew`:
-
-```bat
-gradlew.bat :core:run
-```
-
 La primera vez tardará un momento mientras Gradle descarga las dependencias. Después arranca rápido.
 
 En el primer arranque la aplicación crea automáticamente la base de datos H2 e inicializa todas las tablas. Puedes iniciar sesión de inmediato con la cuenta de administrador por defecto:
