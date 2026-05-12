@@ -30,7 +30,7 @@ public class TrafficModuleController {
     @FXML private Button btnConectar;
     @FXML private TextField fieldWsUrl;
 
-    //pestaña semaforos
+    //pestaña semáforos
     @FXML private ListView<TrafficLight> listSemaforos;
 
     //pestaña trafico
@@ -186,20 +186,35 @@ public class TrafficModuleController {
 
     private ContextMenu buildRoadContextMenu(double simX, double simY) {
         ContextMenu ctx = new ContextMenu();
+
+        // check if a node is close enough to allow point placement
+        TrafficNode nearNode = mapCanvas.findNearestNode(simX, simY, 30);
+
         MenuItem itemA = new MenuItem("Marcar como Punto A");
-        itemA.setOnAction(e -> {
-            mapCanvas.setPointA(null, simX, simY);
-            lblPuntoA.setText(String.format("(%.0f, %.0f)", simX, simY));
-            refreshEnviarBtn();
-        });
         MenuItem itemB = new MenuItem("Marcar como Punto B");
-        itemB.setOnAction(e -> {
-            mapCanvas.setPointB(null, simX, simY);
-            lblPuntoB.setText(String.format("(%.0f, %.0f)", simX, simY));
-            refreshEnviarBtn();
-        });
+
+        if (nearNode != null) {
+            //snap to the node, same as buildNodeContextMenu
+            TrafficNode finalNode = nearNode;
+            itemA.setOnAction(e -> {
+                mapCanvas.setPointA(finalNode.getId(), finalNode.getX(), finalNode.getY());
+                lblPuntoA.setText(finalNode.getId());
+                refreshEnviarBtn();
+            });
+            itemB.setOnAction(e -> {
+                mapCanvas.setPointB(finalNode.getId(), finalNode.getX(), finalNode.getY());
+                lblPuntoB.setText(finalNode.getId());
+                refreshEnviarBtn();
+            });
+        } else {
+            //not near a node: disable A and B options
+            itemA.setDisable(true);
+            itemB.setDisable(true);
+        }
+
         MenuItem itemInc = new MenuItem("Añadir incidente aquí");
         itemInc.setOnAction(e -> showIncidentDialog(simX, simY));
+
         ctx.getItems().addAll(itemA, itemB, new SeparatorMenuItem(), itemInc);
         return ctx;
     }

@@ -411,7 +411,8 @@ public class MapCanvas extends Canvas {
 
     //puntos A/B siempre snapean al nodo mas cercano, sin colocacion libre
     private void placePoint(double sx, double sy, boolean isA) {
-        TrafficNode n = findNearestNode(sx, sy);
+        //solo permite colocar si el clic cae cerca de un nodo real
+        TrafficNode n = findNearestNode(sx, sy, 20);
         if (n == null) return;
         if (isA) {
             setPointA(n.getId(), n.getX(), n.getY());
@@ -600,6 +601,8 @@ public class MapCanvas extends Canvas {
     }
 
     private void drawNodes(GraphicsContext gc) {
+        boolean highlighting = placingPointA || placingPointB;
+        Color highlightColor = placingPointA ? POINT_A : POINT_B;
         gc.setLineWidth(1);
         for (TrafficNode n : simState.getNodes()) {
             double r = n.isMain() ? 9 : 5;
@@ -607,6 +610,13 @@ public class MapCanvas extends Canvas {
             gc.fillOval(n.getX() - r, n.getY() - r, r * 2, r * 2);
             gc.setStroke(NODE_STROKE);
             gc.strokeOval(n.getX() - r, n.getY() - r, r * 2, r * 2);
+            //anillo de guia cuando el usuario esta colocando un punto A o B
+            if (highlighting) {
+                gc.setStroke(highlightColor);
+                gc.setLineWidth(2);
+                gc.strokeOval(n.getX() - r - 4, n.getY() - r - 4, (r + 4) * 2, (r + 4) * 2);
+                gc.setLineWidth(1);
+            }
         }
     }
 
@@ -752,8 +762,8 @@ public class MapCanvas extends Canvas {
         String hint = null;
         Color bg = HINT_INC_BG;
         if (placingIncident) hint = "Haz clic en cualquier punto de una calle para colocar el incidente";
-        else if (placingPointA) { hint = "Haz clic en una interseccion para marcar el Punto A (snapping automatico)"; bg = HINT_A_BG; }
-        else if (placingPointB) { hint = "Haz clic en una interseccion para marcar el Punto B (snapping automatico)"; bg = HINT_B_BG; }
+        else if (placingPointA) { hint = "Haz clic sobre una interseccion resaltada para marcar el Punto A"; bg = HINT_A_BG; }
+        else if (placingPointB) { hint = "Haz clic sobre una interseccion resaltada para marcar el Punto B"; bg = HINT_B_BG; }
         if (hint == null) return;
         gc.setFill(bg);
         gc.fillRoundRect(12, h - 36, hint.length() * 6.5 + 16, 26, 6, 6);
