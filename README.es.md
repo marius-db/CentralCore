@@ -6,13 +6,16 @@ Aplicación de escritorio para administración de ciudades construida sobre una 
 
 Se incluyen dos módulos de serie: una base de datos de registros ciudadanos y una interfaz de gestión de tráfico que se conecta a un servidor de simulación por WebSocket.
 
+El simulador de tráfico es un proyecto separado: [TrafficSim](https://github.com/marius-db/TrafficSim).
+Las claves de licencia se pueden generar con la herramienta complementaria: [Licencing-gen](https://github.com/marius-db/Licencing-gen).
+
 ---
 
 ## Requisitos
 
 Antes de nada, asegúrate de tener lo siguiente instalado:
 
-- **Java 21 JDK**:  la aplicación está compilada para Java 21. Vale cualquier distribución de JDK 21 (Eclipse Temurin, Oracle, Amazon Corretto, etc.). Asegúrate de que `java` y `javac` están en el PATH.
+- **Java 21 JDK**: la aplicación está compilada para Java 21. Vale cualquier distribución de JDK 21 (Eclipse Temurin, Oracle, Amazon Corretto, etc.). Asegúrate de que `java` y `javac` están en el PATH.
 - **Git**: para clonar el repositorio.
 - **IntelliJ IDEA** (recomendado): el proyecto está configurado como proyecto Gradle e IntelliJ lo importa todo automáticamente. La edición Community es gratuita y funciona perfectamente.
 
@@ -61,7 +64,7 @@ Para compilar todo (core + todos los módulos):
 ./gradlew build
 ```
 
-Esto también ejecuta los tests y produce la salida compilada de todos los subproyectos. Los shadow JARs de los módulos (JARs gordos con todas las dependencias incluidas) se generan automáticamente como parte de este paso y quedan aquí:
+Esto también ejecuta todos los tests y produce la salida compilada de todos los subproyectos. Los shadow JARs de los módulos (JARs gordos con todas las dependencias incluidas) se generan automáticamente como parte de este paso y quedan aquí:
 
 ```
 modules/CitizenModule/build/libs/CitizenModule.jar
@@ -106,6 +109,8 @@ modules/
 
 Cuando ambos formatos están presentes para el mismo módulo, el JAR tiene prioridad y se omite el directorio.
 
+Cada módulo tiene su propio `URLClassLoader` aislado para que no haya conflictos de clases entre módulos. El shell solo conoce la interfaz `Module`; las clases concretas del módulo son invisibles para él.
+
 ### Formato de module.json
 
 Cada módulo necesita un `module.json` en la raíz de su carpeta de proyecto (modo desarrollo) o incluido dentro del JAR (modo distribución):
@@ -117,6 +122,7 @@ Cada módulo necesita un `module.json` en la raíz de su carpeta de proyecto (mo
   "version": "1.0.0",
   "description": "Lo que hace este módulo",
   "mainClass": "com.ejemplo.MiModulo",
+  "logoPath": "images/logo.png",
   "author": "Nombre del Autor"
 }
 ```
@@ -127,6 +133,8 @@ Cada módulo necesita un `module.json` en la raíz de su carpeta de proyecto (mo
 2. Añádelo a `settings.gradle`: `include 'modules:MiModulo'`
 3. La clase principal debe implementar `com.centralcore.modules.Module` y tener un constructor sin argumentos.
 4. Cada módulo tiene su propio `URLClassLoader` aislado para que no haya conflictos de clases entre módulos.
+
+La interfaz `Module` requiere: `getModuleId()`, `getName()`, `getVersion()`, `getDescription()`, `getLogoPath()`, `setModuleDir(File)`, `initialize()`, `shutdown()`, `reload()` y `getMainUI()`. El módulo puede llamar a su propio equivalente de `initSchema()` en `initialize()` para extender la base de datos H2 compartida con sus propias tablas.
 
 ### Compilar los JARs de los módulos
 
@@ -175,7 +183,10 @@ CentralCore/
 │       │   └── ModuleManager.java        - gestor del ciclo de vida
 │       └── util/
 │           ├── CustomTitleBar.java       - barra de título personalizada y arrastrable
+│           ├── DwmManager.java           - integración nativa DWM en Windows
 │           ├── ModuleDetailsDialog.java
+│           ├── PreferencesStorage.java   - persiste estado de la UI (posiciones de divisores, etc.)
+│           ├── RememberMeStorage.java    - guarda credenciales cuando "recuérdame" está activo
 │           ├── SceneManager.java         - navegación centralizada entre escenas
 │           ├── SessionManager.java       - usuario actual en sesión
 │           ├── LicenceStorage.java       - persiste claves de licencia con Java Prefs
@@ -212,6 +223,30 @@ CentralCore/
 
 ---
 
+## Módulos incluidos
+
+### CitizenModule
+
+CRUD completo para registros ciudadanos. El diseño es un `SplitPane`: una tabla con búsqueda en la izquierda y un panel de detalle/edición en la derecha. La posición del divisor se guarda y se restaura entre sesiones mediante `PreferencesStorage`.
+
+El formulario de edición valida cada campo por separado y muestra etiquetas de error por campo. Se admiten archivos adjuntos: cada ciudadano puede tener documentos vinculados a su registro, categorizados por tipo (DNI/pasaporte, certificado de nacimiento, permiso de residencia, licencia de conducir, etc.).
+
+Tablas utilizadas: `ciudadanos`, `ciudadano_documentos`. El módulo también migra la tabla `ciudadanos` en el primer arranque para añadir columnas que el schema del core no incluye (`lugar_nac`, `nacionalidad`, `codigo_postal`, `estado_civil`).
+
+### TrafficModule
+
+Interfaz de gestión de tráfico que se conecta a un servidor de simulación externo por WebSocket. El simulador es un proyecto separado: [TrafficSim](https://github.com/marius-db/TrafficSim).
+
+El mapa se renderiza en un `Canvas` de JavaFX con un `AnimationTimer` para el bucle de renderizado en tiempo real. Todos los colores y fuentes están pre-cacheados como constantes estáticas para evitar alocaciones por frame. Una tabla de colores de densidad (20 pasos) se pre-calcula al cargar la clase para que no haya llamadas a `new Color()` dentro del bucle de renderizado. Las actualizaciones de las listas están limitadas a cada 5 ticks (~400ms) porque los ciclos de los semáforos duran varios segundos.
+
+El panel lateral tiene pestañas para: semáforos (con override manual), densidad de tramos de vía, ruta de emergencia (haz clic para marcar el punto A y el punto B en el mapa, envía la solicitud de ruta al simulador), incidentes activos e historial de incidentes cerrados. El clic derecho en cualquier punto del mapa abre un menú contextual.
+
+`SimConnection` gestiona el ciclo de vida del WebSocket: se conecta a `ws://localhost:8765` por defecto, se reconecta automáticamente cada 3 segundos si se cae la conexión, y enruta los mensajes entrantes por tipo (`map`, `state`, `ev_done`).
+
+Tablas utilizadas: `traffic_incidents`, `traffic_incident_updates`.
+
+---
+
 ## Esquema de base de datos
 
 Las tablas se crean automáticamente en el primer arranque. No necesitas configurar nada manualmente.
@@ -221,11 +256,13 @@ Las tablas se crean automáticamente en el primer arranque. No necesitas configu
 | `users` | Usuarios de la aplicación con contraseñas hasheadas con BCrypt y roles |
 | `licences` | Claves de licencia de módulos con fecha de expiración |
 | `ciudadanos` | Registros ciudadanos (gestionados por CitizenModule) |
-| `vehiculos` | Vehículos registrados vinculados a ciudadanos |
-| `incidentes_trafico` | Incidentes de tráfico con gravedad, estado y coordenadas en el mapa |
 | `ciudadano_documentos` | Archivos adjuntos vinculados a registros ciudadanos |
+| `traffic_incidents` | Incidentes de tráfico con tipo, coordenadas en el mapa y estado |
+| `traffic_incident_updates` | Historial de actualizaciones de cada incidente |
 
 El archivo de base de datos se encuentra en `~/centralcore_db.mv.db` (en tu directorio home). Puedes eliminarlo desde Ajustes dentro de la aplicación, o borrar el archivo manualmente para empezar desde cero.
+
+> El `SchemaInitializer` del core también crea las tablas `vehiculos` e `incidentes_trafico` como parte del schema base, aunque ninguna de las dos la usan los módulos actuales.
 
 ---
 
@@ -237,15 +274,60 @@ Bienvenida -> Login -> Shell Principal
                         │     ├── CitizenModule
                         │     └── TrafficModule
                         ├── Instalaciones  - lista los módulos cargados con detalles
-                        ├── Licencias      - añadir/eliminar claves de licencia
+                        ├── Licencias      - añadir/eliminar clave de licencia
                         └── Ajustes        - idioma, controles de BD, zona peligrosa
 ```
+
+La pantalla de bienvenida detecta credenciales guardadas y muestra un botón de "Continuar sesión" si existen, autenticando en segundo plano al pulsarlo. El shell principal muestra un velo de licencia cuando no hay ninguna licencia válida; el velo no bloquea las pantallas de Licencias y Ajustes para que el usuario siempre pueda arreglarlo.
 
 ---
 
 ## Sistema de licencias
 
-Las licencias son claves firmadas con HMAC-SHA256 codificadas en Base64 con el formato `email|fecha_expiración|hmac`. La aplicación valida la firma y la expiración al importar, y guarda el resultado localmente mediante la API de Preferences de Java. Las claves de licencia de demostración para ambos módulos incluidos se insertan automáticamente en la base de datos en el primer arranque.
+Las licencias son claves firmadas con HMAC-SHA256 codificadas en Base64 con el formato `email|fecha_expiración|hmac`. La aplicación valida la firma y la expiración al importar, comprueba que el email de la clave coincide con el del usuario en sesión, y guarda el resultado mediante la API de Preferences de Java.
+
+El shell usa una sola licencia global almacenada en `centralcore/licences` de Java Prefs. Si no hay ninguna licencia activa, el área de contenido queda cubierta por el velo hasta que se añada una.
+
+Las claves se pueden generar con [Licencing-gen](https://github.com/marius-db/Licencing-gen). Las claves de licencia de demostración para ambos módulos incluidos se insertan automáticamente en la base de datos en el primer arranque, pero son registros de base de datos; la licencia del shell es una clave separada que hay que añadir desde la pantalla de Licencias.
+
+---
+
+## Cuentas de usuario
+
+La tabla `users` soporta dos roles: `admin` y `operator`. Las cuentas nuevas registradas desde la interfaz reciben el rol `operator`. La cuenta de administrador sembrada es:
+
+- **Email:** `admin@centralcore.local`
+- **Contraseña:** `Admin1234`
+
+La casilla "recuérdame" en el login guarda las credenciales (ofuscadas en Base64, no cifradas) en `~/.centralcore/remember.conf`. Es ofuscación de conveniencia, no seguridad real.
+
+---
+
+## Archivos de configuración locales
+
+CentralCore almacena algunos archivos en `~/.centralcore/`:
+
+| Archivo | Contenido |
+|---|---|
+| `language.conf` | Último idioma seleccionado (`en` o `es`) |
+| `remember.conf` | Credenciales guardadas cuando "recuérdame" está activo |
+| `ui_prefs.conf` | Estado de la UI como posiciones de divisores de paneles |
+
+---
+
+## Tests
+
+Los tests están en `core/src/test/java/com/centralcore/`.
+
+`UnitTests.java` cubre `LicenseValidator` (clave válida, clave expirada, clave manipulada, extracción del email) y `UserDAO.hashPassword` (corrección del hash BCrypt, aleatoriedad del salt). No requiere base de datos.
+
+`IntegrationTests.java` inyecta una conexión H2 en memoria en el singleton `DatabaseConnection` mediante reflexión, ejecuta un schema limpio en cada test y lo destruye al terminar. Cubre `testConnection`, `pingConnection`, registro de usuario, autenticación con credenciales correctas, autenticación con contraseña incorrecta y `findById`.
+
+Ejecuta todos los tests con:
+
+```bash
+./gradlew test
+```
 
 ---
 
@@ -259,4 +341,11 @@ Las licencias son claves firmadas con HMAC-SHA256 codificadas en Base64 con el f
 | Gson | 2.10.1 | Parseo del module.json |
 | JNA | 5.14.0 | Integración nativa DWM en Windows |
 | Shadow | 8.3.0 | Empaquetado de módulos como fat JARs |
-| JUnit Jupiter | 5.10.2 | Tests unitarios |
+| JUnit Jupiter | 5.10.2 | Tests unitarios e integración |
+
+---
+
+## Repositorios relacionados
+
+- [TrafficSim](https://github.com/marius-db/TrafficSim) - el servidor de simulación Python al que se conecta TrafficModule por WebSocket
+- [Licencing-gen](https://github.com/marius-db/Licencing-gen) - la herramienta generadora de claves de licencia firmadas con HMAC
