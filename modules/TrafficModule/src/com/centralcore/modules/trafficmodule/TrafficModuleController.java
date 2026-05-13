@@ -78,7 +78,7 @@ public class TrafficModuleController {
     private final java.util.Map<String, TrafficLight> lightById = new java.util.HashMap<>();
 
     //contador de ticks para throttling de las listas: se actualizan cada 5 ticks (~400ms)
-    //los estados de semaforo cambian en ciclos de varios segundos, no hace falta refrescar a 12fps
+    //los estados de semáforo cambian en ciclos de varios segundos, no hace falta refrescar a 12 fps
     private int stateTick = 0;
     private static final int LIST_REFRESH_INTERVAL = 5;
 
@@ -129,13 +129,13 @@ public class TrafficModuleController {
 
         mapCanvas.setOnIncidentSelected(inc -> listIncidentes.getSelectionModel().select(inc));
 
-        //seleccion de semaforo desde el mapa: resalta en lista y en el mapa
+        //seleccion de semáforo desde el mapa: resalta en lista y en el mapa
         mapCanvas.setOnLightClicked(lt -> {
             listSemaforos.getSelectionModel().select(lt);
             listSemaforos.scrollTo(lt);
         });
 
-        //clic en el mapa fuera de semaforos/incidentes limpia la seleccion
+        //clic en el mapa fuera de semáforo/incidentes limpia la seleccion
         mapPane.setOnMousePressed(e -> hideActiveContextMenu());
     }
 
@@ -144,8 +144,7 @@ public class TrafficModuleController {
     private void showContextMenu(ContextMenu ctx, double simX, double simY) {
         hideActiveContextMenu();
         javafx.geometry.Point2D screen = mapCanvas.localToScreen(
-                simX * mapCanvas.getScaleValue() + mapCanvas.getOffsetX(),
-                simY * mapCanvas.getScaleValue() + mapCanvas.getOffsetY());
+                simX * mapCanvas.getScaleValue() + mapCanvas.getOffsetX(), simY * mapCanvas.getScaleValue() + mapCanvas.getOffsetY());
         if (screen == null) return;
         activeContextMenu = ctx;
         //al ocultarse por cualquier motivo limpia la referencia
@@ -227,11 +226,10 @@ public class TrafficModuleController {
         final boolean[] settling = {true};
 
         //la forma más fiable de forzar la posicion es esperar al primer layout real del splitpane
-        //layoutBoundsProperty cambia cuando el nodo tiene tamano asignado
+        //layoutBoundsProperty cambia cuando el nodo tiene tamaño asignado
         splitPane.layoutBoundsProperty().addListener(new javafx.beans.value.ChangeListener<javafx.geometry.Bounds>() {
             @Override
-            public void changed(javafx.beans.value.ObservableValue<? extends javafx.geometry.Bounds> obs,
-                                javafx.geometry.Bounds oldB, javafx.geometry.Bounds newB) {
+            public void changed(javafx.beans.value.ObservableValue<? extends javafx.geometry.Bounds> obs, javafx.geometry.Bounds oldB, javafx.geometry.Bounds newB) {
                 if (newB.getWidth() > 0) {
                     splitPane.layoutBoundsProperty().removeListener(this);
                     //dos runLater para dejar que javafx termine el primer layout completo
@@ -334,9 +332,7 @@ public class TrafficModuleController {
                 if (empty || e == null) { setGraphic(null); return; }
                 double d = e.getDensity();
                 densBar.setWidth(Math.max(4, d * 80));
-                Color barColor = d < 0.4 ? Color.web("#22c55e")
-                        : d < 0.7 ? Color.web("#f59e0b")
-                        : Color.web("#ef4444");
+                Color barColor = d < 0.4 ? Color.web("#22c55e") : d < 0.7 ? Color.web("#f59e0b") : Color.web("#ef4444");
                 densBar.setFill(barColor);
                 lblName.setText(e.getName() != null ? e.getName() : e.getId());
                 lblName.getStyleClass().setAll("tm-list-label");
@@ -356,8 +352,8 @@ public class TrafficModuleController {
                 getStyleClass().removeAll("inc-abierto", "inc-critico", "inc-resuelto");
                 switch (i.getEstado().toLowerCase()) {
                     case "crítico", "critico" -> getStyleClass().add("inc-critico");
-                    case "resuelto"           -> getStyleClass().add("inc-resuelto");
-                    default                   -> getStyleClass().add("inc-abierto");
+                    case "resuelto" -> getStyleClass().add("inc-resuelto");
+                    default -> getStyleClass().add("inc-abierto");
                 }
             }
         });
@@ -368,18 +364,14 @@ public class TrafficModuleController {
             protected void updateItem(Incident i, boolean empty) {
                 super.updateItem(i, empty);
                 if (empty || i == null) { setText(null); return; }
-                String closed = i.getClosedAt() != null
-                        ? i.getClosedAt().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM HH:mm"))
-                        : "—";
+                String closed = i.getClosedAt() != null ? i.getClosedAt().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM HH:mm")) : "—";
                 setText("[" + closed + "] " + i.getTipo() + " - " + i.getDescripcion());
             }
         });
     }
 
     private void setupCombos() {
-        comboEstadoUpdate.setItems(FXCollections.observableArrayList(
-                "Abierto", "En curso", "Crítico", "Resuelto"
-        ));
+        comboEstadoUpdate.setItems(FXCollections.observableArrayList("Abierto", "En curso", "Crítico", "Resuelto"));
         comboEstadoUpdate.getSelectionModel().selectFirst();
     }
 
@@ -580,8 +572,7 @@ public class TrafficModuleController {
         TrafficNode nextNode = simState.findNode(nextNodeId);
         if (nextNode == null) return;
 
-        double dist = Math.hypot(simState.getEvX() - nextNode.getX(),
-                simState.getEvY() - nextNode.getY());
+        double dist = Math.hypot(simState.getEvX() - nextNode.getX(), simState.getEvY() - nextNode.getY());
         if (dist >= EV_LIGHT_TRIGGER_DIST) return;
 
         String approachDir = inferEvApproachDir(nextNodeId);
@@ -626,10 +617,10 @@ public class TrafficModuleController {
     private boolean showIncidentFormDialog() {
         Dialog<ButtonType> dlg = new Dialog<>();
         dlg.setTitle("Nuevo incidente");
-        dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        ButtonType cancelarBtn = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, cancelarBtn);
 
-        dlg.getDialogPane().getStylesheets().add(
-                getClass().getResource("/css/traffic.css").toExternalForm());
+        dlg.getDialogPane().getStylesheets().add(getClass().getResource("/css/traffic.css").toExternalForm());
 
         ComboBox<String> comboTipo = new ComboBox<>(FXCollections.observableArrayList(
                 "Accidente", "Corte de vía", "Obras", "Semáforo averiado",
@@ -639,9 +630,7 @@ public class TrafficModuleController {
         comboTipo.setMaxWidth(Double.MAX_VALUE);
         comboTipo.getSelectionModel().selectFirst();
 
-        ComboBox<String> comboEstado = new ComboBox<>(FXCollections.observableArrayList(
-                "Abierto", "En curso", "Crítico", "Resuelto"
-        ));
+        ComboBox<String> comboEstado = new ComboBox<>(FXCollections.observableArrayList("Abierto", "En curso", "Crítico", "Resuelto"));
         comboEstado.getStyleClass().add("tm-combo");
         comboEstado.setMaxWidth(Double.MAX_VALUE);
         comboEstado.getSelectionModel().selectFirst();
@@ -666,7 +655,7 @@ public class TrafficModuleController {
         content.setPadding(new Insets(16));
         content.setPrefWidth(320);
 
-        //estilo del panel del dialogo para que encaje con el tema oscuro
+        //estilo del panel del diálogo para que encaje con el tema oscuro
         dlg.getDialogPane().setContent(content);
 
         java.util.Optional<ButtonType> result = dlg.showAndWait();
@@ -863,18 +852,18 @@ public class TrafficModuleController {
     private Color lightStateColor(String state) {
         if (state == null) return Color.web("#ef4444");
         return switch (state) {
-            case "green"  -> Color.web("#22c55e");
+            case "green" -> Color.web("#22c55e");
             case "yellow" -> Color.web("#f59e0b");
-            default       -> Color.web("#ef4444");
+            default -> Color.web("#ef4444");
         };
     }
 
     private String stateDisplayName(String state) {
         if (state == null) return "Rojo";
         return switch (state) {
-            case "green"  -> "Verde";
+            case "green" -> "Verde";
             case "yellow" -> "Ambar";
-            default       -> "Rojo";
+            default -> "Rojo";
         };
     }
 
@@ -885,35 +874,44 @@ public class TrafficModuleController {
             case "S" -> "v Sur";
             case "E" -> "> Este";
             case "W" -> "< Oeste";
-            default  -> dir;
+            default -> dir;
         };
     }
 
     private void showOverrideDialog(TrafficLight light) {
         Dialog<ButtonType> dlg = new Dialog<>();
-        dlg.setTitle("Sobreescribir semaforo: " + light.getId()
-                + " (" + dirDisplayName(light.getDir()) + ")");
-        dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        dlg.setTitle("Sobreescribir semaforo: " + light.getId() + " (" + dirDisplayName(light.getDir()) + ")");
+        ButtonType cancelarBtn = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, cancelarBtn);
 
-        ComboBox<String> comboState = new ComboBox<>(FXCollections.observableArrayList(
-                "Verde", "Ambar", "Rojo"
-        ));
+        //mismo stylesheet que el dialogo de incidentes para mantener coherencia visual
+        dlg.getDialogPane().getStylesheets().add(getClass().getResource("/css/traffic.css").toExternalForm());
+
+        ComboBox<String> comboState = new ComboBox<>(FXCollections.observableArrayList("Verde", "Ambar", "Rojo"));
+        comboState.getStyleClass().add("tm-combo");
+        comboState.setMaxWidth(Double.MAX_VALUE);
         comboState.getSelectionModel().select(stateDisplayName(light.getState()));
 
         Spinner<Integer> spinnerDur = new Spinner<>(5, 120, 30, 5);
+        spinnerDur.setMaxWidth(Double.MAX_VALUE);
+        spinnerDur.getEditor().getStyleClass().add("tm-url-field");
 
         Label lblInfo = new Label("Nodo: " + light.getNodeId()
                 + "   Direccion: " + dirDisplayName(light.getDir())
                 + "   Estado actual: " + stateDisplayName(light.getState())
                 + "   Contador: " + light.getTimer() + "s");
-        lblInfo.setStyle("-fx-text-fill: -cc-text-secondary; -fx-font-size: 11px;");
+        lblInfo.getStyleClass().add("tm-hint");
+        lblInfo.setWrapText(true);
 
         VBox content = new VBox(10,
                 lblInfo,
-                new Label("Forzar estado:"), comboState,
-                new Label("Duracion (segundos):"), spinnerDur
+                new Label("Forzar estado:") {{ getStyleClass().add("tm-field-label"); }},
+                comboState,
+                new Label("Duracion (segundos):") {{ getStyleClass().add("tm-field-label"); }},
+                spinnerDur
         );
         content.setPadding(new Insets(16));
+        content.setPrefWidth(320);
         dlg.getDialogPane().setContent(content);
 
         dlg.showAndWait().ifPresent(bt -> {
@@ -922,7 +920,7 @@ public class TrafficModuleController {
                 String internalState = switch (selected) {
                     case "Verde" -> "green";
                     case "Ambar" -> "yellow";
-                    default      -> "red";
+                    default -> "red";
                 };
                 connection.overrideLight(light.getId(), internalState, spinnerDur.getValue());
             }
