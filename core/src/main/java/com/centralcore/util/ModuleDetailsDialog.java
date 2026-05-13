@@ -18,7 +18,7 @@ public class ModuleDetailsDialog {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.initOwner(parentStage);
-        dialogStage.setTitle(module.getName() + " - Details");
+        dialogStage.setTitle(module.getName() + " - " + TranslationManager.get("module.details.title"));
         dialogStage.setWidth(450);
         dialogStage.setHeight(320);
 
@@ -29,26 +29,26 @@ public class ModuleDetailsDialog {
                         "-fx-spacing: 15;"
         );
 
-        Label lblName = new Label("Module: " + module.getName());
+        Label lblName = new Label(TranslationManager.get("module.details.label.module") + " " + module.getName());
         lblName.setStyle(
                 "-fx-font-size: 18; " +
                         "-fx-font-weight: bold; " +
                         "-fx-text-fill: #ecf0f1;"
         );
 
-        Label lblId = new Label("ID: " + module.getModuleId());
+        Label lblId = new Label(TranslationManager.get("module.details.label.id") + " " + module.getModuleId());
         lblId.setStyle(
                 "-fx-font-size: 12; " +
                         "-fx-text-fill: #bdc3c7;"
         );
 
-        Label lblVersion = new Label("Version: " + module.getVersion());
+        Label lblVersion = new Label(TranslationManager.get("module.details.label.version") + " " + module.getVersion());
         lblVersion.setStyle(
                 "-fx-font-size: 12; " +
                         "-fx-text-fill: #bdc3c7;"
         );
 
-        Label lblDescLabel = new Label("Description:");
+        Label lblDescLabel = new Label(TranslationManager.get("module.details.label.description"));
         lblDescLabel.setStyle(
                 "-fx-font-size: 13; " +
                         "-fx-font-weight: bold; " +
@@ -73,7 +73,7 @@ public class ModuleDetailsDialog {
         buttonsBox.setStyle("-fx-spacing: 10; -fx-alignment: center-right;");
         buttonsBox.setPadding(new Insets(15, 0, 0, 0));
 
-        Button btnUpdate = new Button("Update");
+        Button btnUpdate = new Button(TranslationManager.get("module.details.btn.update"));
         btnUpdate.setStyle(
                 "-fx-padding: 8 16; " +
                         "-fx-font-size: 12; " +
@@ -88,11 +88,11 @@ public class ModuleDetailsDialog {
 
             if (reloaded != null) {
                 System.out.println("modulo recargado: " + moduleId);
-                lblStatus.setText("✔ Módulo recargado correctamente");
+                lblStatus.setText(TranslationManager.get("module.details.status.reloaded"));
                 lblStatus.setStyle("-fx-font-size: 11; -fx-text-fill: #2ecc71;");
             } else {
                 System.err.println("fallo al recargar modulo: " + moduleId);
-                lblStatus.setText("✘ Error al recargar el módulo");
+                lblStatus.setText(TranslationManager.get("module.details.status.reloadFailed"));
                 lblStatus.setStyle("-fx-font-size: 11; -fx-text-fill: #e74c3c;");
             }
 
@@ -100,7 +100,7 @@ public class ModuleDetailsDialog {
             lblStatus.setVisible(true);
         });
 
-        Button btnDelete = new Button("Delete");
+        Button btnDelete = new Button(TranslationManager.get("module.details.btn.delete"));
         btnDelete.setStyle(
                 "-fx-padding: 8 16; " +
                         "-fx-font-size: 12; " +
@@ -113,7 +113,7 @@ public class ModuleDetailsDialog {
             dialogStage.close();
         });
 
-        Button btnClose = new Button("Close");
+        Button btnClose = new Button(TranslationManager.get("module.details.btn.close"));
         btnClose.setStyle(
                 "-fx-padding: 8 16; " +
                         "-fx-font-size: 12; " +

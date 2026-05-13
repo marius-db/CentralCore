@@ -81,7 +81,7 @@ public class WelcomeController implements Initializable, TranslationManager.Lang
     }
 
     private void updateLabels() {
-        //si hay sesion guardada mostrar "continuar sesion", si no el login normal
+        //sí hay sesión guardada mostrar "continuar sesión", si no el login normal
         String btnKey = hasSession ? "welcome.continue" : "btn.login";
         btnLogin.setText(TranslationManager.get(btnKey));
         lblTaglineTitle.setText(TranslationManager.get("welcome.title"));
@@ -98,7 +98,7 @@ public class WelcomeController implements Initializable, TranslationManager.Lang
         }
     }
 
-    //autentica en segundo plano con las credenciales guardadas tras pulsar el boton
+    //auténtica en segundo plano con las credenciales guardadas tras pulsar el boton
     private void runSessionAuth() {
         String[] creds = RememberMeStorage.load();
         if (creds == null) {

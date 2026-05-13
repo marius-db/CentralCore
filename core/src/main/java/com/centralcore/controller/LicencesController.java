@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -45,10 +46,14 @@ public class LicencesController implements Initializable, TranslationManager.Lan
 
     @FXML
     private void onAddLicenceClicked() {
+        //reemplazar los botones built-in de textinputdialog con translated buttontype
+        ButtonType btnOkInput     = new ButtonType(TranslationManager.get("dialog.btn.ok"),     ButtonBar.ButtonData.OK_DONE);
+        ButtonType btnCancelInput = new ButtonType(TranslationManager.get("dialog.btn.cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
         TextInputDialog keyDialog = new TextInputDialog();
         keyDialog.setTitle(TranslationManager.get("licences.add.title"));
         keyDialog.setHeaderText(TranslationManager.get("licences.add.header"));
         keyDialog.setContentText(TranslationManager.get("licences.add.prompt"));
+        keyDialog.getDialogPane().getButtonTypes().setAll(btnOkInput, btnCancelInput);
         //aplicar tema antes y después de mostrar para cubrir todos los nodos del scene graph
         applyDialogTheme(keyDialog.getDialogPane());
 
@@ -56,8 +61,9 @@ public class LicencesController implements Initializable, TranslationManager.Lan
         if (key == null || key.isBlank()) return;
 
         if (!LicenseValidator.validate(key)) {
+            ButtonType btnOk = new ButtonType(TranslationManager.get("dialog.btn.ok"), ButtonBar.ButtonData.OK_DONE);
             Alert err = new Alert(Alert.AlertType.ERROR,
-                    TranslationManager.get("licences.error.invalid"), ButtonType.OK);
+                    TranslationManager.get("licences.error.invalid"), btnOk);
             applyDialogTheme(err.getDialogPane());
             err.showAndWait();
             return;
@@ -69,8 +75,9 @@ public class LicencesController implements Initializable, TranslationManager.Lan
                 ? com.centralcore.util.SessionManager.getCurrentUser().getEmail()
                 : "";
         if (!tokenEmail.equals(userEmail)) {
+            ButtonType btnOk = new ButtonType(TranslationManager.get("dialog.btn.ok"), ButtonBar.ButtonData.OK_DONE);
             Alert err = new Alert(Alert.AlertType.ERROR,
-                    TranslationManager.get("licences.error.emailMismatch"), ButtonType.OK);
+                    TranslationManager.get("licences.error.emailMismatch"), btnOk);
             applyDialogTheme(err.getDialogPane());
             err.showAndWait();
             return;
@@ -92,14 +99,16 @@ public class LicencesController implements Initializable, TranslationManager.Lan
     private void onRemoveLicenceClicked() {
         if (licences.isEmpty()) return;
 
+        ButtonType btnYes = new ButtonType(TranslationManager.get("dialog.btn.yes"), ButtonBar.ButtonData.YES);
+        ButtonType btnNo  = new ButtonType(TranslationManager.get("dialog.btn.no"),  ButtonBar.ButtonData.NO);
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
                 TranslationManager.get("licences.remove.confirm"),
-                ButtonType.YES, ButtonType.NO);
+                btnYes, btnNo);
         confirm.setTitle(TranslationManager.get("licences.remove.title"));
         applyDialogTheme(confirm.getDialogPane());
 
         confirm.showAndWait().ifPresent(btn -> {
-            if (btn == ButtonType.YES) {
+            if (btn == btnYes) {
                 LicenceStorage.removeAppLicence();
                 licences.clear();
                 refreshView();
