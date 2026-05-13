@@ -18,7 +18,7 @@ import com.sun.jna.win32.W32APIOptions;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 
-//integra la ventana de javafx con el dwm de windows para resize nativo y sombra, sin barra nativa
+//íntegra la ventana de javafx con el dwm de windows para resize nativo y sombra, sin barra nativa
 public class DwmManager {
 
     //mensajes de windows manejados por el wndproc
@@ -46,7 +46,7 @@ public class DwmManager {
     private static final int GWL_STYLE   = -16;
     private static final int GWL_WNDPROC = -4;
 
-    //flags para SetWindowPos al forzar recalculo del frame
+    //flags para SetWindowPos al forzar recálculo del frame
     private static final int SWP_FRAMECHANGED = 0x0020;
     private static final int SWP_NOMOVE       = 0x0002;
     private static final int SWP_NOSIZE       = 0x0001;
@@ -83,7 +83,7 @@ public class DwmManager {
         }
     }
 
-    //interfaz jna extendida para subclassing del wndproc y manipulacion de estilos
+    //interfaz jna extendida para subclassing del wndproc y manipulación de estilos
     interface User32Ex extends StdCallLibrary {
 
         User32Ex INSTANCE = Native.load(
@@ -98,7 +98,7 @@ public class DwmManager {
         //escribir un nuevo estilo entero
         int SetWindowLong(HWND hwnd, int index, int value);
 
-        //subclasificar el wndproc con una funcion java
+        //subclasificar el wndproc con una función java
         LONG_PTR SetWindowLongPtr(HWND hwnd, int index, WinUser.WindowProc wndProc);
 
         //reenviar mensajes al proc original
@@ -107,7 +107,7 @@ public class DwmManager {
         boolean SetWindowPos(HWND hwnd, HWND insertAfter, int x, int y, int width, int height, int flags);
     }
 
-    //instala la integracion dwm en la ventana de javafx
+    //instala la integración dwm en la ventana de javafx
     public static void install(Stage stage) {
 
         //solo ejecutar en windows
@@ -149,15 +149,15 @@ public class DwmManager {
     //extiende el frame dwm para que windows dibuje sombra y borde accent nativo
     private static void extendFrame(HWND hwnd) {
         MARGINS margins = new MARGINS();
-        //-1 en todos los margenes extiende el frame por toda la ventana
-        margins.cxLeftWidth    = -1;
-        margins.cxRightWidth   = -1;
-        margins.cyTopHeight    = -1;
+        //-1 en todos los márgenes extiende el frame por toda la ventana
+        margins.cxLeftWidth = -1;
+        margins.cxRightWidth = -1;
+        margins.cyTopHeight = -1;
         margins.cyBottomHeight = -1;
         Dwmapi.INSTANCE.DwmExtendFrameIntoClientArea(hwnd, margins);
     }
 
-    //subclass del wndproc para resize nativo y supresion del frame no-cliente
+    //subclass del wndproc para resize nativo y supresión del frame no-cliente
     private static void subclassWindowProc(HWND hwnd, Stage stage) {
 
         //guardar referencia al proc original para mensajes no manejados
@@ -165,41 +165,41 @@ public class DwmManager {
 
         WinUser.WindowProc newProc = (hWnd, message, wParam, lParam) -> {
 
-            //suprimir el area no-cliente para que windows no dibuje el marco grueso visualmente
-            //el resize sigue funcionando porque WM_NCHITTEST lo gestiona desde nuestra logica
+            //suprimir el área no-cliente para que windows no dibuje el marco grueso visualmente
+            //el resize sigue funcionando porque WM_NCHITTEST lo gestiona desde nuestra lógica
             if (message == WM_NCCALCSIZE && wParam.intValue() == 1) {
                 return new LRESULT(0);
             }
 
             if (message == WM_NCHITTEST) {
 
-                //extraer posicion del cursor desde lparam
-                int lp   = lParam.intValue();
+                //extraer posición del cursor desde lparam
+                int lp = lParam.intValue();
                 int curX = (short) (lp & 0xFFFF);
                 int curY = (short) ((lp >> 16) & 0xFFFF);
 
-                //obtener rectangulo actual de la ventana
+                //obtener rectángulo actual de la ventana
                 com.sun.jna.platform.win32.WinDef.RECT rect = new com.sun.jna.platform.win32.WinDef.RECT();
                 User32.INSTANCE.GetWindowRect(hWnd, rect);
 
-                int wLeft   = rect.left;
-                int wTop    = rect.top;
-                int wRight  = rect.right;
+                int wLeft = rect.left;
+                int wTop = rect.top;
+                int wRight = rect.right;
                 int wBottom = rect.bottom;
 
-                boolean onLeft   = curX < wLeft   + BORDER;
-                boolean onRight  = curX > wRight   - BORDER;
-                boolean onTop    = curY < wTop    + BORDER;
-                boolean onBottom = curY > wBottom  - BORDER;
+                boolean onLeft = curX < wLeft + BORDER;
+                boolean onRight = curX > wRight - BORDER;
+                boolean onTop = curY < wTop + BORDER;
+                boolean onBottom = curY > wBottom - BORDER;
 
-                if (onTop    && onLeft)  return new LRESULT(HTTOPLEFT);
-                if (onTop    && onRight) return new LRESULT(HTTOPRIGHT);
+                if (onTop && onLeft)  return new LRESULT(HTTOPLEFT);
+                if (onTop && onRight) return new LRESULT(HTTOPRIGHT);
                 if (onBottom && onLeft)  return new LRESULT(HTBOTTOMLEFT);
                 if (onBottom && onRight) return new LRESULT(HTBOTTOMRIGHT);
-                if (onLeft)              return new LRESULT(HTLEFT);
-                if (onRight)             return new LRESULT(HTRIGHT);
-                if (onTop)               return new LRESULT(HTTOP);
-                if (onBottom)            return new LRESULT(HTBOTTOM);
+                if (onLeft) return new LRESULT(HTLEFT);
+                if (onRight) return new LRESULT(HTRIGHT);
+                if (onTop) return new LRESULT(HTTOP);
+                if (onBottom) return new LRESULT(HTBOTTOM);
 
                 //todo lo que no es borde es area cliente: javafx gestiona el drag y los botones
                 //no devolver HTCAPTION porque windows entraría en el bucle modal de arrastre

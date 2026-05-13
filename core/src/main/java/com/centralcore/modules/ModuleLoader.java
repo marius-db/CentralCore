@@ -16,9 +16,9 @@ import java.util.jar.JarFile;
 
 import com.google.gson.Gson;
 
-//descubre y carga modulos desde la carpeta /modules usando reflexion
+//descubre y carga módulos desde la carpeta /modules usando reflexion
 //prioridad de carga:
-//  1. JARs sueltos en la raiz de /modules (distribucion): modules/MiModulo.jar
+//  1. JARs sueltos en la raíz de /modules (distribución): modules/MiModulo.jar
 //  2. Subdirectorios con build/classes/java/main (desarrollo): modules/MiModulo/build/...
 public class ModuleLoader {
 
@@ -80,7 +80,7 @@ public class ModuleLoader {
             //ids ya cargados desde JAR, para no cargarlos de nuevo desde directorio
             java.util.Set<String> loadedIds = new java.util.HashSet<>();
 
-            //primera pasada: JARs sueltos en la raiz de /modules
+            //primera pasada: JARs sueltos en la raíz de /modules
             File[] jars = modulesDir.listFiles(f -> f.isFile() && f.getName().endsWith(".jar"));
             if (jars != null) {
                 for (File jar : jars) {
@@ -121,7 +121,7 @@ public class ModuleLoader {
         return loadedModules;
     }
 
-    //carga un modulo desde un JAR suelto en la raiz de /modules
+    //carga un módulo desde un JAR suelto en la raiz de /modules
     //lee module.json desde dentro del JAR via JarFile
     private static Module loadModuleFromJar(File jarFile) {
         try {
@@ -195,7 +195,7 @@ public class ModuleLoader {
                 return null;
             }
 
-            //classloader aislado por modulo para evitar conflictos entre clases
+            //classloader aislado por módulo para evitar conflictos entre clases
             URLClassLoader moduleClassLoader = new URLClassLoader(
                     new URL[]{classesDir.toURI().toURL(), resourcesDir.toURI().toURL()},
                     Module.class.getClassLoader()

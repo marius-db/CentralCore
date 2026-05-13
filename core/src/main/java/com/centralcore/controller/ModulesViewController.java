@@ -63,7 +63,7 @@ public class ModulesViewController implements Initializable, TranslationManager.
                         " -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 4, 0, 0, 2);"
         );
 
-        //intentar cargar imagen del modulo, fallback a rectangulo coloreado si no existe
+        //intentar cargar imagen del módulo, fallback a rectángulo coloreado si no existe
         //envuelto en StackPane para centrar el logo dentro del tile
         StackPane logoContainer = new StackPane(buildLogoNode(module, 150, 100));
         logoContainer.setAlignment(javafx.geometry.Pos.CENTER);
@@ -93,10 +93,10 @@ public class ModulesViewController implements Initializable, TranslationManager.
         return tile;
     }
 
-    //carga la imagen del modulo o devuelve un rectangulo de fallback
+    //carga la imagen del modulo o devuelve un rectángulo de fallback
     static javafx.scene.Node buildLogoNode(Module module, double width, double height) {
         try {
-            //intenta cargar el logo desde el classloader del modulo (funciona tanto en JAR como en desarrollo)
+            //intenta cargar el logo desde el classloader del módulo (funciona tanto en JAR como en desarrollo)
             String logoPath = module.getLogoPath();
             if (logoPath != null && !logoPath.isBlank()) {
                 URL resource = module.getClass().getResource("/" + logoPath);

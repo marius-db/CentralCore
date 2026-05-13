@@ -3,8 +3,8 @@ package com.centralcore.modules;
 import java.io.File;
 import javafx.scene.Parent;
 
-//interfaz que todos los modulos deben implementar
-//el shell solo conoce esta interfaz, no los modulos concretos
+//interfaz que todos los módulos deben implementar
+//el shell solo conoce esta interfaz, no los módulos concretos
 public interface Module {
 
     String getModuleId();
@@ -17,10 +17,10 @@ public interface Module {
 
     String getLogoPath();
 
-    //inyectado por ModuleLoader tras instanciar: permite al modulo localizar su module.json e imagenes
+    //inyectado por ModuleLoader tras instanciar: permite al módulo localizar su module.json e imágenes
     void setModuleDir(File moduleDir);
 
-    //llamado al cargar el modulo: inicializar recursos aqui
+    //llamado al cargar el módulo: inicializar recursos aquí
     void initialize() throws Exception;
 
     //llamado al descargar: cerrar conexiones y limpiar

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//estado completo de la simulacion, actualizado en cada tick
+//estado completo de la simulación, actualizado en cada tick
 public class SimState {
 
     private List<TrafficNode> nodes = new ArrayList<>();
@@ -21,10 +21,10 @@ public class SimState {
     private List<String> evRoute = new ArrayList<>();
     private boolean routeDone = false;
 
-    //indices para lookups rapidos
+    //índices para lookups rápidos
     private final Map<String, TrafficNode> nodeMap = new HashMap<>();
     private final Map<String, TrafficLight> lightById = new HashMap<>();
-    //mapa nodeId -> lista de semaforos de esa interseccion (4 por nodo)
+    //mapa nodeId -> lista de semáforos de esa intersección (4 por nodo)
     private final Map<String, List<TrafficLight>> lightsByNode = new HashMap<>();
 
     public void rebuildIndexes() {
@@ -46,7 +46,7 @@ public class SimState {
         return lightById.get(id);
     }
 
-    //devuelve el semaforo de una direccion concreta en un nodo
+    //devuelve el semáforo de una dirección concreta en un nodo
     public TrafficLight findLightAtNodeDir(String nodeId, String dir) {
         List<TrafficLight> lts = lightsByNode.get(nodeId);
         if (lts == null) return null;
@@ -56,7 +56,7 @@ public class SimState {
         return null;
     }
 
-    //devuelve todos los semaforos de un nodo (para override masivo de la interseccion)
+    //devuelve todos los semáforos de un nodo (para override masivo de la intersección)
     public List<TrafficLight> findLightsAtNode(String nodeId) {
         List<TrafficLight> lts = lightsByNode.get(nodeId);
         return lts != null ? lts : new ArrayList<>();

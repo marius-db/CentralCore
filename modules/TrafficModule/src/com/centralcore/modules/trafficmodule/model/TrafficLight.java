@@ -3,7 +3,7 @@ package com.centralcore.modules.trafficmodule.model;
 public class TrafficLight {
 
     //estados: "green", "yellow", "red"
-    //dir: "N", "S", "E", "W"(direccion de aproximacion que cubre este semaforo)
+    //dir: "N", "S", "E", "W"(dirección de aproximación que cubre este semáforo)
     private String id;
     private String nodeId;
     private String dir;

@@ -48,7 +48,7 @@ public class TranslationManager {
         try {
             return bundle.getString(key);
         } catch (Exception e) {
-            //devuelve la clave como fallback para que no explote la ui si falta una traduccion
+            //devuelve la clave como fallback para que no explote la ui si falta una traducción
             return key;
         }
     }

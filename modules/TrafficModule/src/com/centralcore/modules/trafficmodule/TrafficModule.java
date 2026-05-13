@@ -15,10 +15,10 @@ public class TrafficModule implements Module {
     private Parent uiRoot;
     private TrafficModuleController controller;
 
-    //directorio del modulo inyectado por ModuleLoader
+    //directorio del módulo inyectado por ModuleLoader
     private File moduleDir;
 
-    //config leida de module.json, cargada en setModuleDir
+    //config leída de module.json, cargada en setModuleDir
     private ModuleConfig config;
 
     @Override
@@ -86,7 +86,7 @@ public class TrafficModule implements Module {
         return config != null ? config.logoPath : "images/logo.png";
     }
 
-    //devuelve el archivo de imagen de logo resuelto desde el directorio del modulo
+    //devuelve el archivo de imagen de logo resuelto desde el directorio del módulo
     public File getLogoFile() {
         if (moduleDir == null || config == null) return null;
         File f = new File(moduleDir, "resources/" + config.logoPath);

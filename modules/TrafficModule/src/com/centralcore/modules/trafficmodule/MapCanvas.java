@@ -17,13 +17,13 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-//canvas de trafico optimizado:
+//canvas de tráfico optimizado:
 //- colores y fuentes pre-cacheados (sin Color.web/Font.font en el render loop)
 //- tabla de colores de densidad pre-calculada (sin new Color por arista por frame)
 //- sin gc.save/restore en bucles (causa freeze en zoom con muchos elementos)
 //- set de nombres de calle reutilizado (sin new HashSet por frame)
-//- coches con separacion real entre carriles
-//- clic derecho funciona en cualquier punto (nodo, calle o vacio)
+//- coches con separación real entre carriles
+//- clic derecho funciona en cualquier punto (nodo, calle o vacío)
 public class MapCanvas extends Canvas {
 
     //paleta: todas las constantes de color se crean una sola vez al cargar la clase
@@ -76,7 +76,7 @@ public class MapCanvas extends Canvas {
     private static final double LANE_SEP = 7.0;
 
     //tabla de colores de densidad pre-calculada: evita new Color() en cada frame
-    //20 pasos cubre la precision necesaria sin coste de interpolacion en tiempo real
+    //20 pasos cubre la precision necesaria sin coste de interpolación en tiempo real
     private static final int DENS_STEPS = 20;
     private static final Color[] DENS_CACHE_MAIN = buildDensCache(true);
     private static final Color[] DENS_CACHE_SIDE = buildDensCache(false);
@@ -634,7 +634,7 @@ public class MapCanvas extends Canvas {
                 gc.setFill(ltColor(lt.getState()));
                 gc.fillOval(lx - r, ly - r, r * 2, r * 2);
 
-                //anillo de seleccion si este semaforo esta seleccionado
+                //anillo de selección si este semáforo está seleccionado
                 if (selectedLight != null && selectedLight.getId().equals(lt.getId())) {
                     gc.setStroke(LT_SELECTED_GLOW);
                     gc.setLineWidth(4);
@@ -716,8 +716,8 @@ public class MapCanvas extends Canvas {
         for (Incident i : incidents) {
             Color col = switch (i.getEstado().toLowerCase()) {
                 case "critico", "crítico" -> INC_CRI;
-                case "resuelto"           -> INC_MIN;
-                default                   -> INC_OPEN;
+                case "resuelto" -> INC_MIN;
+                default -> INC_OPEN;
             };
             boolean sel = selectedInc != null && selectedInc.getId() == i.getId();
             double r = sel ? 9 : 7, ix = i.getMapX(), iy = i.getMapY();

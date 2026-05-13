@@ -2,7 +2,7 @@ package com.centralcore.util;
 
 import com.centralcore.model.User;
 
-//guarda el usuario en sesion, accesible globalmente sin pasar referencias
+//guarda el usuario en sesión, accesible globalmente sin pasar referencias
 public class SessionManager {
 
     private static User currentUser = null;
