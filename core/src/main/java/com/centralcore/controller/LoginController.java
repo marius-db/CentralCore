@@ -69,6 +69,13 @@ public class LoginController implements Initializable, TranslationManager.Langua
             bg.setPreserveRatio(false);
             bg.setEffect(new GaussianBlur(20));
 
+            //excluir del layout para que no desplace el contenido del stackpane al redimensionar
+            //sin esto el imageview empuja los hijos hacia un lado aunque tenga bindings correctos
+            bg.setManaged(false);
+
+            //dejar pasar eventos de ratón para que los botones debajo sean clickables
+            bg.setMouseTransparent(true);
+
             //vincular al loginRoot, no a la escena - el blur no debe llegar a la barra de título
             bg.fitWidthProperty().bind(loginRoot.widthProperty());
             bg.fitHeightProperty().bind(loginRoot.heightProperty());

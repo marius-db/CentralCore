@@ -14,6 +14,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.layout.VBox;
 
 public class SettingsController implements Initializable, TranslationManager.LanguageChangeListener {
@@ -149,20 +150,25 @@ public class SettingsController implements Initializable, TranslationManager.Lan
 
     @FXML
     private void onDeleteDbClicked() {
+        ButtonType btnYes = new ButtonType(TranslationManager.get("btn.yes"), ButtonBar.ButtonData.YES);
+        ButtonType btnNo  = new ButtonType(TranslationManager.get("btn.no"),  ButtonBar.ButtonData.NO);
+
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle(TranslationManager.get("settings.deleteDb.confirm.title"));
         confirm.setHeaderText(TranslationManager.get("settings.deleteDb.confirm.header"));
         confirm.setContentText(TranslationManager.get("settings.deleteDb.confirm.body"));
-        confirm.getDialogPane().setStyle("-fx-background-color: #1c1f2b; -fx-text-fill: #f0f2f8;");
-        confirm.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+        confirm.getButtonTypes().setAll(btnYes, btnNo);
+        applyDialogTheme(confirm.getDialogPane());
 
         Optional<ButtonType> result = confirm.showAndWait();
-        if (result.isEmpty() || result.get() != ButtonType.YES) return;
+        if (result.isEmpty() || result.get() != btnYes) return;
+
+        ButtonType btnOk     = new ButtonType(TranslationManager.get("btn.ok"),     ButtonBar.ButtonData.OK_DONE);
+        ButtonType btnCancel = new ButtonType(TranslationManager.get("btn.cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
         Dialog<String> passDialog = new Dialog<>();
         passDialog.setTitle(TranslationManager.get("settings.deleteDb.pass.title"));
         passDialog.setHeaderText(TranslationManager.get("settings.deleteDb.pass.header"));
-        passDialog.getDialogPane().setStyle("-fx-background-color: #1c1f2b; -fx-text-fill: #f0f2f8;");
 
         PasswordField pwField = new PasswordField();
         pwField.setPromptText(TranslationManager.get("login.password"));
@@ -177,8 +183,9 @@ public class SettingsController implements Initializable, TranslationManager.Lan
         content.getChildren().addAll(lbl, pwField);
         content.setStyle("-fx-padding: 12;");
         passDialog.getDialogPane().setContent(content);
-        passDialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        passDialog.setResultConverter(btn -> btn == ButtonType.OK ? pwField.getText() : null);
+        passDialog.getDialogPane().getButtonTypes().addAll(btnOk, btnCancel);
+        passDialog.setResultConverter(btn -> btn == btnOk ? pwField.getText() : null);
+        applyDialogTheme(passDialog.getDialogPane());
 
         Optional<String> passResult = passDialog.showAndWait();
         if (passResult.isEmpty() || passResult.get() == null) return;
@@ -187,9 +194,10 @@ public class SettingsController implements Initializable, TranslationManager.Lan
                 ? SessionManager.getCurrentUser().getEmail() : "";
         UserDAO dao = new UserDAO();
         if (dao.authenticate(email, passResult.get()) == null) {
+            ButtonType btnErrOk = new ButtonType(TranslationManager.get("btn.ok"), ButtonBar.ButtonData.OK_DONE);
             Alert err = new Alert(Alert.AlertType.ERROR,
-                    TranslationManager.get("settings.deleteDb.wrongPass"), ButtonType.OK);
-            err.getDialogPane().setStyle("-fx-background-color: #1c1f2b; -fx-text-fill: #f0f2f8;");
+                    TranslationManager.get("settings.deleteDb.wrongPass"), btnErrOk);
+            applyDialogTheme(err.getDialogPane());
             err.showAndWait();
             return;
         }
@@ -206,11 +214,39 @@ public class SettingsController implements Initializable, TranslationManager.Lan
     }
 
     private void exitAfterDelete() {
+        ButtonType btnOk = new ButtonType(TranslationManager.get("btn.ok"), ButtonBar.ButtonData.OK_DONE);
         Alert bye = new Alert(Alert.AlertType.INFORMATION);
         bye.setTitle(TranslationManager.get("settings.deleteDb.done.title"));
         bye.setContentText(TranslationManager.get("settings.deleteDb.done.body"));
-        bye.getDialogPane().setStyle("-fx-background-color: #1c1f2b; -fx-text-fill: #f0f2f8;");
+        bye.getButtonTypes().setAll(btnOk);
+        applyDialogTheme(bye.getDialogPane());
         bye.showAndWait();
         Platform.exit();
+    }
+
+    //inyecta dialog.css en el scene del dialogo cuando ya esta montado
+    //los estilos inline se ignoran porque Modena los sobreescribe con mayor especificidad;
+    //un stylesheet propio en el scene del dialogo gana correctamente
+    private void applyDialogTheme(DialogPane pane) {
+        //esperar a que el dialogo tenga scene antes de inyectar el css
+        if (pane.getScene() != null) {
+            injectDialogCss(pane);
+        } else {
+            pane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) injectDialogCss(pane);
+            });
+        }
+    }
+
+    private void injectDialogCss(DialogPane pane) {
+        URL cssUrl = getClass().getResource("/com/centralcore/css/dialog.css");
+        if (cssUrl == null) {
+            System.err.println("dialog.css no encontrado");
+            return;
+        }
+        String cssStr = cssUrl.toExternalForm();
+        if (!pane.getScene().getStylesheets().contains(cssStr)) {
+            pane.getScene().getStylesheets().add(cssStr);
+        }
     }
 }
