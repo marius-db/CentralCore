@@ -90,7 +90,7 @@ public class SettingsController implements Initializable, TranslationManager.Lan
         if (lblAboutCopy    != null) lblAboutCopy.setText(TranslationManager.get("settings.about.copy"));
     }
 
-    //solo comprueba si la conexion activa responde, no intenta reabrir
+    //solo comprueba si la conexión activa responde, no intenta reabrir
     private void pingStatus() {
         boolean ok = DatabaseConnection.pingConnection();
         if (ok) {

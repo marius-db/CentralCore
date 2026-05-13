@@ -4,13 +4,13 @@ import java.io.*;
 import java.util.Base64;
 import java.util.Properties;
 
-//guarda y recupera las credenciales del usuario cuando "recuerdame" esta activo
-//no es cifrado real, solo ofuscacion basica para no guardar en texto plano visible
+//guarda y recupera las credenciales del usuario cuando "recuérdame" está activo
+//no es cifrado real, solo ofuscación básica para no guardar en texto plano visible
 public class RememberMeStorage {
 
     private static final String CONFIG_FILE = System.getProperty("user.home") + "/.centralcore/remember.conf";
 
-    //guarda email y contrasena ofuscados en el archivo de configuracion
+    //guarda email y contraseña ofuscados en el archivo de configuración
     public static void save(String email, String password) {
         try {
             File dir = new File(System.getProperty("user.home") + "/.centralcore");

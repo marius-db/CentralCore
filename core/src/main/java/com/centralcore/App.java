@@ -31,7 +31,7 @@ public class App extends Application {
         SceneManager.showWelcome();
 
         stage.show();
-        //instalar integracion DWM despues de show() para que el HWND exista
+        //instalar integración DWM después de show() para que el HWND exista
         DwmManager.install(stage);
     }
 

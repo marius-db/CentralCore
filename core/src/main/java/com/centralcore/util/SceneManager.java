@@ -19,14 +19,14 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-//punto unico de navegacion, todos los cambios de pantalla pasan por aqui
+//punto único de navegación, todos los cambios de pantalla pasan por aqui
 public class SceneManager {
 
     private static Stage stage;
     private static StackPane mainShellContentPane;
     private static javafx.scene.layout.VBox sidebar;
 
-    //escena y wrapper raiz reutilizados para evitar el flash entre pantallas
+    //escena y wrapper raíz reutilizada para evitar el flash entre pantallas
     private static Scene sharedScene;
     private static VBox sceneWrapper;
 
@@ -38,7 +38,7 @@ public class SceneManager {
         buildSharedScene();
     }
 
-    //construye la escena una sola vez, el contenido cambia pero la scene no se recrea
+    //construye la escena una sola vez, el contenido cambia, pero la scene no se recrea
     private static void buildSharedScene() {
         sceneWrapper = new VBox();
         sceneWrapper.setStyle(
@@ -201,10 +201,10 @@ public class SceneManager {
                 FXMLLoader loader = new FXMLLoader(fxmlUrl);
                 Parent modulesView = loader.load();
                 mainShellContentPane.getChildren().setAll(modulesView);
-                System.out.println("volvio a la vista de modulos");
+                System.out.println("volvió a la vista de módulos");
             }
         } catch (IOException e) {
-            System.err.println("error al cargar vista de modulos: " + e.getMessage());
+            System.err.println("error al cargar vista de módulos: " + e.getMessage());
         }
     }
 
@@ -232,12 +232,12 @@ public class SceneManager {
             if (sceneWrapper.getChildren().size() > 1) {
                 Parent oldRoot = (Parent) sceneWrapper.getChildren().get(1);
 
-                //insertar nuevo por debajo del viejo (indice 1), el viejo sube a 2
+                //insertar nuevo por debajo del viejo (índice 1), el viejo sube a 2
                 root.setOpacity(0.0);
                 VBox.setVgrow(root, Priority.ALWAYS);
                 sceneWrapper.getChildren().add(1, root);
 
-                //fade out del viejo y fade in del nuevo simultaneamente
+                //fade out del viejo y fade in del nuevo simultáneamente
                 FadeTransition fadeOut = new FadeTransition(Duration.millis(120), oldRoot);
                 fadeOut.setFromValue(1.0);
                 fadeOut.setToValue(0.0);
@@ -251,7 +251,7 @@ public class SceneManager {
                 fadeOut.play();
                 fadeIn.play();
             } else {
-                //primera carga, sin animacion
+                //primera carga, sin animación
                 sceneWrapper.getChildren().add(root);
                 VBox.setVgrow(root, Priority.ALWAYS);
             }
@@ -266,7 +266,7 @@ public class SceneManager {
         return stage;
     }
 
-    //expone el wrapper raiz para que CustomTitleBar pueda actualizar el radio al maximizar
+    //expone el wrapper raíz para que CustomTitleBar pueda actualizar el radio al maximizar
     public static VBox getSceneWrapper() {
         return sceneWrapper;
     }

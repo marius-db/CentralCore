@@ -15,10 +15,10 @@ public class CitizenModule implements Module {
     private Parent uiRoot;
     private CitizenModuleController controller;
 
-    //directorio del modulo inyectado por ModuleLoader
+    //directorio del módulo inyectado por ModuleLoader
     private File moduleDir;
 
-    //config leida de module.json, cargada en setModuleDir
+    //config leída de module.json, cargada en setModuleDir
     private ModuleConfig config;
 
     @Override

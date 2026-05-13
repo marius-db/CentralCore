@@ -17,7 +17,7 @@ public class UserDAO {
 
         Connection conn = DatabaseConnection.getConnection();
         if (conn == null) {
-            System.err.println("sin conexion a bd para autenticacion");
+            System.err.println("sin conexión a bd para autenticación");
             return null;
         }
 
@@ -41,7 +41,7 @@ public class UserDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("fallo la consulta de autenticacion: " + e.getMessage());
+            System.err.println("fallo la consulta de autenticación: " + e.getMessage());
         }
 
         return null;
@@ -54,7 +54,7 @@ public class UserDAO {
 
         Connection conn = DatabaseConnection.getConnection();
         if (conn == null) {
-            System.err.println("sin conexion a bd para registro");
+            System.err.println("sin conexión a bd para registro");
             return false;
         }
 
@@ -67,7 +67,7 @@ public class UserDAO {
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            //unicidad del email lanza duplicate key - no es un error critico
+            //unicidad del email lanza duplicate key - no es un error crítico
             System.err.println("fallo el registro de usuario: " + e.getMessage());
             return false;
         }

@@ -52,7 +52,7 @@ public class InstallsController implements Initializable, TranslationManager.Lan
         moduleListView.refresh();
     }
 
-    //celda personalizada para renderizar cada modulo en la lista
+    //celda personalizada para renderizar cada módulo en la lista
     private class ModuleListCell extends ListCell<Module> {
 
         private HBox container;
@@ -127,12 +127,12 @@ public class InstallsController implements Initializable, TranslationManager.Lan
                 lblName.setText(module.getName());
                 lblDescription.setText(module.getDescription());
 
-                //actualizar el logo con la imagen del modulo
+                //actualizar el logo con la imagen del módulo
                 logoPlaceholder.getChildren().setAll(
                         ModulesViewController.buildLogoNode(module, 50, 50)
                 );
 
-                //se recrea el menu en cada update para reflejar el modulo actual y el idioma actual
+                //se recrea el menu en cada update para reflejar el módulo actual y el idioma actual
                 ContextMenu contextMenu = createContextMenu(module);
                 btnMenu.setOnAction(e -> contextMenu.show(btnMenu, Side.BOTTOM, -60, 0));
 

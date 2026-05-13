@@ -123,17 +123,17 @@ public class CitizenModuleController implements Initializable {
         setupSplitPane();
     }
 
-    //configura el divisor del splitpane con posicion guardada y persistencia
+    //configura el divisor del split pane con posición guardada y persistencia
     private void setupSplitPane() {
         if (citizenSplitPane == null) return;
-        //cargar posicion guardada, por defecto 1/3 de la pantalla
+        //cargar posición guardada, por defecto 1/3 de la pantalla
         final double savedPos = PreferencesStorage.getDouble("citizen.splitpane.divider", 0.33);
         final double[] dividerPos = {savedPos};
-        //bandera para suprimir guardado mientras se restaura la posicion
+        //bandera para suprimir guardado mientras se restaura la posición
         final boolean[] settling = {true};
 
-        //esperar al primer layout real antes de restaurar, igual que el modulo de trafico
-        //layoutBoundsProperty cambia cuando el nodo tiene tamano asignado por javafx
+        //esperar al primer layout real antes de restaurar, igual que el módulo de tráfico
+        //layoutBoundsProperty cambia cuando el nodo tiene tamaño asignado por javafx
         citizenSplitPane.layoutBoundsProperty().addListener(new javafx.beans.value.ChangeListener<javafx.geometry.Bounds>() {
             @Override
             public void changed(javafx.beans.value.ObservableValue<? extends javafx.geometry.Bounds> obs,
@@ -148,7 +148,7 @@ public class CitizenModuleController implements Initializable {
             }
         });
 
-        //cuando se maximiza o restaura la ventana, replicar la posicion guardada sin guardarla
+        //cuando se maximiza o restaura la ventana, replicar la posición guardada sin guardarla
         citizenSplitPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene == null) return;
             newScene.windowProperty().addListener((o2, oldWin, win) -> {
@@ -165,7 +165,7 @@ public class CitizenModuleController implements Initializable {
             });
         });
 
-        //guardar posicion solo cuando el usuario mueve el divider, no durante el layout
+        //guardar posición solo cuando el usuario mueve el divider, no durante el layout
         citizenSplitPane.getDividers().get(0).positionProperty().addListener((obs, oldPos, newPos) -> {
             if (!settling[0]) {
                 dividerPos[0] = newPos.doubleValue();
@@ -199,7 +199,7 @@ public class CitizenModuleController implements Initializable {
                 "Soltero/a", "Casado/a", "Divorciado/a", "Viudo/a", "Pareja de hecho"
         ));
 
-        //restringir el campo telefono para que solo acepte numeros, espacios y signo +
+        //restringir el campo teléfono para que solo acepte números, espacios y signo +
         editPhone.textProperty().addListener((obs, old, val) -> {
             if (val != null && !val.matches("[0-9 +]*")) {
                 editPhone.setText(val.replaceAll("[^0-9 +]", ""));
@@ -452,7 +452,7 @@ public class CitizenModuleController implements Initializable {
             showFieldError(errLastName, "Los apellidos son obligatorios");
             valid = false;
         }
-        //fecha obligatoria y valida
+        //fecha obligatoria y válida
         if (editBirthDate.getValue() == null) {
             showFieldError(errBirthDate, "Obligatorio, formato: DD/MM/AAAA");
             valid = false;
@@ -460,13 +460,13 @@ public class CitizenModuleController implements Initializable {
             showFieldError(errBirthDate, "La fecha no puede ser futura");
             valid = false;
         }
-        //telefono: solo numeros, espacios y signo +
+        //teléfono: solo números, espacios y signo +
         String phone = editPhone.getText().trim();
         if (!phone.isBlank() && !phone.matches("[0-9 +]+")) {
-            showFieldError(errPhone, "Solo se permiten numeros y el signo +");
+            showFieldError(errPhone, "Solo se permiten números y el signo +");
             valid = false;
         }
-        //email: formato basico si esta relleno
+        //email: formato básico si esta relleno
         String email = editEmail.getText().trim();
         if (!email.isBlank() && !isValidEmail(email)) {
             showFieldError(errEmail, "Formato invalido, ej: correo@dominio.com");
@@ -500,7 +500,7 @@ public class CitizenModuleController implements Initializable {
         errLabel.setManaged(false);
     }
 
-    //validacion de formato de email
+    //validación de formato de email
     private boolean isValidEmail(String email) {
         return email.contains("@") && email.indexOf("@") > 0
                 && email.lastIndexOf(".") > email.indexOf("@") + 1;

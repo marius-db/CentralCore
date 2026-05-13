@@ -9,10 +9,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-//acceso a datos para incidentes de trafico y su historial de actualizaciones
+//acceso a datos para incidentes de tráfico y su historial de actualizaciones
 public class TrafficDAO {
 
-    //crea las tablas del modulo si no existen
+    //crea las tablas del módulo si no existen
     public static void initSchema() {
         Connection conn = DatabaseConnection.getConnection();
         if (conn == null) return;
@@ -128,7 +128,7 @@ public class TrafficDAO {
             System.err.println("error al actualizar estado del incidente: " + e.getMessage());
         }
 
-        //registrar la actualizacion en el historial
+        //registrar la actualización en el historial
         IncidentUpdate u = new IncidentUpdate();
         u.setIncidentId(incidentId);
         u.setEstado(newEstado);

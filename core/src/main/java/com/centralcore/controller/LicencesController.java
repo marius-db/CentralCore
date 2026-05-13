@@ -49,7 +49,7 @@ public class LicencesController implements Initializable, TranslationManager.Lan
         keyDialog.setTitle(TranslationManager.get("licences.add.title"));
         keyDialog.setHeaderText(TranslationManager.get("licences.add.header"));
         keyDialog.setContentText(TranslationManager.get("licences.add.prompt"));
-        //aplicar tema antes y despues de mostrar para cubrir todos los nodos del scene graph
+        //aplicar tema antes y después de mostrar para cubrir todos los nodos del scene graph
         applyDialogTheme(keyDialog.getDialogPane());
 
         String key = keyDialog.showAndWait().orElse(null);
@@ -63,9 +63,9 @@ public class LicencesController implements Initializable, TranslationManager.Lan
             return;
         }
 
-        //verificar que el email de la licencia coincide con el usuario en sesion
+        //verificar que el email de la licencia coincide con el usuario en sesión
         String tokenEmail = LicenseValidator.extractEmail(key);
-        String userEmail  = com.centralcore.util.SessionManager.getCurrentUser() != null
+        String userEmail = com.centralcore.util.SessionManager.getCurrentUser() != null
                 ? com.centralcore.util.SessionManager.getCurrentUser().getEmail()
                 : "";
         if (!tokenEmail.equals(userEmail)) {
@@ -128,12 +128,12 @@ public class LicencesController implements Initializable, TranslationManager.Lan
     }
 
     private void updateLabels() {
-        if (lblTitle      != null) lblTitle.setText(TranslationManager.get("licences.title"));
+        if (lblTitle != null) lblTitle.setText(TranslationManager.get("licences.title"));
         if (lblEmptyTitle != null) lblEmptyTitle.setText(TranslationManager.get("licences.noLicences"));
-        if (lblEmptyDesc  != null) lblEmptyDesc.setText(TranslationManager.get("licences.noLicencesDesc"));
-        if (btnAdd        != null) btnAdd.setText(TranslationManager.get("licences.btn.add"));
-        if (btnRemove     != null) btnRemove.setText(TranslationManager.get("licences.btn.remove"));
-        if (btnAddFirst   != null) btnAddFirst.setText(TranslationManager.get("licences.addFirst"));
+        if (lblEmptyDesc != null) lblEmptyDesc.setText(TranslationManager.get("licences.noLicencesDesc"));
+        if (btnAdd != null) btnAdd.setText(TranslationManager.get("licences.btn.add"));
+        if (btnRemove != null) btnRemove.setText(TranslationManager.get("licences.btn.remove"));
+        if (btnAddFirst != null) btnAddFirst.setText(TranslationManager.get("licences.addFirst"));
         //refrescar celdas para que el cambio de idioma se refleje en los labels
         if (licenceListView != null) licenceListView.refresh();
     }
@@ -143,9 +143,9 @@ public class LicencesController implements Initializable, TranslationManager.Lan
         updateLabels();
     }
 
-    //inyecta dialog.css en el scene del dialogo cuando ya esta montado
-    //los estilos inline se ignoran porque modena los sobreescribe con mayor especificidad;
-    //un stylesheet propio en el scene del dialogo gana correctamente
+    //inyecta dialog.css en el scene del diálogo cuando ya está montado
+    //los estilos inline se ignoran porque Módena los sobreescribe con mayor especificidad;
+    //un stylesheet propio en el scene del diálogo gana correctamente
     private void applyDialogTheme(DialogPane pane) {
         //esperar a que el dialogo tenga scene antes de inyectar el css
         if (pane.getScene() != null) {

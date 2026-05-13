@@ -27,7 +27,7 @@ public class WelcomeController implements Initializable, TranslationManager.Lang
     @FXML private Label lblTaglineSubtitle;
     @FXML private ImageView imgCity;
 
-    //si hay credenciales guardadas el boton entra en modo "continuar sesion"
+    //si hay credenciales guardadas el botón entra en modo "continuar sesión"
     private boolean hasSession = false;
 
     @Override
@@ -40,7 +40,7 @@ public class WelcomeController implements Initializable, TranslationManager.Lang
 
         loadCityImage();
 
-        //detectar si hay sesion guardada para cambiar el texto del boton, sin autologin automatico
+        //detectar si hay sesión guardada para cambiar el texto del botón, sin autologin automático
         hasSession = RememberMeStorage.hasCredentials();
         updateLabels();
     }

@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.Properties;
 
 //guarda y carga preferencias de estado de la ui en ~/.centralcore/ui_prefs.conf
-//usado para persistir posiciones de divisores, tamanios de paneles y similares
+//usado para persistir posiciones de divisores, tamaños de paneles y similares
 public class PreferencesStorage {
 
     private static final String PREFS_FILE = System.getProperty("user.home") + "/.centralcore/ui_prefs.conf";

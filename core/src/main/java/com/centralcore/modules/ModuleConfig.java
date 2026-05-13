@@ -1,6 +1,6 @@
 package com.centralcore.modules;
 
-//mapea el module.json de cada modulo, gson lo deserializa directamente
+//mapea él module.json de cada módulo, Gson lo deserialize directamente
 public class ModuleConfig {
     public String id;
     public String name;

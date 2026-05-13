@@ -69,11 +69,11 @@ public class LoginController implements Initializable, TranslationManager.Langua
             bg.setPreserveRatio(false);
             bg.setEffect(new GaussianBlur(20));
 
-            //vincular al loginRoot, no a la escena - el blur no debe llegar a la barra de titulo
+            //vincular al loginRoot, no a la escena - el blur no debe llegar a la barra de título
             bg.fitWidthProperty().bind(loginRoot.widthProperty());
             bg.fitHeightProperty().bind(loginRoot.heightProperty());
 
-            //clip para que el imageview no desborde los limites del loginRoot y tape la barra de titulo
+            //clip para que el ImageView no desborde los límites del loginRoot y tape la barra de título
             javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle();
             clip.widthProperty().bind(loginRoot.widthProperty());
             clip.heightProperty().bind(loginRoot.heightProperty());
@@ -131,7 +131,7 @@ public class LoginController implements Initializable, TranslationManager.Langua
 
 
 
-    //si habia credenciales guardadas las rellena automaticamente
+    //si había credenciales guardadas las rellena automáticamente
     private void tryLoadRememberedCredentials() {
         String[] creds = RememberMeStorage.load();
         if (creds != null) {
@@ -141,7 +141,7 @@ public class LoginController implements Initializable, TranslationManager.Langua
         }
     }
 
-    //valida que el email tenga formato basico con @
+    //valida que el email tenga formato básico con @
     private boolean isValidEmail(String email) {
         return email.contains("@") && email.indexOf("@") > 0
                 && email.lastIndexOf(".") > email.indexOf("@") + 1;
@@ -191,7 +191,7 @@ public class LoginController implements Initializable, TranslationManager.Langua
             return;
         }
 
-        //deshabilitar el boton durante la autenticacion para evitar doble envio
+        //deshabilitar el botón durante la autenticación para evitar doble envío
         btnLogin.setDisable(true);
         btnLogin.setText("...");
 
@@ -227,7 +227,7 @@ public class LoginController implements Initializable, TranslationManager.Langua
             btnLogin.setDisable(false);
             updateLabels();
             showError(TranslationManager.get("login.error.invalidCredentials"));
-            System.err.println("error en autenticacion: " + authTask.getException().getMessage());
+            System.err.println("error en autenticación: " + authTask.getException().getMessage());
         });
 
         new Thread(authTask, "login-auth-thread").start();
@@ -265,7 +265,7 @@ public class LoginController implements Initializable, TranslationManager.Langua
         boolean created = userDAO.register(username, email, password);
 
         if (created) {
-            //registro exitoso - vuelve al modo login con mensaje de confirmacion
+            //registro exitoso - vuelve al modo login con mensaje de confirmación
             isRegisterMode = false;
             setRegisterFieldsVisible(false);
             clearFields();

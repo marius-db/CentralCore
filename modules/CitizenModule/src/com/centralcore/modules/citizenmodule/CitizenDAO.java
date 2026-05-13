@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 //acceso a datos para ciudadanos y sus documentos
-//reutiliza la conexion h2 del core via DatabaseConnection
+//reutiliza la conexión h2 del core via DatabaseConnection
 public class CitizenDAO {
 
-    //crea las tablas del modulo si no existen
+    //crea las tablas del módulo si no existen
     public static void initSchema() {
         Connection conn = DatabaseConnection.getConnection();
         if (conn == null) return;

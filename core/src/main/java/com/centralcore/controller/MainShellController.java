@@ -150,7 +150,7 @@ public class MainShellController implements Initializable, TranslationManager.La
 
     @FXML
     private void onLogoutClicked() {
-        //limpiar sesion y credenciales guardadas para que welcome no ofrezca continuar
+        //limpiar sesión y credenciales guardadas para que welcome no ofrezca continuar
         SessionManager.clearSession();
         com.centralcore.util.RememberMeStorage.clear();
         SceneManager.showWelcome();
