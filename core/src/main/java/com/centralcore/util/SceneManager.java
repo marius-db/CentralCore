@@ -165,7 +165,7 @@ public class SceneManager {
         );
         header.setPrefHeight(24);
 
-        javafx.scene.control.Button btnBack = new javafx.scene.control.Button("\u2190 Back");
+        javafx.scene.control.Button btnBack = new javafx.scene.control.Button(TranslationManager.get("btn.back"));
         btnBack.setStyle(
                 "-fx-font-size: 10; -fx-padding: 4 8; -fx-cursor: hand; " +
                         "-fx-text-fill: #ecf0f1; -fx-background-color: #2c3e50; " +
