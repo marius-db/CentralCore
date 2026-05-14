@@ -79,6 +79,30 @@ Para hacer una compilación limpia desde cero (útil si algo parece roto):
 
 ---
 
+## Generar el instalador
+
+**Requisitos previos:**
+- JDK 21+ con `jpackage`(incluido en la mayoría de distribuciones JDK 21)
+- [WiX Toolset 3.14.1](https://github.com/wixtoolset/wix3/releases): usa el repositorio legacy v3, la v4 no es compatible con jpackage
+
+**Pasos:**
+
+1. Compila el proyecto:
+   ```bash
+   ./gradlew build
+   ```
+
+2. Empaqueta la aplicación (reemplaza la ruta de jpackage con la ubicación real de tu JDK):
+   ```
+   ruta\a\jpackage.exe --type exe --name CentralCore --input core/build/libs --main-jar centralcore-0.1.0.jar --main-class com.centralcore.Main --dest dist --icon core/src/main/resources/icon.ico --win-menu --win-shortcut --win-per-user-install --app-version 0.1.0
+   ```
+
+3. El instalador quedará en la carpeta `dist/`.
+
+El flag `--win-per-user-install` instala en la carpeta AppData del usuario, por lo que no se requieren permisos de administrador.
+
+---
+
 ## Sistema de módulos
 
 ### Cómo se cargan los módulos
@@ -337,14 +361,14 @@ Ejecuta todos los tests con:
 ## Dependencias
 
 | Librería | Versión | Propósito |
-|---|---|---|
-| JavaFX | 21 | Framework de UI |
+|---|---------|---|
+| JavaFX | 21      | Framework de UI |
 | H2 | 2.4.240 | Base de datos embebida |
-| jBCrypt | 0.4 | Hash de contraseñas |
-| Gson | 2.10.1 | Parseo del module.json |
-| JNA | 5.14.0 | Integración nativa DWM en Windows |
-| Shadow | 8.3.0 | Empaquetado de módulos como fat JARs |
-| JUnit Jupiter | 5.10.2 | Tests unitarios e integración |
+| jBCrypt | 0.4     | Hash de contraseñas |
+| Gson | 2.10.1  | Parseo del module.json |
+| JNA | 5.14.0  | Integración nativa DWM en Windows |
+| Shadow | 9.4.1   | Empaquetado de módulos como fat JARs |
+| JUnit Jupiter | 5.10.2  | Tests unitarios e integración |
 
 ---
 

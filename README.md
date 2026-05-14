@@ -79,6 +79,30 @@ To do a clean build from scratch (useful if something seems broken):
 
 ---
 
+## Building the installer
+
+**Prerequisites:**
+- JDK 21+ with `jpackage`(included in most JDK 21 distributions)
+- [WiX Toolset 3.14.1](https://github.com/wixtoolset/wix3/releases): use the legacy v3 repo, v4 is not supported by jpackage
+
+**Steps:**
+
+1. Build the project:
+   ```bash
+   ./gradlew build
+   ```
+
+2. Package the app (replace the jpackage path with your actual JDK bin location):
+   ```
+   path\to\jpackage.exe --type exe --name CentralCore --input core/build/libs --main-jar centralcore-0.1.0.jar --main-class com.centralcore.Main --dest dist --icon core/src/main/resources/icon.ico --win-menu --win-shortcut --win-per-user-install --app-version 0.1.0
+   ```
+
+3. The installer will be in the `dist/` folder.
+
+The `--win-per-user-install` flag installs to the user's AppData folder, so no admin privileges are required.
+
+---
+
 ## Module system
 
 ### How modules are loaded
@@ -337,14 +361,14 @@ Run all tests with:
 ## Dependencies
 
 | Library | Version | Purpose |
-|---|---|---|
-| JavaFX | 21 | UI framework |
+|---|---------|---|
+| JavaFX | 21      | UI framework |
 | H2 | 2.4.240 | Embedded database |
-| jBCrypt | 0.4 | Password hashing |
-| Gson | 2.10.1 | module.json parsing |
-| JNA | 5.14.0 | Native Windows DWM integration |
-| Shadow | 8.3.0 | Fat JAR packaging for modules |
-| JUnit Jupiter | 5.10.2 | Unit and integration tests |
+| jBCrypt | 0.4     | Password hashing |
+| Gson | 2.10.1  | module.json parsing |
+| JNA | 5.14.0  | Native Windows DWM integration |
+| Shadow | 9.4.1   | Fat JAR packaging for modules |
+| JUnit Jupiter | 5.10.2  | Unit and integration tests |
 
 ---
 
