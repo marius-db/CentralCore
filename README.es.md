@@ -83,22 +83,24 @@ Para hacer una compilación limpia desde cero (útil si algo parece roto):
 
 ### Cómo se cargan los módulos
 
-Al arrancar, la aplicación escanea la carpeta `modules/` junto a la aplicación en ejecución y carga lo que encuentra. Hay dos formatos soportados:
+Al arrancar, la aplicación escanea `~/.centralcore/modules/` y carga lo que encuentra. Esta carpeta se crea automáticamente en el primer arranque. También puedes forzar una recarga desde la pantalla de Instalaciones sin reiniciar la aplicación.
 
-**Modo distribución (archivos JAR):** Coloca un JAR de módulo compilado directamente en la raíz de `modules/`:
+Hay dos formatos soportados:
+
+**Modo distribución (archivos JAR):** Coloca un JAR de módulo compilado directamente en `~/.centralcore/modules/`:
 
 ```
-modules/
+~/.centralcore/modules/
   CitizenModule.jar
   TrafficModule.jar
 ```
 
 La aplicación lee el `module.json` desde dentro del JAR, carga la clase del módulo y lo inicializa. Este es el formato que usarías al distribuir la aplicación a otra persona.
 
-**Modo desarrollo (clases compiladas):** Durante el desarrollo, los módulos se cargan directamente desde la salida de compilación de Gradle sin necesidad de empaquetarlos como JARs primero:
+**Modo desarrollo (clases compiladas):** Durante el desarrollo, los módulos se pueden cargar directamente desde la salida de compilación de Gradle sin empaquetarlos como JARs primero. Coloca la carpeta del proyecto del módulo dentro de `~/.centralcore/modules/` para que el cargador la encuentre:
 
 ```
-modules/
+~/.centralcore/modules/
   CitizenModule/
     build/classes/java/main/
     build/resources/main/
@@ -107,7 +109,7 @@ modules/
     ...
 ```
 
-Cuando ambos formatos están presentes para el mismo módulo, el JAR tiene prioridad y se omite el directorio.
+La carpeta del proyecto del módulo tiene que estar ahí, no basta con una referencia o acceso directo. Cuando ambos formatos están presentes para el mismo módulo, el JAR tiene prioridad y se omite el directorio.
 
 Cada módulo tiene su propio `URLClassLoader` aislado para que no haya conflictos de clases entre módulos. El shell solo conoce la interfaz `Module`; las clases concretas del módulo son invisibles para él.
 
@@ -129,10 +131,10 @@ Cada módulo necesita un `module.json` en la raíz de su carpeta de proyecto (mo
 
 ### Crear un nuevo módulo
 
-1. Crea una nueva subcarpeta dentro de `modules/` con su propio `build.gradle`, `module.json` y directorio `src/`.
+1. Crea una nueva subcarpeta dentro de `modules/` en el proyecto con su propio `build.gradle`, `module.json` y directorio `src/`.
 2. Añádelo a `settings.gradle`: `include 'modules:MiModulo'`
 3. La clase principal debe implementar `com.centralcore.modules.Module` y tener un constructor sin argumentos.
-4. Cada módulo tiene su propio `URLClassLoader` aislado para que no haya conflictos de clases entre módulos.
+4. Para ejecutarlo, coloca la carpeta del proyecto compilada (o el shadow JAR generado) dentro de `~/.centralcore/modules/`.
 
 La interfaz `Module` requiere: `getModuleId()`, `getName()`, `getVersion()`, `getDescription()`, `getLogoPath()`, `setModuleDir(File)`, `initialize()`, `shutdown()`, `reload()` y `getMainUI()`. El módulo puede llamar a su propio equivalente de `initSchema()` en `initialize()` para extender la base de datos H2 compartida con sus propias tablas.
 
@@ -145,7 +147,7 @@ Para compilar el shadow JAR de un módulo concreto:
 ./gradlew :modules:TrafficModule:shadowJar
 ```
 
-O simplemente ejecuta `./gradlew build` para compilarlo todo de una vez. Tras compilar, copia los JARs desde `modules/CitizenModule/build/libs/` a la raíz de `modules/` si quieres usar el modo distribución.
+O simplemente ejecuta `./gradlew build` para compilarlo todo de una vez. Tras compilar, copia los JARs desde `modules/CitizenModule/build/libs/` a `~/.centralcore/modules/` para usar el modo distribución.
 
 ---
 
@@ -260,7 +262,7 @@ Las tablas se crean automáticamente en el primer arranque. No necesitas configu
 | `traffic_incidents` | Incidentes de tráfico con tipo, coordenadas en el mapa y estado |
 | `traffic_incident_updates` | Historial de actualizaciones de cada incidente |
 
-El archivo de base de datos se encuentra en `~/centralcore_db.mv.db` (en tu directorio home). Puedes eliminarlo desde Ajustes dentro de la aplicación, o borrar el archivo manualmente para empezar desde cero.
+El archivo de base de datos se encuentra en `~/.centralcore/centralcore_db.mv.db`.
 
 > El `SchemaInitializer` del core también crea las tablas `vehiculos` e `incidentes_trafico` como parte del schema base, aunque ninguna de las dos la usan los módulos actuales.
 
@@ -305,10 +307,12 @@ La casilla "recuérdame" en el login guarda las credenciales (ofuscadas en Base6
 
 ## Archivos de configuración locales
 
-CentralCore almacena algunos archivos en `~/.centralcore/`:
+CentralCore almacena algunos archivos y carpetas en `~/.centralcore/`:
 
-| Archivo | Contenido |
+| Ruta | Contenido |
 |---|---|
+| `modules/` | JARs de módulos o carpetas de proyecto que se cargan al arrancar |
+| `centralcore_db.mv.db` | Archivo de base de datos H2 |
 | `language.conf` | Último idioma seleccionado (`en` o `es`) |
 | `remember.conf` | Credenciales guardadas cuando "recuérdame" está activo |
 | `ui_prefs.conf` | Estado de la UI como posiciones de divisores de paneles |

@@ -100,19 +100,6 @@ public class ModuleDetailsDialog {
             lblStatus.setVisible(true);
         });
 
-        Button btnDelete = new Button(TranslationManager.get("module.details.btn.delete"));
-        btnDelete.setStyle(
-                "-fx-padding: 8 16; " +
-                        "-fx-font-size: 12; " +
-                        "-fx-cursor: hand; " +
-                        "-fx-background-color: #e74c3c; " +
-                        "-fx-text-fill: white;"
-        );
-        btnDelete.setOnAction(e -> {
-            System.out.println("eliminar modulo: " + module.getName());
-            dialogStage.close();
-        });
-
         Button btnClose = new Button(TranslationManager.get("module.details.btn.close"));
         btnClose.setStyle(
                 "-fx-padding: 8 16; " +
@@ -125,7 +112,7 @@ public class ModuleDetailsDialog {
         );
         btnClose.setOnAction(e -> dialogStage.close());
 
-        buttonsBox.getChildren().addAll(btnUpdate, btnDelete, btnClose);
+        buttonsBox.getChildren().addAll(btnUpdate, btnClose);
 
         root.getChildren().addAll(
                 lblName,

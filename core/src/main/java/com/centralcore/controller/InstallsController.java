@@ -146,10 +146,7 @@ public class InstallsController implements Initializable, TranslationManager.Lan
             MenuItem itemViewDetails = new MenuItem(TranslationManager.get("installs.menu.viewDetails"));
             itemViewDetails.setOnAction(e -> ModuleDetailsDialog.show(SceneManager.getStage(), module));
 
-            MenuItem itemDelete = new MenuItem(TranslationManager.get("installs.menu.delete"));
-            itemDelete.setOnAction(e -> System.out.println("eliminar modulo: " + module.getName()));
-
-            menu.getItems().addAll(itemViewDetails, itemDelete);
+            menu.getItems().addAll(itemViewDetails);
             return menu;
         }
     }

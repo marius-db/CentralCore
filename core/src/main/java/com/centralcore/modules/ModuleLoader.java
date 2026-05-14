@@ -18,12 +18,12 @@ import com.google.gson.Gson;
 
 //descubre y carga módulos desde la carpeta /modules usando reflexion
 //prioridad de carga:
-//  1. JARs sueltos en la raíz de /modules (distribución): modules/MiModulo.jar
+//  1. JARs sueltos en la raíz de /módulos (distribución): modules/MiModulo.jar
 //  2. Subdirectorios con build/classes/java/main (desarrollo): modules/MiModulo/build/...
 public class ModuleLoader {
 
     private static final Gson gson = new Gson();
-    private static final String MODULES_FOLDER = "modules";
+    private static final String MODULES_FOLDER = System.getProperty("user.home") + "/.centralcore/modules";
 
     private ModuleLoader() {
     }

@@ -8,7 +8,7 @@ import java.sql.SQLException;
 //el archivo .mv.db se crea solo en el home del usuario la primera vez
 public class DatabaseConnection {
 
-    private static final String DB_PATH = System.getProperty("user.home") + "/centralcore_db";
+    private static final String DB_PATH = System.getProperty("user.home") + "/.centralcore/centralcore_db";
 
     //AUTO_SERVER=TRUE por si acaso se abre desde dos sitios, DB_CLOSE_DELAY=-1 para que no cierre sola
     private static final String URL =

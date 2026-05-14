@@ -83,22 +83,22 @@ To do a clean build from scratch (useful if something seems broken):
 
 ### How modules are loaded
 
-On startup the app scans the `modules/` folder next to the running application and loads whatever it finds. There are two supported formats:
+On startup the app scans `~/.centralcore/modules/` and loads whatever it finds. This folder is created automatically on first launch. You can also trigger a reload from the Installs screen without restarting the app. There are two supported formats:
 
-**Distribution mode (JAR files):** Drop a compiled module JAR directly into the `modules/` root:
+**Distribution mode (JAR files):** Drop a compiled module JAR directly into `~/.centralcore/modules/`:
 
 ```
-modules/
+~/.centralcore/modules/
   CitizenModule.jar
   TrafficModule.jar
 ```
 
 The app reads `module.json` from inside the JAR, loads the module class, and initializes it. This is the format you would use when distributing the app to someone else.
 
-**Development mode (compiled classes):** During development, modules are loaded directly from their Gradle build output without needing to package them as JARs first:
+**Development mode (compiled classes):** During development, modules can be loaded directly from their Gradle build output without packaging them as JARs first. Place the module project folder inside `~/.centralcore/modules/` so the loader can find it:
 
 ```
-modules/
+~/.centralcore/modules/
   CitizenModule/
     build/classes/java/main/
     build/resources/main/
@@ -107,7 +107,7 @@ modules/
     ...
 ```
 
-When both formats are present for the same module, the JAR takes priority and the directory is skipped.
+The module project folder needs to be there, not just a symlink or reference to it. When both formats are present for the same module, the JAR takes priority and the directory is skipped.
 
 Each module gets its own isolated `URLClassLoader` so there are no class conflicts between modules. The module interface is the only thing the core shell knows about; module classes are invisible to it otherwise.
 
@@ -129,10 +129,10 @@ Every module needs a `module.json` either at the root of its project folder (dev
 
 ### Creating a new module
 
-1. Create a new subfolder under `modules/` with its own `build.gradle`, `module.json`, and `src/` directory.
+1. Create a new subfolder under `modules/` in the project with its own `build.gradle`, `module.json`, and `src/` directory.
 2. Add it to `settings.gradle`: `include 'modules:MyModule'`
 3. The main class must implement `com.centralcore.modules.Module` and have a no-args constructor.
-4. Each module gets its own isolated `URLClassLoader` so there are no class conflicts between modules.
+4. To run it, place the compiled project folder (or the built shadow JAR) inside `~/.centralcore/modules/`.
 
 The `Module` interface requires: `getModuleId()`, `getName()`, `getVersion()`, `getDescription()`, `getLogoPath()`, `setModuleDir(File)`, `initialize()`, `shutdown()`, `reload()`, and `getMainUI()`. The module can also call `CitizenDAO.initSchema()` or its own equivalent in `initialize()` to extend the shared H2 database with its own tables.
 
@@ -145,7 +145,7 @@ To build the shadow JAR for a specific module:
 ./gradlew :modules:TrafficModule:shadowJar
 ```
 
-Or just run `./gradlew build` to build everything at once. After building, copy the JARs from `modules/CitizenModule/build/libs/` to the `modules/` root if you want to use distribution mode.
+Or just run `./gradlew build` to build everything at once. After building, copy the JARs from `modules/CitizenModule/build/libs/` to `~/.centralcore/modules/` to use distribution mode.
 
 ---
 
@@ -260,7 +260,7 @@ Tables are created automatically on first run. You never need to set anything up
 | `traffic_incidents` | Traffic incidents with type, map coordinates, and state |
 | `traffic_incident_updates` | Update history for each incident |
 
-The database file lives at `~/centralcore_db.mv.db` (in your home directory). You can delete it from Settings inside the app, or manually delete the file to start fresh.
+The database file lives at `~/.centralcore/centralcore_db.mv.db`. You can delete it from Settings inside the app, or manually delete the file to start fresh.
 
 > The core `SchemaInitializer` also creates `vehiculos` and `incidentes_trafico` tables as part of the base schema, though neither is actively used by the current modules.
 
@@ -305,10 +305,12 @@ The "remember me" checkbox on login saves credentials (Base64 obfuscated, not en
 
 ## Local config files
 
-CentralCore stores a few files in `~/.centralcore/`:
+CentralCore stores a few files and folders in `~/.centralcore/`:
 
-| File | Contents |
+| Path | Contents |
 |---|---|
+| `modules/` | Module JARs or project folders picked up on launch |
+| `centralcore_db.mv.db` | H2 database file |
 | `language.conf` | Last selected language (`en` or `es`) |
 | `remember.conf` | Saved credentials when remember me is active |
 | `ui_prefs.conf` | UI state like split pane divider positions |
