@@ -21,10 +21,10 @@ public class App extends Application {
         stage.initStyle(StageStyle.TRANSPARENT);
 
         stage.setTitle("CentralCore");
-        stage.setMinWidth(1100);
-        stage.setMinHeight(680);
-        stage.setWidth(1280);
-        stage.setHeight(720);
+        stage.setMinWidth(1380);
+        stage.setMinHeight(820);
+        stage.setWidth(1380);
+        stage.setHeight(820);
 
         //initialize construye la escena compartida y la asigna al stage
         SceneManager.initialize(stage);

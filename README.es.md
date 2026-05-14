@@ -83,9 +83,7 @@ Para hacer una compilación limpia desde cero (útil si algo parece roto):
 
 ### Cómo se cargan los módulos
 
-Al arrancar, la aplicación escanea `~/.centralcore/modules/` y carga lo que encuentra. Esta carpeta se crea automáticamente en el primer arranque. También puedes forzar una recarga desde la pantalla de Instalaciones sin reiniciar la aplicación.
-
-Hay dos formatos soportados:
+Al arrancar, la aplicación escanea `~/.centralcore/modules/` y carga lo que encuentra. Esta carpeta se crea automáticamente en el primer arranque. También puedes forzar una recarga en cualquier momento con el botón **↻ Recargar módulos** de la pantalla de Instalaciones — apaga todos los módulos activos, vuelve a escanear la carpeta y los reinicializa, sin reiniciar la aplicación. Hay dos formatos soportados:
 
 **Modo distribución (archivos JAR):** Coloca un JAR de módulo compilado directamente en `~/.centralcore/modules/`:
 
@@ -262,7 +260,7 @@ Las tablas se crean automáticamente en el primer arranque. No necesitas configu
 | `traffic_incidents` | Incidentes de tráfico con tipo, coordenadas en el mapa y estado |
 | `traffic_incident_updates` | Historial de actualizaciones de cada incidente |
 
-El archivo de base de datos se encuentra en `~/.centralcore/centralcore_db.mv.db`.
+El archivo de base de datos se encuentra en `~/.centralcore/centralcore_db.mv.db`. Puedes eliminarlo desde Ajustes dentro de la aplicación, o borrar el archivo manualmente para empezar desde cero.
 
 > El `SchemaInitializer` del core también crea las tablas `vehiculos` e `incidentes_trafico` como parte del schema base, aunque ninguna de las dos la usan los módulos actuales.
 
@@ -275,7 +273,7 @@ Bienvenida -> Login -> Shell Principal
                         ├── Módulos (vista por defecto)
                         │     ├── CitizenModule
                         │     └── TrafficModule
-                        ├── Instalaciones  - lista los módulos cargados con detalles
+                        ├── Instalaciones  - lista los módulos cargados con nombre, icono y descripción; el botón ↻ Recargar módulos en la esquina superior derecha recarga todos los módulos desde disco sin reiniciar la aplicación
                         ├── Licencias      - añadir/eliminar clave de licencia
                         └── Ajustes        - idioma, controles de BD, zona peligrosa
 ```
@@ -300,6 +298,7 @@ La tabla `users` soporta dos roles: `admin` y `operator`. Las cuentas nuevas reg
 
 - **Email:** `admin@centralcore.local`
 - **Contraseña:** `Admin1234`
+- **Licencia:** `YWRtaW5AY2VudHJhbGNvcmUubG9jYWx8MjExMi0xMi0zMXxrdGpQbWxVMVdwM2NEbkRWNkM4R1Z4OUdkbW9Hbk1NZXhuRkE5MzhRSWhjPQ==`
 
 La casilla "recuérdame" en el login guarda las credenciales (ofuscadas en Base64, no cifradas) en `~/.centralcore/remember.conf`. Es ofuscación de conveniencia, no seguridad real.
 

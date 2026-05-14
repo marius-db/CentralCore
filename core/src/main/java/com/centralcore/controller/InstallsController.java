@@ -27,6 +27,7 @@ public class InstallsController implements Initializable, TranslationManager.Lan
 
     @FXML private ListView<Module> moduleListView;
     @FXML private Label lblTitle;
+    @FXML private Button btnRefresh;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -41,8 +42,16 @@ public class InstallsController implements Initializable, TranslationManager.Lan
         moduleListView.setCellFactory(param -> new ModuleListCell());
     }
 
+    @FXML
+    private void onRefreshModules() {
+        ModuleManager.getInstance().reloadAll();
+        moduleListView.getItems().clear();
+        moduleListView.getItems().addAll(ModuleManager.getInstance().getAllModules());
+    }
+
     private void updateLabels() {
         if (lblTitle != null) lblTitle.setText(TranslationManager.get("installs.title"));
+        if (btnRefresh != null) btnRefresh.setText(TranslationManager.get("installs.btn.reload"));
     }
 
     @Override

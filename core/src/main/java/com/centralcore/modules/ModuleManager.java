@@ -99,4 +99,11 @@ public class ModuleManager {
     public int getModuleCount() {
         return modules.size();
     }
+
+    //descarga todos los módulos activos y los vuelve a escanear desde disco
+    //útil para cargar/descargar módulos en caliente sin reiniciar la app
+    public void reloadAll() {
+        shutdownAllModules();
+        loadAndInitializeModules();
+    }
 }
