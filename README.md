@@ -83,7 +83,7 @@ To do a clean build from scratch (useful if something seems broken):
 
 ### How modules are loaded
 
-On startup the app scans `~/.centralcore/modules/` and loads whatever it finds. This folder is created automatically on first launch. You can also trigger a reload from the Installs screen without restarting the app. There are two supported formats:
+On startup the app scans `~/.centralcore/modules/` and loads whatever it finds. This folder is created automatically on first launch. You can also trigger a full reload at any time from the **Reload Modules** button on the Installs screen, it shuts down all active modules, rescans the folder, and reinitializes everything without restarting the app. There are two supported formats:
 
 **Distribution mode (JAR files):** Drop a compiled module JAR directly into `~/.centralcore/modules/`:
 
@@ -273,7 +273,7 @@ Welcome -> Login -> Main Shell
                      ├── Modules (default view)
                      │     ├── CitizenModule
                      │     └── TrafficModule
-                     ├── Installs   - lists loaded modules with details
+                     ├── Installs   - lists loaded modules with name, icon and description; the Reload Modules button in the top-right hot-reloads all modules from disk without restarting the app
                      ├── Licences   - add/remove licence key
                      └── Settings   - language, DB controls, danger zone
 ```
@@ -298,6 +298,7 @@ The `users` table supports two roles: `admin` and `operator`. New accounts regis
 
 - **Email:** `admin@centralcore.local`
 - **Password:** `Admin1234`
+- **License:** `YWRtaW5AY2VudHJhbGNvcmUubG9jYWx8MjExMi0xMi0zMXxrdGpQbWxVMVdwM2NEbkRWNkM4R1Z4OUdkbW9Hbk1NZXhuRkE5MzhRSWhjPQ==`
 
 The "remember me" checkbox on login saves credentials (Base64 obfuscated, not encrypted) to `~/.centralcore/remember.conf`. This is convenience obfuscation only, not real security.
 
