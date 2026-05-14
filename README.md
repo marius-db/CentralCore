@@ -47,10 +47,11 @@ From the project root, run:
 ```
 The first run will take a moment while Gradle downloads dependencies. After that it starts quickly.
 
-On first launch the app automatically creates the H2 database and initializes all tables. You can log in immediately with the default admin account:
+On first launch, the app automatically creates the H2 database and initializes all tables. You can log in immediately with the default admin account:
 
 - **Email:** `admin@centralcore.local`
 - **Password:** `Admin1234`
+- **License:** `YWRtaW5AY2VudHJhbGNvcmUubG9jYWx8MjExMi0xMi0zMXxrdGpQbWxVMVdwM2NEbkRWNkM4R1Z4OUdkbW9Hbk1NZXhuRkE5MzhRSWhjPQ==`
 
 If you are using IntelliJ IDEA, just open the project folder and let it import as a Gradle project. Then run the `Main` class inside `core/src/main/java/com/centralcore/`.
 

@@ -47,10 +47,11 @@ Desde la raíz del proyecto, ejecuta:
 ```
 La primera vez tardará un momento mientras Gradle descarga las dependencias. Después arranca rápido.
 
-En el primer arranque la aplicación crea automáticamente la base de datos H2 e inicializa todas las tablas. Puedes iniciar sesión de inmediato con la cuenta de administrador por defecto:
+En el primer arranque, la aplicación crea automáticamente la base de datos H2 e inicializa todas las tablas. Puedes iniciar sesión de inmediato con la cuenta de administrador por defecto:
 
 - **Email:** `admin@centralcore.local`
 - **Contraseña:** `Admin1234`
+- **Licencia:** `YWRtaW5AY2VudHJhbGNvcmUubG9jYWx8MjExMi0xMi0zMXxrdGpQbWxVMVdwM2NEbkRWNkM4R1Z4OUdkbW9Hbk1NZXhuRkE5MzhRSWhjPQ==`
 
 Si usas IntelliJ IDEA, abre la carpeta del proyecto y deja que lo importe como proyecto Gradle. Luego ejecuta la clase `Main` dentro de `core/src/main/java/com/centralcore/`.
 
