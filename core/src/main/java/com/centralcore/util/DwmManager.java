@@ -26,14 +26,14 @@ public class DwmManager {
     private static final int WM_NCCALCSIZE = 0x0083;
 
     //resultados del hit test para resize en cada borde y esquina
-    private static final int HTCLIENT      = 1;
-    private static final int HTLEFT        = 10;
-    private static final int HTRIGHT       = 11;
-    private static final int HTTOP         = 12;
-    private static final int HTTOPLEFT     = 13;
-    private static final int HTTOPRIGHT    = 14;
-    private static final int HTBOTTOM      = 15;
-    private static final int HTBOTTOMLEFT  = 16;
+    private static final int HTCLIENT = 1;
+    private static final int HTLEFT = 10;
+    private static final int HTRIGHT = 11;
+    private static final int HTTOP = 12;
+    private static final int HTTOPLEFT = 13;
+    private static final int HTTOPRIGHT = 14;
+    private static final int HTBOTTOM = 15;
+    private static final int HTBOTTOMLEFT = 16;
     private static final int HTBOTTOMRIGHT = 17;
 
     //grosor del borde de resize en pixeles
@@ -43,14 +43,14 @@ public class DwmManager {
     private static final int WS_THICKFRAME = 0x00040000;
 
     //indices de SetWindowLong/GetWindowLong
-    private static final int GWL_STYLE   = -16;
+    private static final int GWL_STYLE = -16;
     private static final int GWL_WNDPROC = -4;
 
     //flags para SetWindowPos al forzar recálculo del frame
     private static final int SWP_FRAMECHANGED = 0x0020;
-    private static final int SWP_NOMOVE       = 0x0002;
-    private static final int SWP_NOSIZE       = 0x0001;
-    private static final int SWP_NOZORDER     = 0x0004;
+    private static final int SWP_NOMOVE = 0x0002;
+    private static final int SWP_NOSIZE = 0x0001;
+    private static final int SWP_NOZORDER = 0x0004;
 
     //interfaz jna para acceder a dwmapi.dll
     interface Dwmapi extends StdCallLibrary {
