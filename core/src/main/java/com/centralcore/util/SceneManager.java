@@ -7,7 +7,7 @@ import com.centralcore.modules.Module;
 
 import javafx.animation.FadeTransition;
 import javafx.scene.shape.Rectangle;
-import javafx.application.Platform;
+import javafx.scene.Group;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -16,6 +16,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -29,6 +30,11 @@ public class SceneManager {
     //escena y wrapper raíz reutilizada para evitar el flash entre pantallas
     private static Scene sharedScene;
     private static VBox sceneWrapper;
+
+    //dimensiones de diseño — el layout siempre se calcula a este tamaño,
+    //y un Scale transform lo adapta al tamaño real de la ventana
+    private static final double DESIGN_W = 1380;
+    private static final double DESIGN_H = 820;
 
     private static final String FXML_PATH = "/com/centralcore/fxml/";
     private static final String CSS_PATH  = "/com/centralcore/css/";
@@ -50,6 +56,12 @@ public class SceneManager {
                         "-fx-background-radius: 8;"
         );
 
+        //fijar el tamaño de diseño: el layout siempre se calcula a 1380x820
+        sceneWrapper.setPrefWidth(DESIGN_W);
+        sceneWrapper.setPrefHeight(DESIGN_H);
+        sceneWrapper.setMaxWidth(DESIGN_W);
+        sceneWrapper.setMaxHeight(DESIGN_H);
+
         //clip redondeado para que las esquinas se vean bien en modo ventana
         //al maximizar se elimina el clip para que ocupe toda la pantalla sin huecos
         applyRoundedClip(8);
@@ -59,7 +71,31 @@ public class SceneManager {
         CustomTitleBar titleBar = new CustomTitleBar(stage);
         sceneWrapper.getChildren().add(titleBar);
 
-        sharedScene = new Scene(sceneWrapper);
+        //viewport: contenedor transparente que ocupa toda la ventana real
+        //el sceneWrapper (contenido de diseño) se escala dentro de este viewport
+        StackPane viewport = new StackPane();
+        viewport.setBackground(javafx.scene.layout.Background.EMPTY);
+
+        //scale transform: adapta sceneWrapper (1380x820) al tamaño real de la ventana
+        //xProperty y yProperty pueden diferir si la ventana tiene otro aspect ratio,
+        //esto rellena la pantalla completamente; si prefieres barras negras y ratio fijo,
+        //usa Bindings.min(viewport.widthProperty().divide(DESIGN_W), viewport.heightProperty().divide(DESIGN_H))
+        //para ambas propiedades
+        Scale scaleTransform = new Scale();
+        scaleTransform.setPivotX(0);
+        scaleTransform.setPivotY(0);
+        scaleTransform.xProperty().bind(viewport.widthProperty().divide(DESIGN_W));
+        scaleTransform.yProperty().bind(viewport.heightProperty().divide(DESIGN_H));
+        sceneWrapper.getTransforms().add(scaleTransform);
+
+        //group no es redimensionable, así StackPane no encoge sceneWrapper en el layout pass,
+        //sin esto el Scale actúa sobre un wrapper ya reducido y el contenido queda
+        //más pequeño que la ventana en vez de ajustarse a ella
+        Group scalingGroup = new Group(sceneWrapper);
+        StackPane.setAlignment(scalingGroup, javafx.geometry.Pos.TOP_LEFT);
+        viewport.getChildren().add(scalingGroup);
+
+        sharedScene = new Scene(viewport);
         //con undecorated no necesitamos fill transparente
         sharedScene.setFill(Color.TRANSPARENT);  //transparente requerido por StageStyle.TRANSPARENT
 

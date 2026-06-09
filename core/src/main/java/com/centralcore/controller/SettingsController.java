@@ -206,9 +206,23 @@ public class SettingsController implements Initializable, TranslationManager.Lan
 
         new Thread(() -> {
             try { Thread.sleep(300); } catch (InterruptedException ignored) {}
-            String dbPath = System.getProperty("user.home") + "/centralcore_db";
-            new File(dbPath + ".mv.db").delete();
-            new File(dbPath + ".trace.db").delete();
+            String dbPath = System.getProperty("user.home") + "/.centralcore/centralcore_db";
+            File dbFile = new File(dbPath + ".mv.db");
+
+            System.out.println("exists: " + dbFile.exists());
+
+            boolean deleted = dbFile.delete();
+
+            System.out.println("deleted: " + deleted);
+
+            File dbFile2 = new File(dbPath + ".trace.db");
+
+            System.out.println("exists: " + dbFile.exists());
+
+            boolean deleted2 = dbFile.delete();
+
+            System.out.println("deleted: " + deleted);
+
             Platform.runLater(this::exitAfterDelete);
         }).start();
     }

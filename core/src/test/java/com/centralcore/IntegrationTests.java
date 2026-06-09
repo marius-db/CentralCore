@@ -89,4 +89,18 @@ class IntegrationTests {
         assertNotNull(found);
         assertEquals("test@centralcore.com", found.getEmail());
     }
+
+    @Test
+    void authentication_fullFlow_sessionEstablished() {
+        //flujo completo: registro, autenticacion y recuperacion por id sobre el mismo usuario
+        UserDAO dao = new UserDAO();
+        boolean registered = dao.register("testuser", "flow@centralcore.com", "pass123");
+        assertTrue(registered);
+        User authenticated = dao.authenticate("flow@centralcore.com", "pass123");
+        assertNotNull(authenticated);
+        User found = dao.findById(authenticated.getId());
+        assertNotNull(found);
+        assertEquals(authenticated.getEmail(), found.getEmail());
+        assertEquals(authenticated.getUsername(), found.getUsername());
+    }
 }

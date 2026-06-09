@@ -104,6 +104,7 @@ public class LicencesController implements Initializable, TranslationManager.Lan
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
                 TranslationManager.get("licences.remove.confirm"),
                 btnYes, btnNo);
+        confirm.setHeaderText(TranslationManager.get("licences.remove.header2"));
         confirm.setTitle(TranslationManager.get("licences.remove.title"));
         applyDialogTheme(confirm.getDialogPane());
 

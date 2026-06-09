@@ -18,6 +18,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 
 public class WelcomeController implements Initializable, TranslationManager.LanguageChangeListener {
 
@@ -26,6 +27,7 @@ public class WelcomeController implements Initializable, TranslationManager.Lang
     @FXML private Label lblTaglineTitle;
     @FXML private Label lblTaglineSubtitle;
     @FXML private ImageView imgCity;
+    @FXML private StackPane rootPane;
 
     //si hay credenciales guardadas el botón entra en modo "continuar sesión"
     private boolean hasSession = false;
@@ -50,16 +52,11 @@ public class WelcomeController implements Initializable, TranslationManager.Lang
             URL imageUrl = getClass().getResource("/com/centralcore/image/city.png");
             if (imageUrl == null) return;
 
-            //cargar sin esperar el tamaño completo, el binding lo ajusta
             imgCity.setImage(new Image(imageUrl.toExternalForm(), true));
 
-            //vincular al scene una vez disponible
-            imgCity.sceneProperty().addListener((obs, oldScene, newScene) -> {
-                if (newScene != null) {
-                    imgCity.fitWidthProperty().bind(newScene.widthProperty());
-                    imgCity.fitHeightProperty().bind(newScene.heightProperty());
-                }
-            });
+            imgCity.fitWidthProperty().bind(rootPane.widthProperty());
+            imgCity.fitHeightProperty().bind(rootPane.heightProperty());
+
         } catch (Exception e) {
             System.err.println("error al cargar city.png: " + e.getMessage());
         }
