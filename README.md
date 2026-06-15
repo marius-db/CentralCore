@@ -6,8 +6,8 @@ Desktop application for city administration built on a plugin architecture. The 
 
 Two modules are included out of the box: a citizen records database and a traffic management interface that connects to a simulation server over WebSocket.
 
-The traffic simulator is a separate project: [TrafficSim](https://github.com/marius-db/TrafficSim).
-Licence keys can be generated with the companion tool: [Licencing-gen](https://github.com/marius-db/Licencing-gen).
+The traffic simulator is a separate project: [TrafficSim](https://github.com/NexusLW/TrafficSim).
+Licence keys can be generated with the companion tool: [Licencing-gen](https://github.com/NexusLW/Licencing-gen).
 
 ---
 
